@@ -53,90 +53,63 @@ const FundingSources = () => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch funding sources and overview stats in parallel
-      const [
-        fundingSourceResponse,
-        overviewResponse,
-        fundingByTypeResponse
-      ] = await Promise.all([
-        fundingSourceApi.getAll(),
-        fundingSourceApi.getFundingSourceOverview(),
-        fundingSourceApi.getFundingSourceByType()
-      ]);
-      
-      let sources = [];
-      if (fundingSourceResponse?.status && Array.isArray(fundingSourceResponse.data)) {
-        sources = fundingSourceResponse.data;
-      } else {
-        console.warn('No funding sources data received from API');
-      }
+      // Simplified fetch - only get funding sources
+      const fundingSourceResponse = await fundingSourceApi.getAll();
+      const sources = fundingSourceResponse?.data || [];
       
       setFundingSourcesList(sources);
 
-      // Use API data for stats if available, otherwise calculate from sources
-      if (overviewResponse?.status && overviewResponse.data) {
-        const data = overviewResponse.data;
-        const currentYear = data.current_year || {};
-        
-        // Helper function to calculate percentage change
-        const calculateChange = (total, current, usePercentage = false) => {
-          if (!total || !current || total === current) return "No previous data";
-          const previous = total - current;
-          if (previous <= 0) return "No comparison available";
-          const percentage = ((current / previous) - 1) * 100;
-          return usePercentage ? `${percentage.toFixed(2)}% from last year` : (percentage >= 0 ? `+${percentage.toFixed(2)}% from last year` : `${percentage.toFixed(2)}% from last year`);
-        };
-        
-        setOverviewStats([
-          { 
-            title: "Total Climate Finance", 
-            value: formatCurrency(data.total_climate_finance || 0), 
-            change: currentYear.total_finance ? 
-              calculateChange(data.total_climate_finance, currentYear.total_finance, true) : 
-              "Based on all-time data"
-          },
-          { 
-            title: "Active Funding Sources", 
-            value: data.active_funding_source || 0, 
-            change: currentYear.active_funding_source ? 
-              calculateChange(data.active_funding_source, currentYear.active_funding_source, true) :
-              `Across ${new Set(sources.map(s => s.type).filter(Boolean)).size} categories`
-          },
-          { 
-            title: "Committed Funds", 
-            value: formatCurrency(data.committed_funds || 0), 
-            change: currentYear.committed_funds ? 
-              calculateChange(data.committed_funds, currentYear.committed_funds, true) :
-              `${sources.length} funding sources`
-          },
-          { 
-            title: "Total Projects", 
-            value: data.total_projects || 0, 
-            change: currentYear.total_projects ? 
-              calculateChange(data.total_projects, currentYear.total_projects, true) :
-              "Across all funding sources"
-          }
-        ]);
-      } else {
-        setOverviewStats([]);
-      }
+      // Calculate overview stats from sources
+      const overviewData = {
+        total_climate_finance: sources.reduce((sum, fs) => 
+          sum + (fs.grant_amount || 0) + (fs.loan_amount || 0), 0),
+        active_funding_source: sources.length,
+        committed_funds: sources.reduce((sum, fs) => sum + (fs.grant_amount || 0), 0),
+        disbursed_funds: sources.reduce((sum, fs) => sum + (fs.disbursement || 0), 0)
+      };
 
-      // Set chart data from API or calculate from sources
-      if (fundingByTypeResponse?.status && fundingByTypeResponse.data) {
-        setFundingByType(fundingByTypeResponse.data);
-      } else {
-        setFundingByType([]);
-      }
-
-
-      // Use direct mock trend data
-      setFundingTrend([
-        { year: "2020", grants: 10000000, loans: 5000000, total: 15000000 },
-        { year: "2021", grants: 12000000, loans: 8000000, total: 20000000 },
-        { year: "2022", grants: 15000000, loans: 10000000, total: 25000000 },
-        { year: "2023", grants: 18000000, loans: 12000000, total: 30000000 },
-        { year: "2024", grants: 20000000, loans: 15000000, total: 35000000 }
+      setOverviewStats([
+        {
+          title: "Total Climate Finance",
+          value: formatCurrency(overviewData.total_climate_finance),
+          change: "All-time total"
+        },
+        {
+          title: "Active Funding Sources",
+          value: overviewData.active_funding_source,
+          change: `${new Set(sources.map(s => s.type).filter(Boolean)).size} categories`
+        },
+        {
+          title: "Committed Funds",
+          value: formatCurrency(overviewData.committed_funds),
+          change: `${sources.length} funding sources`
+        },
+        {
+          title: "Disbursed Funds",
+          value: formatCurrency(overviewData.disbursed_funds),
+          change: "Total disbursed"
+        }
       ]);
+
+      // Calculate funding by type
+      const typeData = sources.reduce((acc, fs) => {
+        const type = fs.type || (fs.grant_amount > 0 ? 'Grant' : 'Loan');
+        if (!acc[type]) acc[type] = { count: 0, totalAmount: 0 };
+        acc[type].count++;
+        acc[type].totalAmount += (fs.grant_amount || 0) + (fs.loan_amount || 0);
+        return acc;
+      }, {});
+
+      const fundingByType = Object.entries(typeData).map(([name, data]) => ({
+        name,
+        value: data.totalAmount,
+        count: data.count
+      }));
+      setFundingByType(fundingByType);
+
+
+      // Remove trend chart - set to empty
+      setFundingTrend([]);
 
       setRetryCount(0);
     } catch (error) {
@@ -309,28 +282,6 @@ const FundingSources = () => {
           </Card>
         </div>
 
-        {/* Funding Trend */}
-        <div className="animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-          <Card hover padding={true}>
-            {fundingTrend.length > 0 ? (
-              <LineChartComponent
-                title="Funding Trend"
-                data={fundingTrend}
-                xAxisKey="year"
-                yAxisKey="total"
-                formatYAxis={true}
-                lineName="Total Funding"
-              />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <AlertCircle size={24} className="mx-auto text-gray-400 mb-2" />
-                  <p className="text-gray-600">No trend data available</p>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
       </div>
 
 

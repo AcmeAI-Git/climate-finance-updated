@@ -48,77 +48,32 @@ const AdminDashboard = () => {
             if (response.status && response.data) {
                 const data = response.data;
                 
-                // Helper function for financial metrics (using funding source calculation method)
-                const calculateFinancialChange = (total, current) => {
-                    if (!total || !current || total === current) return "No previous data";
-                    const previous = total - current;
-                    if (previous <= 0) return "No comparison available";
-                    const percentage = ((current / previous) - 1) * 100;
-                    return percentage >= 0 ? `+${percentage.toFixed(2)}% from last year` : `0% from last year`;
-                };
-
-                // Helper function for project count changes (absolute difference)
-                const calculateProjectChange = (current, previous) => {
-                    const curr = current;
-                    const prev = previous;
-                    if (prev === undefined || prev === null || curr === undefined || curr === null) {
-                        return "No comparison available";
-                    }
-                    const diff = curr - prev;
-                    if (diff === 0) return "No change from last year";
-                    return diff > 0
-                        ? `+${diff} from last year`
-                        : `0% from last year`;
-                };
-                
-
-
                 setDashboardStats([
                     {
                         title: getChartTranslation(language, null, 'projectsByStatus'),
                         value: data.total_projects || 0,
-                        change: data.previous_year?.total_projects !== undefined
-                            ? calculateProjectChange(
-                                  data.current_year?.total_projects || 0,
-                                  data.previous_year.total_projects || 0
-                              )
-                            : "Based on all-time data",
+                        change: "All projects",
                         color: "primary",
                         icon: <FolderTree size={20} />,
                     },
                     {
                         title: getChartTranslation(language, null, 'projectsByType'),
                         value: data.active_projects || 0,
-                        change: data.previous_year?.active_projects !== undefined
-                            ? calculateProjectChange(
-                                  data.current_year?.active_projects || 0,
-                                  data.previous_year.active_projects || 0
-                              )
-                            : "Based on all-time data",
+                        change: "Currently active",
                         color: "success",
                         icon: <Activity size={20} />,
                     },
                     {
                         title: getChartTranslation(language, null, 'fundingByType'),
                         value: formatCurrency(data.total_climate_finance || 0),
-                        change: data.current_year?.total_climate_finance ? 
-                            calculateFinancialChange(
-                                data.total_climate_finance || 0,
-                                data.current_year.total_climate_finance || 0
-                            ) : 
-                            "Based on all-time data",
+                        change: "All-time total",
                         color: "warning",
                         icon: <Banknote size={20} />,
                     },
                     {
-                        title: language === 'bn' ? 'অ্যাডাপটেশন ফাইন্যান্স' : 'Adaptation Finance',
-                        value: formatCurrency(data.adaptation_finance || 0),
-                        change: data.current_year?.adaptation_finance ? 
-                            calculateFinancialChange(
-                                data.adaptation_finance || 0,
-                                data.current_year.adaptation_finance || 0
-                            ) : 
-                            "Based on all-time data",
+                        title: language === 'bn' ? 'সম্পূর্ণ প্রকল্প' : 'Completed Projects',
+                        value: data.completed_projects || 0,
+                        change: "Successfully completed",
                         color: "primary",
                         icon: <DollarSign size={20} />,
                     },

@@ -83,58 +83,52 @@ const Projects = () => {
       setError(null);
       const [
         projectsResponse,
-        overviewResponse,
         statusResponse,
         trendResponse
       ] = await Promise.all([
         projectApi.getAll(),
-        projectApi.getProjectsOverviewStats(),
         projectApi.getByStatus(),
         projectApi.getTrend()
       ]);
+      
       if (projectsResponse?.status && Array.isArray(projectsResponse.data)) {
         setProjectsList(projectsResponse.data);
         setFilteredProjects(projectsResponse.data);
-      } else {
-        setProjectsList([]);
-        setFilteredProjects([]);
-      }
-
-      if (overviewResponse?.status && overviewResponse.data) {
-        const data = overviewResponse.data;
-        const currentYear = data.current_year || {};
-        const calculateChange = (total, current) => {
-          const previous = total - current;
-          if (!total || !current || previous <= 0 || current === 0) return "No comparison available";
-          const percentage = ((current / previous) - 1) * 100;
-          return percentage >= 0 ? `+${percentage.toFixed(2)}% from last year` : `${percentage.toFixed(2)}% from last year`;
+        
+        // Calculate stats from projects
+        const projects = projectsResponse.data;
+        const overviewData = {
+          total_projects: projects.length,
+          active_projects: projects.filter(p => p.status === 'Active').length,
+          total_investment: projects.reduce((sum, p) => sum + (p.total_cost_usd || 0), 0),
+          completed_projects: projects.filter(p => p.status === 'Completed' || p.status === 'Implemented').length
         };
 
         setOverviewStats([
           {
             title: "Total Projects",
-            value: data.total_projects || 0,
-            change: calculateChange(data.total_projects, currentYear.total_projects)
+            value: overviewData.total_projects,
+            change: "All projects"
           },
           {
             title: "Active Projects",
-            value: data.active_projects || 0,
-            change: calculateChange(data.active_projects, currentYear.active_projects)
+            value: overviewData.active_projects,
+            change: "Currently active"
           },
           {
             title: "Total Investment",
-            value: formatCurrency(data.total_investment || 0),
-            change: calculateChange(data.total_investment, currentYear.total_investment)
+            value: formatCurrency(overviewData.total_investment),
+            change: "Total funding"
           },
           {
             title: "Completed Projects",
-            value: data.completed_projects || 0,
-            change: currentYear.completed_projects ? 
-              calculateChange(data.completed_projects, currentYear.completed_projects) : 
-              "Based on all-time data"
+            value: overviewData.completed_projects,
+            change: "Successfully completed"
           }
         ]);
       } else {
+        setProjectsList([]);
+        setFilteredProjects([]);
         setOverviewStats([]);
       }
 

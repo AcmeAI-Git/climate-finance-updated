@@ -251,15 +251,32 @@ const ProjectFormPage = ({
       
       // Calculate WASH finance based on WASH component presence and total cost
       const washFinance = formData.wash_component.presence 
-        ? totalCost * (
-            (formData.wash_component.water_supply_percent || 0) + 
-            (formData.wash_component.sanitation_percent || 0) + 
-            (formData.wash_component.public_admin_percent || 0)
-          ) / 100
+        ? totalCost * (formData.wash_component.wash_percentage || 0) / 100
         : 0;
       
       // Calculate WASH finance percentage
       const washFinancePercent = totalCost > 0 ? (washFinance / totalCost) * 100 : 0;
+
+      // ✅ FIX 1: Convert districts to location_ids
+      const location_ids = [];
+      if (formData.districts && formData.districts.length > 0) {
+        const allLocationsResponse = await locationApi.getAll();
+        const locations = allLocationsResponse.data || [];
+        
+        for (const districtName of formData.districts) {
+          let location = locations.find(l => l.name === districtName);
+          
+          if (!location) {
+            const newLocationResponse = await locationApi.add({
+              name: districtName,
+              region: formData.geographic_division
+            });
+            location = newLocationResponse.data;
+          }
+          
+          location_ids.push(location.location_id);
+        }
+      }
 
       // Create clean project data object
       const projectData = {
@@ -280,15 +297,15 @@ const ProjectFormPage = ({
           wash_percentage: formData.wash_component.wash_percentage || 0,
           description: formData.wash_component_description || ''
         },
-        // Transform relationship arrays to match backend expectations
+        // ✅ FIXED relationship IDs:
         agency_ids: formData.agencies || [],
         funding_source_ids: formData.funding_sources || [],
-        focal_area_ids: formData.focal_areas || [],
+        location_ids: location_ids,           // ✅ Converted from districts
+        sdg_ids: formData.alignment_sdg || [], // ✅ Renamed
+        // Removed focal_area_ids
+        
         submitter_email: formData.submitter_email,
-        // New geographic location fields
         geographic_division: formData.geographic_division,
-        districts: formData.districts || [],
-        // New fields for client requirements
         hotspot_vulnerability_type: formData.hotspot_vulnerability_type,
         wash_component_description: formData.wash_component_description,
         direct_beneficiaries: parseInt(formData.direct_beneficiaries) || 0,
@@ -298,9 +315,11 @@ const ProjectFormPage = ({
         equity_marker: formData.equity_marker,
         equity_marker_description: formData.equity_marker_description,
         assessment: formData.assessment,
-        alignment_sdg: formData.alignment_sdg || [],
         alignment_nap: formData.alignment_nap,
-        alignment_cff: formData.alignment_cff
+        alignment_cff: formData.alignment_cff,
+        climate_relevance_score: parseFloat(formData.climate_relevance_score) || 0,
+        climate_relevance_category: formData.climate_relevance_category || '',
+        climate_relevance_justification: formData.climate_relevance_justification || ''
       };
 
       if (actualMode === 'public') {

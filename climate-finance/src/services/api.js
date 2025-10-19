@@ -15,8 +15,11 @@ const createResponse = (data, message = 'Success') => ({
 });
 
 // Base API configuration
-// const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://climate-finance.onrender.com';
-const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://climate-finance.onrender.com';
+// const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
+
+// Mock data fallback control - DISABLED for production
+const ENABLE_MOCK_FALLBACK = false;
 
 // Generic API request function with error handling, timeout, and mock data fallback
 const apiRequest = async (endpoint, options = {}) => {
@@ -24,7 +27,7 @@ const apiRequest = async (endpoint, options = {}) => {
   
   // Create AbortController for timeout
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout for faster fallback
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for production
   
   const config = {
     headers: {
@@ -60,11 +63,13 @@ const apiRequest = async (endpoint, options = {}) => {
     clearTimeout(timeoutId);
     console.warn(`API request failed for ${endpoint}, falling back to mock data:`, error.message);
     
-    // Fallback to mock data for connection errors
-    if (error.name === 'AbortError' || 
+    // Fallback to mock data for connection errors (if enabled)
+    if (ENABLE_MOCK_FALLBACK && (
+        error.name === 'AbortError' || 
         (error.name === 'TypeError' && error.message.includes('fetch')) ||
         error.message.includes('Failed to fetch') ||
-        error.message.includes('Connection refused')) {
+        error.message.includes('Connection refused')
+    )) {
       
       // Return mock data based on endpoint
       return getMockDataForEndpoint(endpoint, options);
