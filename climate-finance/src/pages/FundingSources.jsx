@@ -83,11 +83,6 @@ const FundingSources = () => {
           title: "Committed Funds",
           value: formatCurrency(overviewData.committed_funds),
           change: `${sources.length} funding sources`
-        },
-        {
-          title: "Disbursed Funds",
-          value: formatCurrency(overviewData.disbursed_funds),
-          change: "Total disbursed"
         }
       ]);
 
@@ -228,9 +223,9 @@ const FundingSources = () => {
 
       {/* Overview Stats */}
       {overviewStats.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {overviewStats.map((stat, index) => {
-            const icons = [<DollarSign size={20} />, <Building size={20} />, <TrendingUp size={20} />, <CheckCircle size={20} />];
+            const icons = [<DollarSign size={20} />, <Building size={20} />, <TrendingUp size={20} />];
             return (
               <div 
                 key={index}
@@ -260,8 +255,8 @@ const FundingSources = () => {
       )}
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 mb-6">
-        {/* Funding by Type */}
+      <div className="mb-6">
+        {/* Funding by Type - Full Width */}
         <div className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Card hover padding={true}>
             {fundingByType.length > 0 ? (
@@ -281,7 +276,6 @@ const FundingSources = () => {
             )}
           </Card>
         </div>
-
       </div>
 
 
@@ -366,7 +360,7 @@ const FundingSources = () => {
                       )}
                       
                       <div className="text-sm text-gray-500">
-                        {source.description || 'Climate finance funding source'}
+                        {source.description || `${source.type || 'Funding'} organization supporting climate finance initiatives`}
                       </div>
                     </div>
                   </div>

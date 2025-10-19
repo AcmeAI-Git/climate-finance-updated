@@ -48,21 +48,6 @@ const AdminProjects = () => {
       statusType: 'project'
     },
     {
-      key: 'type',
-      header: 'Type',
-      render: (value) => {
-        if (!value) return '-';
-        const colorClass = value === 'Adaptation' ? 'bg-blue-100 text-blue-800' : 
-                          value === 'Mitigation' ? 'bg-green-100 text-green-800' : 
-                          'bg-purple-100 text-purple-800';
-        return (
-          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${colorClass}`}>
-            {getChartTranslation('en', 'mitigationType', value)}
-          </span>
-        );
-      }
-    },
-    {
       key: 'total_cost_usd',
       header: 'Total Cost',
       type: 'currency'
@@ -86,9 +71,7 @@ const AdminProjects = () => {
     }
 
     // Create unique option arrays using the actual fields available
-    const sectors = Array.from(new Set(projectsList.map(p => p.sector).filter(Boolean))).sort();
-    const types = Array.from(new Set(projectsList.map(p => p.type).filter(Boolean))).sort();
-    const divisions = Array.from(new Set(projectsList.map(p => p.division).filter(Boolean))).sort();
+    const divisions = Array.from(new Set(projectsList.map(p => p.geographic_division).filter(Boolean))).sort();
     const statuses = Array.from(new Set(projectsList.map(p => p.status).filter(Boolean))).sort();
 
     return [
@@ -101,23 +84,7 @@ const AdminProjects = () => {
         ]
       },
       {
-        key: 'type',
-        defaultValue: 'All',
-        options: [
-          { value: 'All', label: 'All Types' },
-          ...types.map(type => ({ value: type, label: getChartTranslation('en', 'mitigationType', type) }))
-        ]
-      },
-      {
-        key: 'sector',
-        defaultValue: 'All',
-        options: [
-          { value: 'All', label: 'All Sectors' },
-          ...sectors.map(sector => ({ value: sector, label: sector }))
-        ]
-      },
-      {
-        key: 'division',
+        key: 'geographic_division',
         defaultValue: 'All',
         options: [
           { value: 'All', label: 'All Divisions' },

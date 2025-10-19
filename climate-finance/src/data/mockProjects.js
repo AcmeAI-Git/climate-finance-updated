@@ -86,10 +86,6 @@ export const mockProjects = [
       {"funding_source_id": 3, "name": "Asian Development Bank", "dev_partner": "ADB", "loan_amount": 12000000},
       {"funding_source_id": 4, "name": "KfW Development Bank", "dev_partner": "KfW", "grant_amount": 6000000}
     ],
-    "focal_areas": [
-      {"focal_area_id": 3, "name": "Renewable Energy"},
-      {"focal_area_id": 4, "name": "Energy Efficiency"}
-    ],
     "wash_component": {
       "presence": false,
       "wash_percentage": 0,
@@ -136,10 +132,6 @@ export const mockProjects = [
     "funding_sources": [
       {"funding_source_id": 5, "name": "European Union", "dev_partner": "EU", "grant_amount": 20000000},
       {"funding_source_id": 6, "name": "Agence Française de Développement", "dev_partner": "AFD", "loan_amount": 12000000}
-    ],
-    "focal_areas": [
-      {"focal_area_id": 5, "name": "Urban Climate Adaptation"},
-      {"focal_area_id": 6, "name": "Green Infrastructure"}
     ],
     "wash_component": {
       "presence": true,
@@ -188,10 +180,6 @@ export const mockProjects = [
       {"funding_source_id": 7, "name": "International Fund for Agricultural Development", "dev_partner": "IFAD", "grant_amount": 18000000},
       {"funding_source_id": 8, "name": "Japan International Cooperation Agency", "dev_partner": "JICA", "loan_amount": 10000000}
     ],
-    "focal_areas": [
-      {"focal_area_id": 7, "name": "Climate-Smart Agriculture"},
-      {"focal_area_id": 8, "name": "Food Security"}
-    ],
     "wash_component": {
       "presence": false,
       "wash_percentage": 0,
@@ -238,10 +226,6 @@ export const mockProjects = [
     "funding_sources": [
       {"funding_source_id": 9, "name": "Global Environment Facility", "dev_partner": "GEF", "grant_amount": 14000000},
       {"funding_source_id": 10, "name": "Norway International Climate and Forest Initiative", "dev_partner": "NICFI", "grant_amount": 8000000}
-    ],
-    "focal_areas": [
-      {"focal_area_id": 9, "name": "Forest Conservation"},
-      {"focal_area_id": 10, "name": "Biodiversity Protection"}
     ],
     "wash_component": {
       "presence": false,
@@ -290,10 +274,6 @@ export const mockProjects = [
       {"funding_source_id": 11, "name": "United Nations Office for Disaster Risk Reduction", "dev_partner": "UNDRR", "grant_amount": 10000000},
       {"funding_source_id": 12, "name": "Swiss Agency for Development and Cooperation", "dev_partner": "SDC", "grant_amount": 5000000}
     ],
-    "focal_areas": [
-      {"focal_area_id": 11, "name": "Disaster Risk Reduction"},
-      {"focal_area_id": 12, "name": "Early Warning Systems"}
-    ],
     "wash_component": {
       "presence": true,
       "wash_percentage": 25,
@@ -319,34 +299,163 @@ export const mockAgencies = [
   { agency_id: 12, name: "Bangladesh Red Crescent Society", type: "NGO" }
 ];
 
-// Mock funding sources data
+// Mock funding sources data with complete realistic information
 export const mockFundingSources = [
-  { funding_source_id: 1, name: "Green Climate Fund", dev_partner: "GCF", grant_amount: 15000000, loan_amount: 0 },
-  { funding_source_id: 2, name: "World Bank", dev_partner: "WB", grant_amount: 0, loan_amount: 10000000 },
-  { funding_source_id: 3, name: "Asian Development Bank", dev_partner: "ADB", grant_amount: 0, loan_amount: 12000000 },
-  { funding_source_id: 4, name: "KfW Development Bank", dev_partner: "KfW", grant_amount: 6000000, loan_amount: 0 },
-  { funding_source_id: 5, name: "European Union", dev_partner: "EU", grant_amount: 20000000, loan_amount: 0 },
-  { funding_source_id: 6, name: "Agence Française de Développement", dev_partner: "AFD", grant_amount: 0, loan_amount: 12000000 },
-  { funding_source_id: 7, name: "International Fund for Agricultural Development", dev_partner: "IFAD", grant_amount: 18000000, loan_amount: 0 },
-  { funding_source_id: 8, name: "Japan International Cooperation Agency", dev_partner: "JICA", grant_amount: 0, loan_amount: 10000000 },
-  { funding_source_id: 9, name: "Global Environment Facility", dev_partner: "GEF", grant_amount: 14000000, loan_amount: 0 },
-  { funding_source_id: 10, name: "Norway International Climate and Forest Initiative", dev_partner: "NICFI", grant_amount: 8000000, loan_amount: 0 },
-  { funding_source_id: 11, name: "United Nations Office for Disaster Risk Reduction", dev_partner: "UNDRR", grant_amount: 10000000, loan_amount: 0 },
-  { funding_source_id: 12, name: "Swiss Agency for Development and Cooperation", dev_partner: "SDC", grant_amount: 5000000, loan_amount: 0 }
+  { 
+    funding_source_id: 1, 
+    name: "Green Climate Fund", 
+    dev_partner: "GCF", 
+    type: "Climate Fund",
+    grant_amount: 15000000, 
+    loan_amount: 0,
+    counterpart_funding: 5000000,
+    disbursement: 0,
+    non_grant_instrument: "Readiness Support",
+    description: "The world's largest climate fund dedicated to helping developing countries reduce their greenhouse gas emissions and enhance their ability to respond to climate change.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 2, 
+    name: "World Bank", 
+    dev_partner: "WB", 
+    type: "Multilateral",
+    grant_amount: 0, 
+    loan_amount: 10000000,
+    counterpart_funding: 2000000,
+    disbursement: 0,
+    non_grant_instrument: "Concessional Loans",
+    description: "International financial institution providing loans and grants to developing countries for capital projects and policy reforms.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 3, 
+    name: "Asian Development Bank", 
+    dev_partner: "ADB", 
+    type: "Multilateral",
+    grant_amount: 0, 
+    loan_amount: 12000000,
+    counterpart_funding: 3000000,
+    disbursement: 0,
+    non_grant_instrument: "Technical Assistance",
+    description: "Regional development bank focused on promoting social and economic development in Asia and the Pacific.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 4, 
+    name: "KfW Development Bank", 
+    dev_partner: "KfW", 
+    type: "Bilateral",
+    grant_amount: 6000000, 
+    loan_amount: 0,
+    counterpart_funding: 1500000,
+    disbursement: 0,
+    non_grant_instrument: "Development Cooperation",
+    description: "German development bank supporting sustainable development and climate protection worldwide.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 5, 
+    name: "European Union", 
+    dev_partner: "EU", 
+    type: "Multilateral",
+    grant_amount: 20000000, 
+    loan_amount: 0,
+    counterpart_funding: 5000000,
+    disbursement: 0,
+    non_grant_instrument: "Blending Facilities",
+    description: "Political and economic union providing development assistance and climate finance to partner countries.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 6, 
+    name: "Agence Française de Développement", 
+    dev_partner: "AFD", 
+    type: "Bilateral",
+    grant_amount: 0, 
+    loan_amount: 12000000,
+    counterpart_funding: 2000000,
+    disbursement: 0,
+    non_grant_instrument: "Concessional Finance",
+    description: "French development agency financing and supporting projects that improve living conditions and promote sustainable development.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 7, 
+    name: "International Fund for Agricultural Development", 
+    dev_partner: "IFAD", 
+    type: "Multilateral",
+    grant_amount: 18000000, 
+    loan_amount: 0,
+    counterpart_funding: 4000000,
+    disbursement: 0,
+    non_grant_instrument: "Rural Development",
+    description: "Specialized UN agency focused on eradicating rural poverty and hunger through agricultural development.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 8, 
+    name: "Japan International Cooperation Agency", 
+    dev_partner: "JICA", 
+    type: "Bilateral",
+    grant_amount: 0, 
+    loan_amount: 10000000,
+    counterpart_funding: 2500000,
+    disbursement: 0,
+    non_grant_instrument: "Technical Cooperation",
+    description: "Japanese government agency providing development assistance through technical cooperation, loans, and grants.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 9, 
+    name: "Global Environment Facility", 
+    dev_partner: "GEF", 
+    type: "Climate Fund",
+    grant_amount: 14000000, 
+    loan_amount: 0,
+    counterpart_funding: 3500000,
+    disbursement: 0,
+    non_grant_instrument: "Trust Fund",
+    description: "Partnership of 18 agencies providing grants for projects related to biodiversity, climate change, and sustainable development.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 10, 
+    name: "Norway International Climate and Forest Initiative", 
+    dev_partner: "NICFI", 
+    type: "Bilateral",
+    grant_amount: 8000000, 
+    loan_amount: 0,
+    counterpart_funding: 2000000,
+    disbursement: 0,
+    non_grant_instrument: "Results-Based Payments",
+    description: "Norwegian government initiative supporting efforts to reduce greenhouse gas emissions from deforestation and forest degradation.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 11, 
+    name: "United Nations Office for Disaster Risk Reduction", 
+    dev_partner: "UNDRR", 
+    type: "Multilateral",
+    grant_amount: 10000000, 
+    loan_amount: 0,
+    counterpart_funding: 2000000,
+    disbursement: 0,
+    non_grant_instrument: "Capacity Building",
+    description: "UN office coordinating disaster risk reduction efforts and building resilience to disasters worldwide.",
+    active_projects: 1
+  },
+  { 
+    funding_source_id: 12, 
+    name: "Swiss Agency for Development and Cooperation", 
+    dev_partner: "SDC", 
+    type: "Bilateral",
+    grant_amount: 5000000, 
+    loan_amount: 0,
+    counterpart_funding: 1000000,
+    disbursement: 0,
+    non_grant_instrument: "Humanitarian Aid",
+    description: "Swiss government agency providing development cooperation and humanitarian aid to reduce poverty and global risks.",
+    active_projects: 1
+  }
 ];
 
-// Mock focal areas data
-export const mockFocalAreas = [
-  { focal_area_id: 1, name: "Climate Change Adaptation" },
-  { focal_area_id: 2, name: "Water Resources Management" },
-  { focal_area_id: 3, name: "Renewable Energy" },
-  { focal_area_id: 4, name: "Energy Efficiency" },
-  { focal_area_id: 5, name: "Urban Climate Adaptation" },
-  { focal_area_id: 6, name: "Green Infrastructure" },
-  { focal_area_id: 7, name: "Climate-Smart Agriculture" },
-  { focal_area_id: 8, name: "Food Security" },
-  { focal_area_id: 9, name: "Forest Conservation" },
-  { focal_area_id: 10, name: "Biodiversity Protection" },
-  { focal_area_id: 11, name: "Disaster Risk Reduction" },
-  { focal_area_id: 12, name: "Early Warning Systems" }
-];

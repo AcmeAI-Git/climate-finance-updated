@@ -55,7 +55,6 @@ export const projectService = {
       // Add aliases for ProjectDetails compatibility
       projectAgencies: project.agencies || [],
       projectFundingSources: project.funding_sources || [],
-      projectFocalAreas: project.focal_areas || [],
       projectLocations: project.districts ? project.districts.map(district => ({ name: district })) : []
     };
     

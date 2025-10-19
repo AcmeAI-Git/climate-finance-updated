@@ -110,7 +110,7 @@ const AdminListPage = ({
   const handleDelete = async (item) => {
     try {
       // Handle different ID field names for different entities
-      const id = item.id || item[`${entityName}_id`] || item.project_id || item.agency_id || item.location_id || item.focal_area_id || item.funding_source_id;
+      const id = item.id || item[`${entityName}_id`] || item.project_id || item.agency_id || item.location_id || item.funding_source_id;
       await apiService.delete(id);
       await fetchData();
       setDeleteModal({ isOpen: false, item: null });
@@ -165,8 +165,6 @@ const AdminListPage = ({
           id = row.location_id;
         } else if (entityName === 'funding-source') {
           id = row.funding_source_id;
-        } else if (entityName === 'focal-area') {
-          id = row.focal_area_id;
         } else if (entityName === 'user') {
           id = row.id;
         } else {

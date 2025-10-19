@@ -14,20 +14,111 @@ const createResponse = (data, message = 'Success') => ({
   data
 });
 
+// Helper function to check if mock data exists for an endpoint
+const hasMockDataForEndpoint = (endpoint) => {
+  const mockEndpoints = [
+    '/project/all-project',
+    '/project/get/',
+    '/project/projectsOverviewStats',
+    '/project/get-project-by-status',
+    '/project/get-project-by-trend',
+    '/project/get-regional-distribution',
+    '/project/get-overview-stat',
+    '/project/add-project',
+    '/project/update/',
+    '/project/delete/',
+    '/agency/all',
+    '/agency/get/',
+    '/funding-source/all',
+    '/funding-source/get/',
+    '/project/get-funding-source-by-type',
+    '/project/get-funding-source-overview',
+    '/project/get-funding-source-trend',
+    '/project/get-funding-source',
+    '/auth/login'
+  ];
+  
+  return mockEndpoints.some(mockEndpoint => endpoint.includes(mockEndpoint));
+};
+
+// Helper function to check if backend response contains actual data
+const hasData = (responseData) => {
+  if (!responseData || !responseData.status) return false;
+  
+  const data = responseData.data;
+  if (!data) return false;
+  
+  // Check if it's an array with items
+  if (Array.isArray(data)) {
+    return data.length > 0;
+  }
+  
+  // Check if it's an object with meaningful content
+  if (typeof data === 'object') {
+    return Object.keys(data).length > 0;
+  }
+  
+  // Check if it's a primitive value that's not null/undefined
+  return data !== null && data !== undefined;
+};
+
 // Base API configuration
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://climate-finance.onrender.com';
 // const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
 
-// Mock data fallback control - DISABLED for production
-const ENABLE_MOCK_FALLBACK = false;
+// Environment configuration
+const USE_BACKEND_ONLY = import.meta.env.VITE_USE_BACKEND_ONLY === 'true';
 
-// Generic API request function with error handling, timeout, and mock data fallback
+// Mock data fallback control - ENABLED for development (no database yet)
+const ENABLE_MOCK_FALLBACK = true;
+
+// Generic API request function with mock data first, then backend fallback
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${BASE_URL}/api${endpoint}`;
   
+  // If USE_BACKEND_ONLY is true, skip mock data entirely
+  if (USE_BACKEND_ONLY) {
+    return await makeBackendRequest(url, endpoint, options);
+  }
+  
+  // Check if mock data exists for this endpoint
+  if (ENABLE_MOCK_FALLBACK && hasMockDataForEndpoint(endpoint)) {
+    try {
+      // Get mock data first
+      const mockData = await getMockDataForEndpoint(endpoint, options);
+      
+      // Check if backend is available and has data
+      try {
+        const backendData = await makeBackendRequest(url, endpoint, options);
+        
+        // If backend has actual data, use it instead of mock
+        if (hasData(backendData)) {
+          console.log(`Backend has data for ${endpoint}, using backend data`);
+          return backendData;
+        }
+      } catch (backendError) {
+        // Backend not available or has no data, use mock
+        console.log(`Backend unavailable for ${endpoint}, using mock data:`, backendError.message);
+      }
+      
+      // Use mock data
+      return mockData;
+    } catch (mockError) {
+      console.error(`Mock data failed for ${endpoint}:`, mockError.message);
+      // Fallback to backend attempt
+      return await makeBackendRequest(url, endpoint, options);
+    }
+  }
+  
+  // For endpoints without mock data, try backend directly
+  return await makeBackendRequest(url, endpoint, options);
+};
+
+// Helper function to make backend requests
+const makeBackendRequest = async (url, endpoint, options = {}) => {
   // Create AbortController for timeout
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for production
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
   
   const config = {
     headers: {
@@ -61,20 +152,6 @@ const apiRequest = async (endpoint, options = {}) => {
   } catch (error) {
     // Clear timeout on error
     clearTimeout(timeoutId);
-    console.warn(`API request failed for ${endpoint}, falling back to mock data:`, error.message);
-    
-    // Fallback to mock data for connection errors (if enabled)
-    if (ENABLE_MOCK_FALLBACK && (
-        error.name === 'AbortError' || 
-        (error.name === 'TypeError' && error.message.includes('fetch')) ||
-        error.message.includes('Failed to fetch') ||
-        error.message.includes('Connection refused')
-    )) {
-      
-      // Return mock data based on endpoint
-      return getMockDataForEndpoint(endpoint, options);
-    }
-    
     throw error;
   }
 };
@@ -168,13 +245,6 @@ const getMockDataForEndpoint = async (endpoint, options = {}) => {
     return fundingSourceService.getAll();
   }
   
-  // Focal area endpoints
-  if (endpoint.includes('/focal-area/all')) {
-    return createResponse([], 'Focal areas not available');
-  }
-  if (endpoint.includes('/focal-area/get/')) {
-    return createResponse({}, 'Focal area not found');
-  }
   
   // Auth endpoints
   if (endpoint.includes('/auth/login')) {
@@ -352,35 +422,6 @@ export const fundingSourceApi = {
   getFundingSource: () => apiRequest('/project/get-funding-source'),
 };
 
-// Focal Area API endpoints
-export const focalAreaApi = {
-  getAll: () => apiRequest('/focal-area/all'),
-  getById: (id) => {
-    if (!id) throw new Error('Focal area ID is required');
-    return apiRequest(`/focal-area/get/${id}`);
-  },
-  add: (focalAreaData) => {
-    if (!focalAreaData || !focalAreaData.name) throw new Error('Focal area name is required');
-    return apiRequest('/focal-area/add-focal-area', {
-      method: 'POST',
-      body: JSON.stringify(focalAreaData),
-    });
-  },
-  update: (id, focalAreaData) => {
-    if (!id) throw new Error('Focal area ID is required');
-    if (!focalAreaData) throw new Error('Focal area data is required');
-    return apiRequest(`/focal-area/update/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(focalAreaData),
-    });
-  },
-  delete: (id) => {
-    if (!id) throw new Error('Focal area ID is required');
-    return apiRequest(`/focal-area/delete/${id}`, {
-      method: 'DELETE',
-    });
-  },
-};
 
 // Auth API endpoints
 export const authApi = {

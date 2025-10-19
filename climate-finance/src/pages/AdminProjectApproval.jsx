@@ -222,16 +222,6 @@ const AdminProjectApproval = () => {
                 subtitle={`By: ${project.submitter_email}`}
                 badge={
                   <div className="flex flex-wrap gap-1">
-                    {project.type && (
-                      <Badge variant="info" size="sm">
-                        {project.type}
-                      </Badge>
-                    )}
-                    {project.sector && (
-                      <Badge variant="success" size="sm">
-                        {project.sector}
-                      </Badge>
-                    )}
                     {project.status && (
                       <Badge variant="warning" size="sm">
                         {project.status}

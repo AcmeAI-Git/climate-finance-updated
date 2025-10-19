@@ -169,14 +169,14 @@ const FundingSourceDetails = () => {
       </div>
       
       <div className="layout-container">
-        {/* Main Funding Source Card - Fixed Typography & Colors */}
+        {/* Main Funding Source Card */}
         <Card className="mb-6" padding="p-4 sm:p-6">
           {/* Top Bar: Type, ID, Export */}
           <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <span className={`text-sm px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${getTypeColor(source.type)}`}>
                 {getTypeIcon(source.type)}
-                {source.type || 'Unknown'}
+                {source.type || 'Funding Source'}
               </span>
               <span className="text-sm text-gray-500 font-medium">#{source.funding_source_id || source.id}</span>
             </div>
@@ -204,24 +204,23 @@ const FundingSourceDetails = () => {
                 {source.name}
               </h1>
               <p className="text-base text-gray-600 leading-relaxed">
-                {source.description || `${source.type || 'Unknown'} funding organization supporting climate finance initiatives in Bangladesh.`}
+                {source.description || `${source.type || 'Funding'} organization supporting climate finance initiatives in Bangladesh.`}
               </p>
             </div>
           </div>
 
-          {/* Key Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-gray-50 rounded-xl">
+          {/* Key Metrics Grid - 3 columns properly justified */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
             <div className="text-center">
               <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Committed</div>
-              <div className="text-base sm:text-lg font-bold text-gray-900">
+              <div className="text-lg font-bold text-gray-900">
                 {formatCurrency(source.total_committed || source.grant_amount || 0)}
               </div>
             </div>
             
-            
             <div className="text-center">
               <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Projects</div>
-              <div className="text-base sm:text-lg font-bold text-primary-600">
+              <div className="text-lg font-bold text-primary-600">
                 {source.active_projects || 0} Active
               </div>
             </div>
@@ -234,46 +233,74 @@ const FundingSourceDetails = () => {
             </div>
           </div>
 
-
-          {/* Sectors - Horizontal Tags */}
-          {source.sectors && Array.isArray(source.sectors) && source.sectors.length > 0 && (
-            <div>
-              <div className="text-base font-semibold text-gray-800 mb-3">Focus Sectors:</div>
-              <div className="flex flex-wrap gap-2">
-                {source.sectors.slice(0, 8).map((sector, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-2 bg-primary-100 text-primary-800 text-sm rounded-lg font-medium"
-                  >
-                    {sector}
-                  </span>
-                ))}
-                {source.sectors.length > 8 && (
-                  <span className="px-3 py-2 bg-gray-100 text-gray-600 text-sm rounded-lg font-medium">
-                    +{source.sectors.length - 8} more
-                  </span>
+          {/* Funding Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Funding Information</h3>
+              <div className="space-y-2">
+                {source.grant_amount > 0 && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Grant Amount</span>
+                    <span className="text-sm font-semibold text-green-600">
+                      {formatCurrency(source.grant_amount)}
+                    </span>
+                  </div>
+                )}
+                {source.loan_amount > 0 && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Loan Amount</span>
+                    <span className="text-sm font-semibold text-blue-600">
+                      {formatCurrency(source.loan_amount)}
+                    </span>
+                  </div>
+                )}
+                {source.counterpart_funding > 0 && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Counterpart Funding</span>
+                    <span className="text-sm font-semibold text-purple-600">
+                      {formatCurrency(source.counterpart_funding)}
+                    </span>
+                  </div>
+                )}
+                {source.non_grant_instrument && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Non-Grant Instrument</span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {source.non_grant_instrument}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
-          )}
-        </Card>
 
-        {/* Financial Summary */}
-        <Card className="mb-6" padding="p-4 sm:p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Financial Summary</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-primary-50 rounded-lg border border-primary-100">
-              <div className="text-sm text-gray-600 font-medium mb-2">Total Committed</div>
-              <div className="text-xl font-bold text-primary-700">
-                {formatCurrency(source.total_committed || source.grant_amount || 0)}
+            {/* Projects List if available */}
+            {source.projects && Array.isArray(source.projects) && source.projects.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Associated Projects</h3>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {source.projects.slice(0, 5).map((project, index) => (
+                    <div key={index} className="p-3 bg-white border border-gray-200 rounded-lg">
+                      <div className="font-medium text-sm text-gray-900 mb-1">{project.title}</div>
+                      <div className="flex justify-between items-center text-xs text-gray-500">
+                        <span>FY {project.approval_fy}</span>
+                        <span className={`px-2 py-1 rounded-full ${
+                          project.status === 'Active' ? 'bg-green-100 text-green-800' : 
+                          project.status === 'Completed' ? 'bg-blue-100 text-blue-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  {source.projects.length > 5 && (
+                    <div className="text-center text-sm text-gray-500 py-2">
+                      +{source.projects.length - 5} more projects
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="text-center p-4 bg-success-50 rounded-lg border border-success-100">
-              <div className="text-sm text-gray-600 font-medium mb-2">Active Projects</div>
-              <div className="text-xl font-bold text-success-700">
-                {source.active_projects || 0}
-              </div>
-            </div>
+            )}
           </div>
         </Card>
       </div>

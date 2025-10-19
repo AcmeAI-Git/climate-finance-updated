@@ -33,7 +33,6 @@ const AdminFormPage = ({
   const pluralize = (word) => {
     const pluralRules = {
       'agency': 'agencies',
-      'focal-area': 'focal-areas',
       'funding-source': 'funding-sources',
       'location': 'locations',
       'user': 'users',

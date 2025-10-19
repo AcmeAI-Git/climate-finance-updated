@@ -52,7 +52,6 @@ const ProjectDetails = () => {
         projectAgencies: projectData.agencies || [],
         projectLocations: projectData.locations || [],
         projectFundingSources: projectData.funding_sources || [],
-        projectFocalAreas: projectData.focal_areas || []
       };
 
       setProject(enrichedProject);
@@ -317,27 +316,6 @@ const ProjectDetails = () => {
             )}
           </Card>
 
-          {/* Focal Areas */}
-          <Card padding="p-4 sm:p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Focal Areas</h3>
-            {Array.isArray(project.projectFocalAreas) && project.projectFocalAreas.length > 0 ? (
-              <div className="space-y-3">
-                {project.projectFocalAreas.map((area, index) => (
-                  <div
-                    key={index}
-                    className="p-3 bg-primary-50 rounded-lg border border-primary-100"
-                  >
-                    <div className="font-medium text-gray-900">{area.name}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <CheckCircle size={24} className="mx-auto mb-2" />
-                <p className="font-medium">No focal areas</p>
-              </div>
-            )}
-          </Card>
         </div>
 
 

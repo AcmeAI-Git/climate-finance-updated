@@ -165,3 +165,8 @@ coverage/
 # Backup files
 *.bak
 *.backup
+
+# Test data and analysis files
+test/
+*.xlsx
+*.xls

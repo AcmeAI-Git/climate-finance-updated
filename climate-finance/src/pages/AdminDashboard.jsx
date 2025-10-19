@@ -169,13 +169,6 @@ const AdminDashboard = () => {
             path: "/admin/locations",
             color: "bg-success-500",
         },
-        {
-            title: "Focal Areas",
-            description: "Manage project focal areas",
-            icon: <Target size={20} />,
-            path: "/admin/focal-areas",
-            color: "bg-warning-500",
-        },
     ];
 
     if (isLoading) {
