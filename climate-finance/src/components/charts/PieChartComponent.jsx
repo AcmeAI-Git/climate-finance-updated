@@ -222,7 +222,7 @@ const PieChartComponent = ({
   return (
     <div className="w-full">
       <div 
-        className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300"
+        className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none"
         style={{ minHeight: '380px' }}
       >
         <Pie 

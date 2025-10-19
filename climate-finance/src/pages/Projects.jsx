@@ -108,22 +108,22 @@ const Projects = () => {
           {
             title: "Total Projects",
             value: overviewData.total_projects,
-            change: "All projects"
+            change: ""
           },
           {
             title: "Active Projects",
             value: overviewData.active_projects,
-            change: "Currently active"
+            change: ""
           },
           {
             title: "Total Investment",
             value: formatCurrency(overviewData.total_investment),
-            change: "Total funding"
+            change: ""
           },
           {
             title: "Completed Projects",
             value: overviewData.completed_projects,
-            change: "Successfully completed"
+            change: ""
           }
         ]);
       } else {

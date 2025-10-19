@@ -234,7 +234,7 @@ const FundingSourceDetails = () => {
           </div>
 
           {/* Funding Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="mb-6">
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Funding Information</h3>
               <div className="space-y-2">
@@ -275,7 +275,7 @@ const FundingSourceDetails = () => {
 
             {/* Projects List if available */}
             {source.projects && Array.isArray(source.projects) && source.projects.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-3 mt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Associated Projects</h3>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {source.projects.slice(0, 5).map((project, index) => (

@@ -156,7 +156,7 @@ const BangladeshMapComponent = ({
 
     return (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 select-none">
                 {title}
             </h3>
             <div style={{ width: "100%", height: height, minHeight: 350 }}>

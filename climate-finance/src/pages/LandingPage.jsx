@@ -71,22 +71,22 @@ const LandingPage = () => {
                     {
                         title: "Total Climate Finance",
                         value: formatCurrency(data.total_climate_finance || 0),
-                        change: "All-time total"
+                        change: ""
                     },
                     {
                         title: "Total Projects",
                         value: data.total_projects || 0,
-                        change: "All projects"
+                        change: ""
                     },
                     {
                         title: "Active Projects",
                         value: data.active_projects || 0,
-                        change: "Currently active"
+                        change: ""
                     },
                     {
                         title: "Completed Projects",
                         value: data.completed_projects || 0,
-                        change: "Successfully completed"
+                        change: ""
                     }
                 ]);
             } else {

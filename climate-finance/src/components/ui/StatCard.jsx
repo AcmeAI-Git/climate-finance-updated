@@ -122,7 +122,7 @@ const StatCard = ({ title, value, change, icon = null, color = 'primary', locale
       `}
       padding={true}
     >
-      <div className="flex flex-col h-full text-center">
+      <div className="flex flex-col h-full text-center select-none">
         {/* Icon and Title - Centered */}
         <div className="flex flex-col items-center mb-4">
           {icon && (
@@ -147,20 +147,22 @@ const StatCard = ({ title, value, change, icon = null, color = 'primary', locale
         </div>
         
         {/* Change indicator - Centered at bottom */}
-        <div className="flex justify-center">
-          <div className={`
-            inline-flex items-center gap-1 px-3 py-1.5 
-            rounded-full text-xs font-semibold
-            ${changeColorClass}
-          `}>
-            {isPositive ? (
-              <TrendingUp size={12} className="text-success-600" />
-            ) : (
-              <TrendingDown size={12} className="text-error-600" />
-            )}
-            <span className="leading-none">{change}</span>
+        {change && change.trim() !== '' && (
+          <div className="flex justify-center">
+            <div className={`
+              inline-flex items-center gap-1 px-3 py-1.5 
+              rounded-full text-xs font-semibold
+              ${changeColorClass}
+            `}>
+              {isPositive ? (
+                <TrendingUp size={12} className="text-success-600" />
+              ) : (
+                <TrendingDown size={12} className="text-error-600" />
+              )}
+              <span className="leading-none">{change}</span>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Progress indicator for percentage values */}
         {change.includes('%') && (

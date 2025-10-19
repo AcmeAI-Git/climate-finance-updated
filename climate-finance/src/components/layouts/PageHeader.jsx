@@ -46,9 +46,9 @@ const PageHeader = ({
       {/* Header Content */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start">
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 select-none">{title}</h1>
           {subtitle && (
-            <p className="text-gray-600 text-lg">{subtitle}</p>
+            <p className="text-gray-600 text-lg select-none">{subtitle}</p>
           )}
         </div>
 

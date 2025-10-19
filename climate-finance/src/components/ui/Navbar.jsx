@@ -60,7 +60,7 @@ const Navbar = () => {
                             className="flex items-center group"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
-                            <h1 className="text-xl font-bold text-purple-700 group-hover:text-purple-600 transition-colors duration-200">
+                            <h1 className="text-xl font-bold text-purple-700 group-hover:text-purple-600 transition-colors duration-200 select-none">
                                 <span className="notranslate" translate="no">
                                     {getClimateFinanceTransliteration(language)}
                                 </span>

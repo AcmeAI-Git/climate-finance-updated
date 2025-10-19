@@ -34,25 +34,15 @@ const BarChartComponent = ({ data, title, xAxisKey, bars, formatYAxis = false })
 
   return (
     <div className="w-full">
-      <div className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300" style={{ minHeight: '380px' }}>
-        <div style={{ height: '350px', width: '100%' }}>
+      <div className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none" style={{ minHeight: '380px' }}>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">{displayTitle}</h3>
+        <div style={{ height: '320px', width: '100%' }}>
           <VictoryChart
             theme={VictoryTheme.material}
             domainPadding={50}
-            padding={{ left: 20, top: 50, right: 20, bottom: 80 }}
+            padding={{ left: 20, top: 20, right: 20, bottom: 80 }}
             domain={{ y: [0, Math.max(...data.flatMap(item => bars.map(bar => item[bar.dataKey]))) + 1] }}
           >
-            <VictoryLabel
-              text={displayTitle}
-              x={170}
-              y={20}
-              textAnchor="middle"
-              style={{
-                fontSize: 18,
-                fontWeight: 600,
-                fill: '#111827'
-              }}
-            />
             <VictoryAxis
               dependentAxis
               tickFormat={(t) => formatYAxis ? formatCurrency(t) : Math.floor(t)}

@@ -339,7 +339,7 @@ const FundingSources = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
                         <h4 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors mb-2 sm:mb-0">
                           {source.name || 'Unknown Source'}
                         </h4>
@@ -365,51 +365,24 @@ const FundingSources = () => {
                     </div>
                   </div>
 
-                  {/* Financial Info and Actions */}
+                  {/* Action Button */}
                   <div className="mt-6 lg:mt-0 lg:ml-6 flex-shrink-0">
-                    <div className="flex items-end gap-4 lg:gap-6">
-                      {/* Grant Amount */}
-                      {(source.grant_amount || source.total_committed) && (
-                        <div className="text-center">
-                          <div className="text-sm text-gray-500 mb-1">
-                            {source.grant_amount ? 'Grant Amount' : 'Total Committed'}
-                          </div>
-                          <div className="text-lg font-semibold text-gray-900">
-                            {formatCurrency(source.grant_amount || source.total_committed)}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Disbursed */}
-                      {(source.disbursement || source.total_disbursed) && (
-                        <div className="text-center">
-                          <div className="text-sm text-gray-500 mb-1">Disbursed</div>
-                          <div className="text-lg font-semibold text-green-600">
-                            {formatCurrency(source.disbursement || source.total_disbursed)}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Action Button */}
-                      <div className="flex-shrink-0">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            const id = source.funding_source_id || source.id;
-                            if (id) {
-                              navigate(`/funding-sources/${id}`);
-                            } else {
-                              console.error('No valid ID found for funding source:', source);
-                            }
-                          }}
-                          className="flex items-center gap-2 px-4 py-2 text-purple-600 border-purple-600 hover:bg-purple-50"
-                        >
-                          <ExternalLink size={14} />
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        const id = source.funding_source_id || source.id;
+                        if (id) {
+                          navigate(`/funding-sources/${id}`);
+                        } else {
+                          console.error('No valid ID found for funding source:', source);
+                        }
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-purple-600 border-purple-600 hover:bg-purple-50"
+                    >
+                      <ExternalLink size={14} />
+                      View Details
+                    </Button>
                   </div>
                 </div>
               ))}
