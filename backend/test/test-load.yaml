@@ -1,0 +1,35 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 100
+      name: "100 Concurrent Users"
+    # - duration: 60
+    #   arrivalRate: 100
+    #   rampTo: 1000
+    #   name: "1,000 Concurrent Users"
+    # - duration: 60
+    #   arrivalRate: 1000
+    #   rampTo: 5000
+    #   name: "5,000 Concurrent Users"
+    # - duration: 60
+    #   arrivalRate: 5000
+    #   rampTo: 10000
+    #   name: "10,000 Concurrent Users"
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+  ensure:
+    thresholds:
+      - http.response_time.p99: 100
+      - http.response_time.p95: 75
+scenarios:
+  - flow:
+      - loop:
+          - get:
+              url: "/api/test"
+        count: 100

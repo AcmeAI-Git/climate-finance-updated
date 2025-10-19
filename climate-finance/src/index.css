@@ -1,0 +1,368 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #213547;
+  background-color: #f5f5f5; /* Changed from #ffffff to a light gray */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Responsive layout constraints for extreme zoom scenarios */
+.layout-container {
+  max-width: min(1120px, 90vw);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.noto-sans-bengali {
+  font-family: "Noto Sans Bengali", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+/* Global Bangla font rule */
+.lang-bn, .lang-bn * {
+  font-family: 'Noto Serif Bengali', serif !important;
+}
+
+.recharts-pie-sector:focus {
+  outline: none;
+}
+
+
+@media (max-width: 768px) {
+  .layout-container {
+    max-width: 95vw;
+  }
+}
+
+/* Prevent excessive stretching at extreme zoom levels */
+@media (min-width: 1536px) {
+  .layout-container {
+    max-width: min(1120px, 70vw);
+  }
+}
+
+@media (min-width: 2048px) {
+  .layout-container {
+    max-width: min(1120px, 60vw);
+  }
+}
+
+@media (min-width: 2560px) {
+  .layout-container {
+    max-width: min(1120px, 50vw);
+  }
+}
+
+/* Custom animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Layout utilities for consistent card heights and responsive grids */
+.card-grid {
+  display: grid;
+  grid-template-rows: auto;
+  align-items: stretch;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header {
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* Responsive grid system for optimal layout at all zoom levels */
+.grid-responsive {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+/* Responsive breakpoints with zoom-aware constraints */
+@media (min-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1120px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Prevent excessive stretching on ultra-wide screens */
+@media (min-width: 1536px) {
+  .grid-responsive {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+}
+
+/* Enhanced responsive grids for better zoom behavior */
+.grid-stats {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+  .grid-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.grid-charts {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 1024px) {
+  .grid-charts {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Ensure cards maintain readable proportions */
+.card-constrained {
+  max-width: 100%;
+  width: 100%;
+}
+
+@media (min-width: 1536px) {
+  .card-constrained {
+    max-width: 380px;
+  }
+}
+
+/* Responsive text scaling for extreme zoom levels */
+@media (min-width: 2048px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+/* Prevent cards from becoming too wide on ultra-wide screens */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+@media (min-width: 1120px) {
+  .content-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .content-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+}
+
+/* Improved hover effects */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Status badge improvements */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Progress bar improvements */
+.progress-container {
+  background: linear-gradient(to right, #f3f4f6, #e5e7eb);
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+  transition: width 0.7s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.6s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out both;
+}
+
+/* Custom hover effects */
+.hover-lift {
+  transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Purple focus ring for accessibility */
+.focus-ring-purple:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.4);
+}
+
+/* Custom scrollbar for modern look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

@@ -1,0 +1,352 @@
+// Mock data aligned with client's Excel structure
+// Fields NOT in Excel have been removed: type, sector, focal_areas, disbursement
+export const mockProjects = [
+  {
+    "project_id": "demo-proj-001",
+    "title": "Coastal Climate Resilience and Adaptation Project",
+    "status": "Active",
+    "approval_fy": 2023,
+    "beginning": "2023-01-15",
+    "closing": "2026-12-31",
+    "total_cost_usd": 25000000,
+    "gef_grant": 15000000,
+    "cofinancing": 10000000,
+    "wash_finance": 5000000,
+    "wash_finance_percent": 20.0,
+    "beneficiaries": "Coastal communities in vulnerable areas",
+    "objectives": "Enhance climate resilience of coastal communities through integrated water management, early warning systems, and sustainable livelihood development.",
+    "hotspot_vulnerability_type": "Coastal flooding and cyclone prone areas",
+    "wash_component_description": "Integrated water supply and sanitation systems for climate-resilient communities",
+    "direct_beneficiaries": 150000,
+    "indirect_beneficiaries": 500000,
+    "beneficiary_description": "Vulnerable coastal communities including women, children, and elderly in Cox's Bazar, Chattogram, and Noakhali districts",
+    "gender_inclusion": "Strong focus on women's participation in water management committees and climate adaptation planning",
+    "equity_marker": "strong",
+    "equity_marker_description": "Project specifically targets marginalized communities with high vulnerability to climate impacts",
+    "assessment": "Comprehensive climate vulnerability assessment completed. Project addresses critical adaptation needs in high-risk coastal zones.",
+    "alignment_nap": "Fully aligned with Bangladesh National Adaptation Plan priority areas for coastal zone management",
+    "alignment_cff": "Supports Climate Finance Framework objectives for adaptation finance mobilization",
+    "geographic_division": "Chattogram",
+    "districts": ["Cox's Bazar", "Chattogram", "Noakhali"],
+    "climate_relevance_score": 85.5,
+    "climate_relevance_category": "High",
+    "climate_relevance_justification": "Project directly addresses climate adaptation needs in vulnerable coastal zones through integrated water management and early warning systems, with strong focus on climate-resilient infrastructure and community-based adaptation strategies.",
+    "agencies": [
+      {"agency_id": 1, "name": "Ministry of Water Resources", "type": "Government Agency"},
+      {"agency_id": 2, "name": "UNDP Bangladesh", "type": "International Organization"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 1, "name": "Green Climate Fund", "dev_partner": "GCF", "grant_amount": 15000000},
+      {"funding_source_id": 2, "name": "World Bank", "dev_partner": "WB", "loan_amount": 10000000}
+    ],
+    "wash_component": {
+      "presence": true,
+      "wash_percentage": 30,
+      "description": "Comprehensive WASH infrastructure with climate-resilient design"
+    },
+    "alignment_sdg": [1, 2, 6, 13, 14]
+  },
+  {
+    "project_id": "demo-proj-002",
+    "title": "Renewable Energy for Rural Communities",
+    "type": "Mitigation",
+    "sector": "Energy",
+    "status": "Completed",
+    "approval_fy": 2021,
+    "beginning": "2021-03-01",
+    "closing": "2024-02-28",
+    "total_cost_usd": 18000000,
+    "gef_grant": 12000000,
+    "cofinancing": 6000000,
+    "wash_finance": 0,
+    "wash_finance_percent": 0,
+    "beneficiaries": "Rural households and small businesses",
+    "objectives": "Promote clean energy access in rural areas through solar power systems and energy efficiency measures to reduce greenhouse gas emissions.",
+    "hotspot_vulnerability_type": "Energy poverty and climate vulnerability in rural areas",
+    "wash_component_description": "",
+    "direct_beneficiaries": 25000,
+    "indirect_beneficiaries": 100000,
+    "beneficiary_description": "Rural households, small businesses, and community institutions in Rajshahi and Sylhet divisions",
+    "gender_inclusion": "Women entrepreneurs trained in solar technology maintenance and business development",
+    "equity_marker": "medium",
+    "equity_marker_description": "Focus on energy access for underserved rural communities",
+    "assessment": "Project successfully reduced carbon emissions by 15,000 tons annually while improving energy access",
+    "alignment_nap": "Aligned with NAP renewable energy targets and rural development priorities",
+    "alignment_cff": "Supports CFF mitigation finance goals for clean energy transition",
+    "geographic_division": "Rajshahi",
+    "districts": ["Rajshahi", "Bogura", "Pabna", "Sirajganj"],
+    "climate_relevance_score": 92.0,
+    "climate_relevance_category": "High",
+    "climate_relevance_justification": "Direct climate mitigation project that reduces greenhouse gas emissions through renewable energy deployment and energy efficiency measures, contributing significantly to national climate targets.",
+    "agencies": [
+      {"agency_id": 3, "name": "Ministry of Power, Energy and Mineral Resources", "type": "Government Agency"},
+      {"agency_id": 4, "name": "Grameen Shakti", "type": "NGO"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 3, "name": "Asian Development Bank", "dev_partner": "ADB", "loan_amount": 12000000},
+      {"funding_source_id": 4, "name": "KfW Development Bank", "dev_partner": "KfW", "grant_amount": 6000000}
+    ],
+    "focal_areas": [
+      {"focal_area_id": 3, "name": "Renewable Energy"},
+      {"focal_area_id": 4, "name": "Energy Efficiency"}
+    ],
+    "wash_component": {
+      "presence": false,
+      "wash_percentage": 0,
+      "description": ""
+    },
+    "alignment_sdg": [7, 8, 13]
+  },
+  {
+    "project_id": "demo-proj-003",
+    "title": "Urban Climate Resilience and Green Infrastructure",
+    "type": "Adaptation",
+    "sector": "Urban Development",
+    "status": "Active",
+    "approval_fy": 2022,
+    "beginning": "2022-06-01",
+    "closing": "2025-05-31",
+    "total_cost_usd": 32000000,
+    "gef_grant": 20000000,
+    "cofinancing": 12000000,
+    "wash_finance": 8000000,
+    "wash_finance_percent": 25.0,
+    "beneficiaries": "Urban residents and municipal authorities",
+    "objectives": "Develop climate-resilient urban infrastructure including green spaces, flood management systems, and sustainable urban planning.",
+    "hotspot_vulnerability_type": "Urban flooding and heat island effects",
+    "wash_component_description": "Integrated urban water management and sanitation systems with climate adaptation features",
+    "direct_beneficiaries": 500000,
+    "indirect_beneficiaries": 2000000,
+    "beneficiary_description": "Urban residents in Dhaka and Chattogram metropolitan areas, with focus on low-income settlements",
+    "gender_inclusion": "Women's groups actively involved in urban planning and green space management",
+    "equity_marker": "strong",
+    "equity_marker_description": "Special attention to vulnerable urban populations in informal settlements",
+    "assessment": "Comprehensive urban climate risk assessment completed. Project addresses critical adaptation needs in rapidly growing cities.",
+    "alignment_nap": "Fully aligned with NAP urban adaptation strategies and green infrastructure development",
+    "alignment_cff": "Supports CFF objectives for urban climate finance and resilience building",
+    "geographic_division": "Dhaka",
+    "districts": ["Dhaka", "Narayanganj", "Gazipur"],
+    "climate_relevance_score": 78.0,
+    "climate_relevance_category": "Moderate-High",
+    "climate_relevance_justification": "Urban climate adaptation project addressing flooding and heat island effects through green infrastructure and sustainable urban planning, with significant climate resilience benefits for vulnerable urban populations.",
+    "agencies": [
+      {"agency_id": 5, "name": "Dhaka North City Corporation", "type": "Local Government"},
+      {"agency_id": 6, "name": "UN-Habitat", "type": "International Organization"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 5, "name": "European Union", "dev_partner": "EU", "grant_amount": 20000000},
+      {"funding_source_id": 6, "name": "Agence Française de Développement", "dev_partner": "AFD", "loan_amount": 12000000}
+    ],
+    "focal_areas": [
+      {"focal_area_id": 5, "name": "Urban Climate Adaptation"},
+      {"focal_area_id": 6, "name": "Green Infrastructure"}
+    ],
+    "wash_component": {
+      "presence": true,
+      "wash_percentage": 45,
+      "description": "Climate-resilient urban WASH systems with flood protection and water recycling"
+    },
+    "alignment_sdg": [6, 11, 13, 15]
+  },
+  {
+    "project_id": "demo-proj-004",
+    "title": "Sustainable Agriculture and Food Security",
+    "type": "Adaptation",
+    "sector": "Agriculture",
+    "status": "Active",
+    "approval_fy": 2023,
+    "beginning": "2023-04-01",
+    "closing": "2027-03-31",
+    "total_cost_usd": 28000000,
+    "gef_grant": 18000000,
+    "cofinancing": 10000000,
+    "wash_finance": 0,
+    "wash_finance_percent": 0,
+    "beneficiaries": "Smallholder farmers and agricultural communities",
+    "objectives": "Enhance agricultural resilience to climate change through sustainable farming practices, drought-resistant crops, and improved irrigation systems.",
+    "hotspot_vulnerability_type": "Drought and flood prone agricultural areas",
+    "wash_component_description": "",
+    "direct_beneficiaries": 75000,
+    "indirect_beneficiaries": 300000,
+    "beneficiary_description": "Smallholder farmers, particularly women farmers, in drought and flood-prone areas of Khulna and Barishal divisions",
+    "gender_inclusion": "Women farmers receive priority training and support for climate-smart agriculture techniques",
+    "equity_marker": "strong",
+    "equity_marker_description": "Focus on marginalized farming communities with high climate vulnerability",
+    "assessment": "Baseline assessment shows high climate vulnerability in target areas. Project addresses critical food security needs.",
+    "alignment_nap": "Aligned with NAP agricultural adaptation priorities and food security goals",
+    "alignment_cff": "Supports CFF adaptation finance for agricultural sector resilience",
+    "geographic_division": "Khulna",
+    "districts": ["Khulna", "Satkhira", "Bagerhat", "Jessore"],
+    "climate_relevance_score": 88.0,
+    "climate_relevance_category": "High",
+    "climate_relevance_justification": "Direct climate adaptation project addressing agricultural vulnerability to climate change through sustainable farming practices, drought-resistant crops, and improved irrigation systems, critical for food security in climate-vulnerable regions.",
+    "agencies": [
+      {"agency_id": 7, "name": "Ministry of Agriculture", "type": "Government Agency"},
+      {"agency_id": 8, "name": "FAO Bangladesh", "type": "International Organization"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 7, "name": "International Fund for Agricultural Development", "dev_partner": "IFAD", "grant_amount": 18000000},
+      {"funding_source_id": 8, "name": "Japan International Cooperation Agency", "dev_partner": "JICA", "loan_amount": 10000000}
+    ],
+    "focal_areas": [
+      {"focal_area_id": 7, "name": "Climate-Smart Agriculture"},
+      {"focal_area_id": 8, "name": "Food Security"}
+    ],
+    "wash_component": {
+      "presence": false,
+      "wash_percentage": 0,
+      "description": ""
+    },
+    "alignment_sdg": [1, 2, 13, 15]
+  },
+  {
+    "project_id": "demo-proj-005",
+    "title": "Forest Conservation and Biodiversity Protection",
+    "type": "Mitigation",
+    "sector": "Forestry",
+    "status": "Active",
+    "approval_fy": 2022,
+    "beginning": "2022-09-01",
+    "closing": "2026-08-31",
+    "total_cost_usd": 22000000,
+    "gef_grant": 14000000,
+    "cofinancing": 8000000,
+    "wash_finance": 0,
+    "wash_finance_percent": 0,
+    "beneficiaries": "Forest-dependent communities and conservation organizations",
+    "objectives": "Protect and restore forest ecosystems to enhance carbon sequestration and biodiversity conservation while supporting local livelihoods.",
+    "hotspot_vulnerability_type": "Deforestation and biodiversity loss",
+    "wash_component_description": "",
+    "direct_beneficiaries": 40000,
+    "indirect_beneficiaries": 150000,
+    "beneficiary_description": "Forest-dependent communities, indigenous groups, and conservation organizations in Sylhet and Chattogram hill tracts",
+    "gender_inclusion": "Women's groups actively participate in forest conservation and sustainable livelihood activities",
+    "equity_marker": "medium",
+    "equity_marker_description": "Focus on forest-dependent communities with traditional knowledge and rights",
+    "assessment": "Forest cover assessment completed. Project addresses critical conservation needs in biodiversity hotspots.",
+    "alignment_nap": "Aligned with NAP forest conservation and ecosystem-based adaptation strategies",
+    "alignment_cff": "Supports CFF nature-based solutions and REDD+ finance objectives",
+    "geographic_division": "Sylhet",
+    "districts": ["Sylhet", "Moulvibazar", "Habiganj", "Sunamganj"],
+    "climate_relevance_score": 95.0,
+    "climate_relevance_category": "High",
+    "climate_relevance_justification": "Direct climate mitigation project through forest conservation and restoration, enhancing carbon sequestration and biodiversity protection. Critical for achieving national climate targets and REDD+ objectives.",
+    "agencies": [
+      {"agency_id": 9, "name": "Forest Department", "type": "Government Agency"},
+      {"agency_id": 10, "name": "IUCN Bangladesh", "type": "International Organization"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 9, "name": "Global Environment Facility", "dev_partner": "GEF", "grant_amount": 14000000},
+      {"funding_source_id": 10, "name": "Norway International Climate and Forest Initiative", "dev_partner": "NICFI", "grant_amount": 8000000}
+    ],
+    "focal_areas": [
+      {"focal_area_id": 9, "name": "Forest Conservation"},
+      {"focal_area_id": 10, "name": "Biodiversity Protection"}
+    ],
+    "wash_component": {
+      "presence": false,
+      "wash_percentage": 0,
+      "description": ""
+    },
+    "alignment_sdg": [13, 15, 17]
+  },
+  {
+    "project_id": "demo-proj-006",
+    "title": "Disaster Risk Reduction and Early Warning Systems",
+    "type": "Adaptation",
+    "sector": "Disaster Management",
+    "status": "Completed",
+    "approval_fy": 2020,
+    "beginning": "2020-01-01",
+    "closing": "2023-12-31",
+    "total_cost_usd": 15000000,
+    "gef_grant": 10000000,
+    "cofinancing": 5000000,
+    "wash_finance": 3000000,
+    "wash_finance_percent": 20.0,
+    "beneficiaries": "Vulnerable communities in disaster-prone areas",
+    "objectives": "Strengthen disaster preparedness and response capabilities through early warning systems, community training, and resilient infrastructure.",
+    "hotspot_vulnerability_type": "Cyclone and flood prone areas",
+    "wash_component_description": "Emergency WASH facilities and water purification systems for disaster response",
+    "direct_beneficiaries": 200000,
+    "indirect_beneficiaries": 800000,
+    "beneficiary_description": "Vulnerable communities in cyclone and flood-prone areas across coastal and riverine districts",
+    "gender_inclusion": "Women's groups trained as community disaster response leaders and early warning coordinators",
+    "equity_marker": "strong",
+    "equity_marker_description": "Priority focus on most vulnerable communities with limited disaster preparedness capacity",
+    "assessment": "Project successfully improved early warning coverage by 80% and reduced disaster response time by 50%",
+    "alignment_nap": "Fully aligned with NAP disaster risk reduction priorities and Sendai Framework",
+    "alignment_cff": "Supports CFF adaptation finance for disaster risk reduction and resilience building",
+    "geographic_division": "Barishal",
+    "districts": ["Barishal", "Patuakhali", "Bhola", "Pirojpur"],
+    "climate_relevance_score": 82.0,
+    "climate_relevance_category": "High",
+    "climate_relevance_justification": "Critical climate adaptation project addressing disaster risk reduction and early warning systems for climate-vulnerable communities, essential for building resilience against increasing climate-related disasters.",
+    "agencies": [
+      {"agency_id": 11, "name": "Ministry of Disaster Management and Relief", "type": "Government Agency"},
+      {"agency_id": 12, "name": "Bangladesh Red Crescent Society", "type": "NGO"}
+    ],
+    "funding_sources": [
+      {"funding_source_id": 11, "name": "United Nations Office for Disaster Risk Reduction", "dev_partner": "UNDRR", "grant_amount": 10000000},
+      {"funding_source_id": 12, "name": "Swiss Agency for Development and Cooperation", "dev_partner": "SDC", "grant_amount": 5000000}
+    ],
+    "focal_areas": [
+      {"focal_area_id": 11, "name": "Disaster Risk Reduction"},
+      {"focal_area_id": 12, "name": "Early Warning Systems"}
+    ],
+    "wash_component": {
+      "presence": true,
+      "wash_percentage": 25,
+      "description": "Emergency WASH infrastructure for disaster response and community resilience"
+    },
+    "alignment_sdg": [1, 11, 13]
+  }
+];
+
+// Mock agencies data
+export const mockAgencies = [
+  { agency_id: 1, name: "Ministry of Water Resources", type: "Government Agency" },
+  { agency_id: 2, name: "UNDP Bangladesh", type: "International Organization" },
+  { agency_id: 3, name: "Ministry of Power, Energy and Mineral Resources", type: "Government Agency" },
+  { agency_id: 4, name: "Grameen Shakti", type: "NGO" },
+  { agency_id: 5, name: "Dhaka North City Corporation", type: "Local Government" },
+  { agency_id: 6, name: "UN-Habitat", type: "International Organization" },
+  { agency_id: 7, name: "Ministry of Agriculture", type: "Government Agency" },
+  { agency_id: 8, name: "FAO Bangladesh", type: "International Organization" },
+  { agency_id: 9, name: "Forest Department", type: "Government Agency" },
+  { agency_id: 10, name: "IUCN Bangladesh", type: "International Organization" },
+  { agency_id: 11, name: "Ministry of Disaster Management and Relief", type: "Government Agency" },
+  { agency_id: 12, name: "Bangladesh Red Crescent Society", type: "NGO" }
+];
+
+// Mock funding sources data
+export const mockFundingSources = [
+  { funding_source_id: 1, name: "Green Climate Fund", dev_partner: "GCF", grant_amount: 15000000, loan_amount: 0 },
+  { funding_source_id: 2, name: "World Bank", dev_partner: "WB", grant_amount: 0, loan_amount: 10000000 },
+  { funding_source_id: 3, name: "Asian Development Bank", dev_partner: "ADB", grant_amount: 0, loan_amount: 12000000 },
+  { funding_source_id: 4, name: "KfW Development Bank", dev_partner: "KfW", grant_amount: 6000000, loan_amount: 0 },
+  { funding_source_id: 5, name: "European Union", dev_partner: "EU", grant_amount: 20000000, loan_amount: 0 },
+  { funding_source_id: 6, name: "Agence Française de Développement", dev_partner: "AFD", grant_amount: 0, loan_amount: 12000000 },
+  { funding_source_id: 7, name: "International Fund for Agricultural Development", dev_partner: "IFAD", grant_amount: 18000000, loan_amount: 0 },
+  { funding_source_id: 8, name: "Japan International Cooperation Agency", dev_partner: "JICA", grant_amount: 0, loan_amount: 10000000 },
+  { funding_source_id: 9, name: "Global Environment Facility", dev_partner: "GEF", grant_amount: 14000000, loan_amount: 0 },
+  { funding_source_id: 10, name: "Norway International Climate and Forest Initiative", dev_partner: "NICFI", grant_amount: 8000000, loan_amount: 0 },
+  { funding_source_id: 11, name: "United Nations Office for Disaster Risk Reduction", dev_partner: "UNDRR", grant_amount: 10000000, loan_amount: 0 },
+  { funding_source_id: 12, name: "Swiss Agency for Development and Cooperation", dev_partner: "SDC", grant_amount: 5000000, loan_amount: 0 }
+];
+
+// Mock focal areas data
+export const mockFocalAreas = [
+  { focal_area_id: 1, name: "Climate Change Adaptation" },
+  { focal_area_id: 2, name: "Water Resources Management" },
+  { focal_area_id: 3, name: "Renewable Energy" },
+  { focal_area_id: 4, name: "Energy Efficiency" },
+  { focal_area_id: 5, name: "Urban Climate Adaptation" },
+  { focal_area_id: 6, name: "Green Infrastructure" },
+  { focal_area_id: 7, name: "Climate-Smart Agriculture" },
+  { focal_area_id: 8, name: "Food Security" },
+  { focal_area_id: 9, name: "Forest Conservation" },
+  { focal_area_id: 10, name: "Biodiversity Protection" },
+  { focal_area_id: 11, name: "Disaster Risk Reduction" },
+  { focal_area_id: 12, name: "Early Warning Systems" }
+];
