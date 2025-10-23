@@ -41,6 +41,7 @@ const LandingPage = () => {
     const [overviewStats, setOverviewStats] = useState([]);
     const [projectsByStatus, setProjectsByStatus] = useState([]);
     const [regionalData, setRegionalData] = useState([]);
+    const [washDistribution, setWashDistribution] = useState([]);
 
     // Fetch all dashboard data
     useEffect(() => {
@@ -57,10 +58,12 @@ const LandingPage = () => {
                 overviewResponse,
                 statusResponse,
                 regionalResponse,
+                projectsResponse,
             ] = await Promise.all([
                 projectApi.getOverviewStats(),
                 projectApi.getByStatus(),
                 projectApi.getRegionalDistribution(),
+                projectApi.getAll(),
             ]);
 
             // Set overview stats
@@ -117,6 +120,29 @@ const LandingPage = () => {
                 setRegionalData([]);
             }
 
+            // Calculate WASH vs Climate Finance distribution
+            if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+                const projects = projectsResponse.data;
+                let washProjects = 0;
+                let climateFinanceOnly = 0;
+
+                projects.forEach(project => {
+                    const washComponent = project.wash_component;
+                    if (washComponent && (washComponent.wash_percentage > 0 || washComponent.presence)) {
+                        washProjects++;
+                    } else {
+                        climateFinanceOnly++;
+                    }
+                });
+
+                setWashDistribution([
+                    { name: 'WASH Projects', value: washProjects },
+                    { name: 'Climate Finance Only', value: climateFinanceOnly }
+                ]);
+            } else {
+                setWashDistribution([]);
+            }
+
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
             setError("Failed to load dashboard data. Please try again.");
@@ -124,6 +150,7 @@ const LandingPage = () => {
             // Clear all data on error
             setOverviewStats([]);
             setProjectsByStatus([]);
+            setWashDistribution([]);
         } finally {
             setLoading(false);
         }
@@ -154,6 +181,7 @@ const LandingPage = () => {
             overview: overviewStats,
             projectsByStatus,
             regionalData,
+            washDistribution,
             summary: {
                 totalProjects:
                     overviewStats.find((s) => s.title.includes("Projects"))
@@ -294,8 +322,8 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            {/* Charts Section - Pie Chart and Bar Chart Side by Side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Charts Section - Three Charts Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div
                     className="animate-fade-in-up"
                     style={{ animationDelay: "600ms" }}
@@ -310,6 +338,25 @@ const LandingPage = () => {
                             <div className="h-[300px] flex items-center justify-center">
                                 <p className="text-gray-500">
                                     No status data available
+                                </p>
+                            </div>
+                        </Card>
+                    )}
+                </div>
+                <div
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: "650ms" }}
+                >
+                    {washDistribution.length > 0 ? (
+                        <PieChartComponent
+                            title="WASH vs Climate Finance"
+                            data={washDistribution}
+                        />
+                    ) : (
+                        <Card hover padding={true}>
+                            <div className="h-[300px] flex items-center justify-center">
+                                <p className="text-gray-500">
+                                    No WASH data available
                                 </p>
                             </div>
                         </Card>
