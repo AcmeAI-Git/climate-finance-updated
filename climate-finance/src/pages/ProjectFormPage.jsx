@@ -76,6 +76,7 @@ const ProjectFormPage = ({
   const [error, setError] = useState(null);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Determine mode based on params, authentication, and URL query
   const urlParams = new URLSearchParams(location.search);
@@ -194,6 +195,50 @@ const ProjectFormPage = ({
       ...prev,
       wash_component: typeof washData === 'function' ? washData(prev.wash_component) : washData
     }));
+  };
+
+  const validateFile = (file) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+    
+    if (!file) return null;
+    
+    if (!allowedTypes.includes(file.type)) {
+      return 'Please select a PDF or DOCX file';
+    }
+    
+    if (file.size > maxSize) {
+      return 'File size must be less than 10MB';
+    }
+    
+    return null;
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validationError = validateFile(file);
+      if (validationError) {
+        setErrors(prev => ({ ...prev, file: validationError }));
+        setSelectedFile(null);
+      } else {
+        setErrors(prev => ({ ...prev, file: '' }));
+        setSelectedFile(file);
+      }
+    } else {
+      setSelectedFile(null);
+      setErrors(prev => ({ ...prev, file: '' }));
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setErrors(prev => ({ ...prev, file: '' }));
+    // Reset the file input
+    const fileInput = document.getElementById('project-document');
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const validateForm = () => {
@@ -327,6 +372,7 @@ const ProjectFormPage = ({
         const response = await pendingProjectApi.submit(projectData);
         if (response.status) {
           setSuccess(true);
+          setSelectedFile(null); // Reset file state on success
           toast({
             title: 'Success',
             message: 'Project submitted successfully! It will be visible once approved by an administrator.',
@@ -747,6 +793,71 @@ const ProjectFormPage = ({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                 placeholder="Explain the climate relevance score and category..."
               />
+            </div>
+          </div>
+
+          {/* Supporting Documents */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Supporting Documents</h3>
+            <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Document
+                </label>
+                <p className="text-sm text-gray-500 mb-4">
+                  Upload a PDF or DOCX file (max 10MB) to provide additional project details or supporting materials.
+                </p>
+                
+                {!selectedFile ? (
+                  <div className="relative">
+                    <input
+                      id="project-document"
+                      type="file"
+                      accept=".pdf,.docx,.doc"
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 file:cursor-pointer cursor-pointer border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    />
+                  </div>
+                ) : (
+                  <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <svg className="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {selectedFile.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        className="flex-shrink-0 ml-4 p-1 rounded-full hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
+                      >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {errors.file && (
+                  <div className="mt-2 flex items-center gap-1 text-red-600">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm">{errors.file}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
