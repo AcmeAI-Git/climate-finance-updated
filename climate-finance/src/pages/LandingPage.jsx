@@ -24,10 +24,8 @@ import { formatCurrency } from "../utils/formatters";
 import { projectApi } from "../services/api";
 import ExportButton from "../components/ui/ExportButton";
 import PageHeader from "../components/layouts/PageHeader";
-import { useLanguage } from '../context/LanguageContext';
-import { translateChartData, getChartTitle } from '../utils/chartTranslations';
-
-
+import { useLanguage } from "../context/LanguageContext";
+import { translateChartData, getChartTitle } from "../utils/chartTranslations";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -66,60 +64,89 @@ const LandingPage = () => {
                 projectApi.getAll(),
             ]);
 
+            // console.log(overviewResponse, regionalResponse);
+
             // Set overview stats
             if (overviewResponse.status && overviewResponse.data) {
                 const data = overviewResponse.data;
-                
+
                 // Calculate stats from projects if backend values are 0 or missing
                 let calculatedStats = {};
-                if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+                if (
+                    projectsResponse.status &&
+                    Array.isArray(projectsResponse.data)
+                ) {
                     const projects = projectsResponse.data;
                     calculatedStats = {
                         total_projects: projects.length,
-                        active_projects: projects.filter(p => 
-                            p.status === 'Active' || p.status === 'Ongoing' || 
-                            p.status === 'active' || p.status === 'ongoing'
+                        active_projects: projects.filter(
+                            (p) =>
+                                p.status === "Active" ||
+                                p.status === "Ongoing" ||
+                                p.status === "active" ||
+                                p.status === "ongoing"
                         ).length,
-                        completed_projects: projects.filter(p => 
-                            p.status === 'Completed' || p.status === 'Implemented' ||
-                            p.status === 'completed' || p.status === 'implemented'
+                        completed_projects: projects.filter(
+                            (p) =>
+                                p.status === "Completed" ||
+                                p.status === "Implemented" ||
+                                p.status === "completed" ||
+                                p.status === "implemented"
                         ).length,
-                        total_climate_finance: projects.reduce((sum, p) => 
-                            sum + Number(p.total_cost_usd || 0), 0)
+                        total_climate_finance: projects.reduce(
+                            (sum, p) => sum + Number(p.total_cost_usd || 0),
+                            0
+                        ),
                     };
-                    
+
                     // Debug logging
-                    console.log('LandingPage Debug:', {
+                    console.log("LandingPage Debug:", {
                         backendActive: data.active_projects,
                         backendCompleted: data.completed_projects,
                         calculatedActive: calculatedStats.active_projects,
                         calculatedCompleted: calculatedStats.completed_projects,
                         projectsCount: projects.length,
-                        projectStatuses: projects.map(p => p.status)
+                        projectStatuses: projects.map((p) => p.status),
                     });
                 }
-                
+
                 setOverviewStats([
                     {
                         title: "Total Climate Finance",
-                        value: formatCurrency(Number(data.total_climate_finance || calculatedStats.total_climate_finance || 0)),
-                        change: ""
+                        value: formatCurrency(
+                            Number(
+                                data.total_climate_finance ||
+                                    calculatedStats.total_climate_finance ||
+                                    0
+                            )
+                        ),
+                        change: "",
                     },
                     {
                         title: "Total Projects",
-                        value: data.total_projects || calculatedStats.total_projects || 0,
-                        change: ""
+                        value:
+                            data.total_projects ||
+                            calculatedStats.total_projects ||
+                            0,
+                        change: "",
                     },
                     {
                         title: "Active Projects",
-                        value: (data.active_projects && data.active_projects > 0) ? data.active_projects : (calculatedStats.active_projects || 0),
-                        change: ""
+                        value:
+                            data.active_projects && data.active_projects > 0
+                                ? data.active_projects
+                                : calculatedStats.active_projects || 0,
+                        change: "",
                     },
                     {
                         title: "Completed Projects",
-                        value: (data.completed_projects && data.completed_projects > 0) ? data.completed_projects : (calculatedStats.completed_projects || 0),
-                        change: ""
-                    }
+                        value:
+                            data.completed_projects &&
+                            data.completed_projects > 0
+                                ? data.completed_projects
+                                : calculatedStats.completed_projects || 0,
+                        change: "",
+                    },
                 ]);
             } else {
                 setOverviewStats([]);
@@ -133,7 +160,10 @@ const LandingPage = () => {
             }
 
             // Set regional data for map and chart
-            if (regionalResponse.status && Array.isArray(regionalResponse.data)) {
+            if (
+                regionalResponse.status &&
+                Array.isArray(regionalResponse.data)
+            ) {
                 const backendRegional = regionalResponse.data.map((item) => ({
                     region: item.location_name
                         .replace(" Division", " Div.")
@@ -143,66 +173,92 @@ const LandingPage = () => {
                     completed: Number(item.completed_projects) || 0,
                     total: Number(item.total_projects) || 0,
                 }));
-                
+
                 // Calculate from projects if backend has 0 values
                 let calculatedRegional = [];
-                if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+                if (
+                    projectsResponse.status &&
+                    Array.isArray(projectsResponse.data)
+                ) {
                     const projects = projectsResponse.data;
                     const divisionStats = {};
-                    
-                    projects.forEach(p => {
+
+                    projects.forEach((p) => {
                         const division = p.geographic_division;
                         if (!division) return;
-                        
+
                         if (!divisionStats[division]) {
-                            divisionStats[division] = { active: 0, completed: 0, total: 0 };
+                            divisionStats[division] = {
+                                active: 0,
+                                completed: 0,
+                                total: 0,
+                            };
                         }
-                        
+
                         divisionStats[division].total++;
-                        
-                        if (p.status === 'Active' || p.status === 'Ongoing' || 
-                            p.status === 'active' || p.status === 'ongoing') {
+
+                        if (
+                            p.status === "Active" ||
+                            p.status === "Ongoing" ||
+                            p.status === "active" ||
+                            p.status === "ongoing"
+                        ) {
                             divisionStats[division].active++;
-                        } else if (p.status === 'Completed' || p.status === 'Implemented' ||
-                                   p.status === 'completed' || p.status === 'implemented') {
+                        } else if (
+                            p.status === "Completed" ||
+                            p.status === "Implemented" ||
+                            p.status === "completed" ||
+                            p.status === "implemented"
+                        ) {
                             divisionStats[division].completed++;
                         }
                     });
-                    
-                    calculatedRegional = Object.entries(divisionStats).map(([division, stats]) => ({
-                        region: division
-                            .replace(" Division", " Div.")
-                            .replace("Chittagong", "Chattogram")
-                            .replace("Barishal", "Barisal"),
-                        active: stats.active,
-                        completed: stats.completed,
-                        total: stats.total
-                    }));
+
+                    calculatedRegional = Object.entries(divisionStats).map(
+                        ([division, stats]) => ({
+                            region: division
+                                .replace(" Division", " Div.")
+                                .replace("Chittagong", "Chattogram")
+                                .replace("Barishal", "Barisal"),
+                            active: stats.active,
+                            completed: stats.completed,
+                            total: stats.total,
+                        })
+                    );
                 }
-                
+
                 // Use calculated values if backend has 0s
-                const finalRegional = backendRegional.map(item => {
+                const finalRegional = backendRegional.map((item) => {
                     if (item.total === 0) {
-                        const calculated = calculatedRegional.find(c => c.region === item.region);
+                        const calculated = calculatedRegional.find(
+                            (c) => c.region === item.region
+                        );
                         return calculated || item;
                     }
                     return item;
                 });
-                
+
                 setRegionalData(finalRegional);
             } else {
                 setRegionalData([]);
             }
 
             // Calculate WASH vs Climate Finance distribution
-            if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+            if (
+                projectsResponse.status &&
+                Array.isArray(projectsResponse.data)
+            ) {
                 const projects = projectsResponse.data;
                 let washProjects = 0;
                 let climateFinanceOnly = 0;
 
-                projects.forEach(project => {
+                projects.forEach((project) => {
                     const washComponent = project.wash_component;
-                    if (washComponent && (washComponent.wash_percentage > 0 || washComponent.presence)) {
+                    if (
+                        washComponent &&
+                        (washComponent.wash_percentage > 0 ||
+                            washComponent.presence)
+                    ) {
                         washProjects++;
                     } else {
                         climateFinanceOnly++;
@@ -210,13 +266,12 @@ const LandingPage = () => {
                 });
 
                 setWashDistribution([
-                    { name: 'WASH Projects', value: washProjects },
-                    { name: 'Climate Finance Only', value: climateFinanceOnly }
+                    { name: "WASH Projects", value: washProjects },
+                    { name: "Climate Finance Only", value: climateFinanceOnly },
                 ]);
             } else {
                 setWashDistribution([]);
             }
-
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
             setError("Failed to load dashboard data. Please try again.");
@@ -287,7 +342,11 @@ const LandingPage = () => {
         };
     });
 
-    const translatedProjectsByStatus = translateChartData(projectsByStatus, language, 'status');
+    const translatedProjectsByStatus = translateChartData(
+        projectsByStatus,
+        language,
+        "status"
+    );
 
     if (loading) {
         return (
@@ -304,16 +363,19 @@ const LandingPage = () => {
             <PageHeader
                 title="Dashboard"
                 subtitle={
-                    language === "bn"
-                        ? (
-                            <span className="no-translate">
-                                বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ রিয়েল-টাইমে ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন—সহজ ও বিস্তারিত প্রতিবেদনের মাধ্যমে।
-                            </span>
-                        ) : (
-                            <span className="no-translate">
-                                Track, analyze and visualize climate finance flows in Bangladesh with real-time overview and comprehensive reporting.
-                            </span>
-                        )
+                    language === "bn" ? (
+                        <span className="no-translate">
+                            বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ রিয়েল-টাইমে
+                            ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন—সহজ ও বিস্তারিত
+                            প্রতিবেদনের মাধ্যমে।
+                        </span>
+                    ) : (
+                        <span className="no-translate">
+                            Track, analyze and visualize climate finance flows
+                            in Bangladesh with real-time overview and
+                            comprehensive reporting.
+                        </span>
+                    )
                 }
                 actions={
                     <>
@@ -391,8 +453,13 @@ const LandingPage = () => {
 
             {/* Map Section - Full Width */}
             <div className="mb-8">
-                <div className="animate-fade-in-up" style={{ animationDelay: "500ms" }}>
-                    {regionalData.length > 0 && <BangladeshMapComponent data={regionalData} />}
+                <div
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: "500ms" }}
+                >
+                    {regionalData.length > 0 && (
+                        <BangladeshMapComponent data={regionalData} />
+                    )}
                 </div>
             </div>
 
@@ -404,7 +471,7 @@ const LandingPage = () => {
                 >
                     {projectsByStatus.length > 0 ? (
                         <PieChartComponent
-                            title={getChartTitle(language, 'projectsByStatus')}
+                            title={getChartTitle(language, "projectsByStatus")}
                             data={translatedProjectsByStatus}
                         />
                     ) : (
@@ -436,21 +503,34 @@ const LandingPage = () => {
                         </Card>
                     )}
                 </div>
-                <div className="animate-fade-in-up" style={{ animationDelay: "700ms" }}>
+                <div
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: "700ms" }}
+                >
                     {regionalData.length > 0 ? (
                         <BarChartComponent
                             title="Regional Distribution"
                             data={regionalData}
                             xAxisKey="region"
                             bars={[
-                                { dataKey: "active", name: "Active Projects", fill: "#8B5CF6" },
-                                { dataKey: "completed", name: "Completed Projects", fill: "#A78BFA" }
+                                {
+                                    dataKey: "active",
+                                    name: "Active Projects",
+                                    fill: "#8B5CF6",
+                                },
+                                {
+                                    dataKey: "completed",
+                                    name: "Completed Projects",
+                                    fill: "#A78BFA",
+                                },
                             ]}
                         />
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
-                                <p className="text-gray-500">No regional data available</p>
+                                <p className="text-gray-500">
+                                    No regional data available
+                                </p>
                             </div>
                         </Card>
                     )}

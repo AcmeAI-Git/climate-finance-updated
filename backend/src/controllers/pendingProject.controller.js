@@ -11,6 +11,7 @@ exports.addPendingProject = async (req, res) => {
             projectData.supporting_document = fileUrl;
         }
 
+        console.log(projectData)
         const result = await PendingProject.addPendingProject(projectData);
         res.status(201).json({
             status: true,

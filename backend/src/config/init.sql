@@ -56,9 +56,6 @@ CREATE TABLE IF NOT EXISTS PendingProject (
     total_cost_usd DECIMAL(15,2),
     gef_grant DECIMAL(15,2),
     cofinancing DECIMAL(15,2),
-    wash_finance DECIMAL(15,2),
-    wash_finance_percent DECIMAL(5,2),
-    beneficiaries VARCHAR(255),
     objectives TEXT,
     direct_beneficiaries INTEGER,
     indirect_beneficiaries INTEGER,
@@ -78,11 +75,14 @@ CREATE TABLE IF NOT EXISTS PendingProject (
     submitter_email VARCHAR(255) NOT NULL,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     agency_ids INTEGER[],
-    location_ids INTEGER[],
     funding_source_ids INTEGER[],
+    sdg_ids INTEGER[],
+    districts TEXT[],
     wash_component JSONB,
     supporting_document VARCHAR(255)
     );
+
+
 
 -- Table: Agency
 CREATE TABLE IF NOT EXISTS Agency (
