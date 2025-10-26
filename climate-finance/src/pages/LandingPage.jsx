@@ -70,25 +70,54 @@ const LandingPage = () => {
             if (overviewResponse.status && overviewResponse.data) {
                 const data = overviewResponse.data;
                 
+                // Calculate stats from projects if backend values are 0 or missing
+                let calculatedStats = {};
+                if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+                    const projects = projectsResponse.data;
+                    calculatedStats = {
+                        total_projects: projects.length,
+                        active_projects: projects.filter(p => 
+                            p.status === 'Active' || p.status === 'Ongoing' || 
+                            p.status === 'active' || p.status === 'ongoing'
+                        ).length,
+                        completed_projects: projects.filter(p => 
+                            p.status === 'Completed' || p.status === 'Implemented' ||
+                            p.status === 'completed' || p.status === 'implemented'
+                        ).length,
+                        total_climate_finance: projects.reduce((sum, p) => 
+                            sum + Number(p.total_cost_usd || 0), 0)
+                    };
+                    
+                    // Debug logging
+                    console.log('LandingPage Debug:', {
+                        backendActive: data.active_projects,
+                        backendCompleted: data.completed_projects,
+                        calculatedActive: calculatedStats.active_projects,
+                        calculatedCompleted: calculatedStats.completed_projects,
+                        projectsCount: projects.length,
+                        projectStatuses: projects.map(p => p.status)
+                    });
+                }
+                
                 setOverviewStats([
                     {
                         title: "Total Climate Finance",
-                        value: formatCurrency(data.total_climate_finance || 0),
+                        value: formatCurrency(Number(data.total_climate_finance || calculatedStats.total_climate_finance || 0)),
                         change: ""
                     },
                     {
                         title: "Total Projects",
-                        value: data.total_projects || 0,
+                        value: data.total_projects || calculatedStats.total_projects || 0,
                         change: ""
                     },
                     {
                         title: "Active Projects",
-                        value: data.active_projects || 0,
+                        value: (data.active_projects && data.active_projects > 0) ? data.active_projects : (calculatedStats.active_projects || 0),
                         change: ""
                     },
                     {
                         title: "Completed Projects",
-                        value: data.completed_projects || 0,
+                        value: (data.completed_projects && data.completed_projects > 0) ? data.completed_projects : (calculatedStats.completed_projects || 0),
                         change: ""
                     }
                 ]);
@@ -105,17 +134,62 @@ const LandingPage = () => {
 
             // Set regional data for map and chart
             if (regionalResponse.status && Array.isArray(regionalResponse.data)) {
-                setRegionalData(
-                    regionalResponse.data.map((item) => ({
-                        region: item.location_name
+                const backendRegional = regionalResponse.data.map((item) => ({
+                    region: item.location_name
+                        .replace(" Division", " Div.")
+                        .replace("Chittagong", "Chattogram")
+                        .replace("Barishal", "Barisal"),
+                    active: Number(item.active_projects) || 0,
+                    completed: Number(item.completed_projects) || 0,
+                    total: Number(item.total_projects) || 0,
+                }));
+                
+                // Calculate from projects if backend has 0 values
+                let calculatedRegional = [];
+                if (projectsResponse.status && Array.isArray(projectsResponse.data)) {
+                    const projects = projectsResponse.data;
+                    const divisionStats = {};
+                    
+                    projects.forEach(p => {
+                        const division = p.geographic_division;
+                        if (!division) return;
+                        
+                        if (!divisionStats[division]) {
+                            divisionStats[division] = { active: 0, completed: 0, total: 0 };
+                        }
+                        
+                        divisionStats[division].total++;
+                        
+                        if (p.status === 'Active' || p.status === 'Ongoing' || 
+                            p.status === 'active' || p.status === 'ongoing') {
+                            divisionStats[division].active++;
+                        } else if (p.status === 'Completed' || p.status === 'Implemented' ||
+                                   p.status === 'completed' || p.status === 'implemented') {
+                            divisionStats[division].completed++;
+                        }
+                    });
+                    
+                    calculatedRegional = Object.entries(divisionStats).map(([division, stats]) => ({
+                        region: division
                             .replace(" Division", " Div.")
                             .replace("Chittagong", "Chattogram")
                             .replace("Barishal", "Barisal"),
-                        active: Number(item.active_projects) || 0,
-                        completed: Number(item.completed_projects) || 0,
-                        total: Number(item.total_projects) || 0,
-                    }))
-                );
+                        active: stats.active,
+                        completed: stats.completed,
+                        total: stats.total
+                    }));
+                }
+                
+                // Use calculated values if backend has 0s
+                const finalRegional = backendRegional.map(item => {
+                    if (item.total === 0) {
+                        const calculated = calculatedRegional.find(c => c.region === item.region);
+                        return calculated || item;
+                    }
+                    return item;
+                });
+                
+                setRegionalData(finalRegional);
             } else {
                 setRegionalData([]);
             }

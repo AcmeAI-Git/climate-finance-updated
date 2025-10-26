@@ -62,16 +62,16 @@ const FundingSources = () => {
       // Calculate overview stats from sources
       const overviewData = {
         total_climate_finance: sources.reduce((sum, fs) => 
-          sum + (fs.grant_amount || 0) + (fs.loan_amount || 0), 0),
+          sum + Number(fs.grant_amount || 0) + Number(fs.loan_amount || 0), 0),
         active_funding_source: sources.length,
-        committed_funds: sources.reduce((sum, fs) => sum + (fs.grant_amount || 0), 0),
-        disbursed_funds: sources.reduce((sum, fs) => sum + (fs.disbursement || 0), 0)
+        committed_funds: sources.reduce((sum, fs) => sum + Number(fs.grant_amount || 0), 0),
+        disbursed_funds: sources.reduce((sum, fs) => sum + Number(fs.disbursement || 0), 0)
       };
 
       setOverviewStats([
         {
           title: "Total Climate Finance",
-          value: formatCurrency(overviewData.total_climate_finance),
+          value: formatCurrency(Number(overviewData.total_climate_finance) || 0),
           change: "All-time total"
         },
         {
@@ -81,23 +81,23 @@ const FundingSources = () => {
         },
         {
           title: "Committed Funds",
-          value: formatCurrency(overviewData.committed_funds),
+          value: formatCurrency(Number(overviewData.committed_funds) || 0),
           change: `${sources.length} funding sources`
         }
       ]);
 
       // Calculate funding by type
       const typeData = sources.reduce((acc, fs) => {
-        const type = fs.type || (fs.grant_amount > 0 ? 'Grant' : 'Loan');
+        const type = fs.type || (Number(fs.grant_amount) > 0 ? 'Grant' : 'Loan');
         if (!acc[type]) acc[type] = { count: 0, totalAmount: 0 };
         acc[type].count++;
-        acc[type].totalAmount += (fs.grant_amount || 0) + (fs.loan_amount || 0);
+        acc[type].totalAmount += Number(fs.grant_amount || 0) + Number(fs.loan_amount || 0);
         return acc;
       }, {});
 
       const fundingByType = Object.entries(typeData).map(([name, data]) => ({
         name,
-        value: data.totalAmount,
+        value: Number(data.totalAmount) || 0,
         count: data.count
       }));
       setFundingByType(fundingByType);

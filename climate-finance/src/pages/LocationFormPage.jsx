@@ -18,13 +18,15 @@ const LocationFormPage = ({ mode = 'add' }) => {
       type: 'select',
       required: true,
       options: [
-        { value: '', label: 'Select region' },
-        { value: 'Central', label: 'Central' },
-        { value: 'Northeast', label: 'Northeast' },
-        { value: 'Northwest', label: 'Northwest' },
-        { value: 'Southwest', label: 'Southwest' },
-        { value: 'Southeast', label: 'Southeast' },
-        { value: 'Chattogram', label: 'Chattogram' }
+        { value: '', label: 'Select division' },
+        { value: 'Dhaka Division', label: 'Dhaka Division' },
+        { value: 'Chattogram Division', label: 'Chattogram Division' },
+        { value: 'Khulna Division', label: 'Khulna Division' },
+        { value: 'Barisal Division', label: 'Barisal Division' },
+        { value: 'Sylhet Division', label: 'Sylhet Division' },
+        { value: 'Rajshahi Division', label: 'Rajshahi Division' },
+        { value: 'Rangpur Division', label: 'Rangpur Division' },
+        { value: 'Mymensingh Division', label: 'Mymensingh Division' }
       ],
       className: 'md:col-span-1'
     }

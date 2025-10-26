@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
-import { agencyApi, fundingSourceApi, projectApi, pendingProjectApi } from '../services/api';
+import { agencyApi, fundingSourceApi, projectApi, pendingProjectApi, locationApi } from '../services/api';
 import Button from '../components/ui/Button';
 import Loading from '../components/ui/Loading';
 import Card from '../components/ui/Card';
@@ -93,19 +93,7 @@ const ProjectFormPage = ({
     actualMode = 'add';
   }
 
-  // Fetch project data for edit mode
-  useEffect(() => {
-    if (actualMode === 'edit' && id) {
-      fetchProject();
-    }
-  }, [actualMode, id]);
-
-  // Fetch all required data from APIs
-  useEffect(() => {
-    fetchAllData();
-  }, []);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       setIsFetching(true);
       setError(null);
@@ -145,7 +133,19 @@ const ProjectFormPage = ({
     } finally {
       setIsFetching(false);
     }
-  };
+  }, [id]);
+
+  // Fetch project data for edit mode
+  useEffect(() => {
+    if (actualMode === 'edit' && id) {
+      fetchProject();
+    }
+  }, [actualMode, id, fetchProject]);
+
+  // Fetch all required data from APIs
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
   const fetchAllData = async () => {
     try {
@@ -302,7 +302,7 @@ const ProjectFormPage = ({
       // Calculate WASH finance percentage
       const washFinancePercent = totalCost > 0 ? (washFinance / totalCost) * 100 : 0;
 
-      // ✅ FIX 1: Convert districts to location_ids
+      // ✅ Convert districts to location_ids
       const location_ids = [];
       if (formData.districts && formData.districts.length > 0) {
         const allLocationsResponse = await locationApi.getAll();
@@ -323,53 +323,58 @@ const ProjectFormPage = ({
         }
       }
 
-      // Create clean project data object
-      const projectData = {
-        title: formData.title,
-        status: formData.status,
-        total_cost_usd: totalCost,
-        gef_grant: gefGrant,
-        cofinancing: cofinancing,
-        beginning: formData.beginning,
-        closing: formData.closing,
-        approval_fy: parseInt(formData.approval_fy) || new Date().getFullYear(),
-        beneficiaries: formData.beneficiaries,
-        objectives: formData.objectives,
-        wash_finance: washFinance,
-        wash_finance_percent: washFinancePercent,
-        wash_component: {
-          presence: formData.wash_component.presence,
-          wash_percentage: formData.wash_component.wash_percentage || 0,
-          description: formData.wash_component_description || ''
-        },
-        // ✅ FIXED relationship IDs:
-        agency_ids: formData.agencies || [],
-        funding_source_ids: formData.funding_sources || [],
-        location_ids: location_ids,           // ✅ Converted from districts
-        sdg_ids: formData.alignment_sdg || [], // ✅ Renamed
-        // Removed focal_area_ids
-        
-        submitter_email: formData.submitter_email,
-        geographic_division: formData.geographic_division,
-        hotspot_vulnerability_type: formData.hotspot_vulnerability_type,
-        wash_component_description: formData.wash_component_description,
-        direct_beneficiaries: parseInt(formData.direct_beneficiaries) || 0,
-        indirect_beneficiaries: parseInt(formData.indirect_beneficiaries) || 0,
-        beneficiary_description: formData.beneficiary_description,
-        gender_inclusion: formData.gender_inclusion,
-        equity_marker: formData.equity_marker,
-        equity_marker_description: formData.equity_marker_description,
-        assessment: formData.assessment,
-        alignment_nap: formData.alignment_nap,
-        alignment_cff: formData.alignment_cff,
-        climate_relevance_score: parseFloat(formData.climate_relevance_score) || 0,
-        climate_relevance_category: formData.climate_relevance_category || '',
-        climate_relevance_justification: formData.climate_relevance_justification || ''
-      };
+      // Create FormData for file upload support
+      const formDataToSend = new FormData();
+      
+      // Append all project fields
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('total_cost_usd', totalCost.toString());
+      formDataToSend.append('gef_grant', gefGrant.toString());
+      formDataToSend.append('cofinancing', cofinancing.toString());
+      formDataToSend.append('beginning', formData.beginning);
+      formDataToSend.append('closing', formData.closing);
+      formDataToSend.append('approval_fy', (parseInt(formData.approval_fy) || new Date().getFullYear()).toString());
+      formDataToSend.append('beneficiaries', formData.beneficiaries || '');
+      formDataToSend.append('objectives', formData.objectives || '');
+      formDataToSend.append('wash_finance', washFinance.toString());
+      formDataToSend.append('wash_finance_percent', washFinancePercent.toString());
+      formDataToSend.append('submitter_email', formData.submitter_email || '');
+      formDataToSend.append('geographic_division', formData.geographic_division || '');
+      formDataToSend.append('hotspot_vulnerability_type', formData.hotspot_vulnerability_type || '');
+      formDataToSend.append('wash_component_description', formData.wash_component_description || '');
+      formDataToSend.append('direct_beneficiaries', (parseInt(formData.direct_beneficiaries) || 0).toString());
+      formDataToSend.append('indirect_beneficiaries', (parseInt(formData.indirect_beneficiaries) || 0).toString());
+      formDataToSend.append('beneficiary_description', formData.beneficiary_description || '');
+      formDataToSend.append('gender_inclusion', formData.gender_inclusion || '');
+      formDataToSend.append('equity_marker', formData.equity_marker || '');
+      formDataToSend.append('equity_marker_description', formData.equity_marker_description || '');
+      formDataToSend.append('assessment', formData.assessment || '');
+      formDataToSend.append('alignment_nap', formData.alignment_nap || '');
+      formDataToSend.append('alignment_cff', formData.alignment_cff || '');
+      formDataToSend.append('climate_relevance_score', (parseFloat(formData.climate_relevance_score) || 0).toString());
+      formDataToSend.append('climate_relevance_category', formData.climate_relevance_category || '');
+      formDataToSend.append('climate_relevance_justification', formData.climate_relevance_justification || '');
+      
+      // Append file if selected
+      if (selectedFile) {
+        formDataToSend.append('supporting_document', selectedFile);
+      }
+      
+      // Append array fields as JSON strings
+      formDataToSend.append('agency_ids', JSON.stringify(formData.agencies || []));
+      formDataToSend.append('funding_source_ids', JSON.stringify(formData.funding_sources || []));
+      formDataToSend.append('location_ids', JSON.stringify(location_ids));
+      formDataToSend.append('sdg_ids', JSON.stringify(formData.alignment_sdg || []));
+      formDataToSend.append('wash_component', JSON.stringify({
+        presence: formData.wash_component.presence,
+        wash_percentage: formData.wash_component.wash_percentage || 0,
+        description: formData.wash_component_description || ''
+      }));
 
       if (actualMode === 'public') {
         // Submit to pending projects for public mode
-        const response = await pendingProjectApi.submit(projectData);
+        const response = await pendingProjectApi.submit(formDataToSend);
         if (response.status) {
           setSuccess(true);
           setSelectedFile(null); // Reset file state on success
@@ -382,10 +387,10 @@ const ProjectFormPage = ({
           throw new Error(response.message || 'Failed to submit project');
         }
       } else if (actualMode === 'add') {
-        await projectApi.add(projectData);
+        await projectApi.add(formDataToSend);
         navigate('/admin/projects');
       } else {
-        await projectApi.update(id, projectData);
+        await projectApi.update(id, formDataToSend);
         navigate('/admin/projects');
       }
     } catch (error) {

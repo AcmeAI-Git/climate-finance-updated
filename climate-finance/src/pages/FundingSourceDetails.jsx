@@ -221,7 +221,14 @@ const FundingSourceDetails = () => {
             <div className="text-center">
               <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">Projects</div>
               <div className="text-lg font-bold text-primary-600">
-                {source.active_projects || 0} Active
+                {source.projects && Array.isArray(source.projects) 
+                  ? source.projects.filter(p => 
+                      p.status === 'Active' || 
+                      p.status === 'Ongoing' || 
+                      p.status === 'active' || 
+                      p.status === 'ongoing'
+                    ).length 
+                  : (source.active_projects || 0)} Active
               </div>
             </div>
             

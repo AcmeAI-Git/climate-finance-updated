@@ -99,8 +99,13 @@ const Projects = () => {
         const projects = projectsResponse.data;
         const overviewData = {
           total_projects: projects.length,
-          active_projects: projects.filter(p => p.status === 'Active').length,
-          total_investment: projects.reduce((sum, p) => sum + (p.total_cost_usd || 0), 0),
+          active_projects: projects.filter(p => 
+            p.status === 'Active' || 
+            p.status === 'Ongoing' || 
+            p.status === 'active' || 
+            p.status === 'ongoing'
+          ).length,
+          total_investment: projects.reduce((sum, p) => sum + Number(p.total_cost_usd || 0), 0),
           completed_projects: projects.filter(p => p.status === 'Completed' || p.status === 'Implemented').length
         };
 
@@ -379,7 +384,7 @@ const Projects = () => {
             >
               <StatCard 
                 title={stat.title}
-                value={typeof stat.value === 'number' && stat.title.includes('Investment') ? formatCurrency(stat.value) : stat.value}
+                value={stat.value}
                 change={stat.change}
                 color={stat.color}
                 icon={stat.icon}
