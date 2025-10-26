@@ -1,14 +1,15 @@
-const { pool } = require('../config/db');
-const { v4: uuidv4 } = require('uuid');
+const { pool } = require("../config/db");
+const { v4: uuidv4 } = require("uuid");
 
 const Project = {};
 
 Project.addProjectWithRelations = async (data) => {
     const client = await pool.connect();
     try {
-        await client.query('BEGIN');
+        await client.query("BEGIN");
 
-        const {
+        // Destructure and validate input
+        let {
             title,
             status,
             approval_fy,
@@ -36,92 +37,163 @@ Project.addProjectWithRelations = async (data) => {
             climate_relevance_justification,
             hotspot_vulnerability_type,
             wash_component_description,
+            supporting_document,
             agency_ids = [],
             location_ids = [],
             funding_source_ids = [],
             sdg_ids = [],
-            wash_component
+            wash_component,
         } = data;
+
+        // Helper function to parse and validate array fields
+        const parseArrayField = (field, fieldName) => {
+            if (!field) return [];
+            if (Array.isArray(field)) {
+                // Ensure all elements are valid integers
+                const parsed = field.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+                if (parsed.length !== field.length) {
+                    throw new Error(`${fieldName} contains invalid integer values`);
+                }
+                return parsed;
+            }
+            if (typeof field === 'string') {
+                try {
+                    const parsed = JSON.parse(field).map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+                    if (parsed.length === 0 && field !== '[]') {
+                        throw new Error(`${fieldName} is an empty or invalid array`);
+                    }
+                    return parsed;
+                } catch (err) {
+                    throw new Error(`Invalid JSON format for ${fieldName}: ${err.message}`);
+                }
+            }
+            throw new Error(`${fieldName} must be an array or valid JSON array string`);
+        };
+
+        // Parse array fields
+        const parsedAgencyIds = parseArrayField(agency_ids, 'agency_ids');
+        const parsedLocationIds = parseArrayField(location_ids, 'location_ids');
+        const parsedFundingSourceIds = parseArrayField(funding_source_ids, 'funding_source_ids');
+        const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
+
+        // Validate required fields (adjust based on your schema)
+        if (!title || !status || !approval_fy) {
+            throw new Error('Missing required fields: title, status, or approval_fy');
+        }
 
         const project_id = uuidv4();
 
+        // Insert project
         const insertProjectQuery = `
-            INSERT INTO Project (
-                project_id, title, status, approval_fy, beginning, closing,
-                total_cost_usd, gef_grant, cofinancing, wash_finance,
-                wash_finance_percent, beneficiaries, objectives,
-                direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
-                gender_inclusion, equity_marker, equity_marker_description,
-                assessment, alignment_nap, alignment_cff, geographic_division,
-                climate_relevance_score, climate_relevance_category, 
-                climate_relevance_justification, hotspot_vulnerability_type,
-                wash_component_description
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28)
-            RETURNING *
-        `;
+                INSERT INTO Project (
+                    project_id, title, status, approval_fy, beginning, closing,
+                    total_cost_usd, gef_grant, cofinancing, wash_finance,
+                    wash_finance_percent, beneficiaries, objectives,
+                    direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
+                    gender_inclusion, equity_marker, equity_marker_description,
+                    assessment, alignment_nap, alignment_cff, geographic_division,
+                    climate_relevance_score, climate_relevance_category, 
+                    climate_relevance_justification, hotspot_vulnerability_type,
+                    wash_component_description, supporting_document
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
+                RETURNING *
+            `;
 
         const values = [
-            project_id, title, status, approval_fy, beginning, closing,
-            total_cost_usd, gef_grant, cofinancing, wash_finance,
-            wash_finance_percent, beneficiaries, objectives,
-            direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
-            gender_inclusion, equity_marker, equity_marker_description,
-            assessment, alignment_nap, alignment_cff, geographic_division,
-            climate_relevance_score, climate_relevance_category,
-            climate_relevance_justification, hotspot_vulnerability_type,
-            wash_component_description
+            project_id,
+            title,
+            status,
+            approval_fy,
+            beginning,
+            closing,
+            parseFloat(total_cost_usd) || 0,
+            parseFloat(gef_grant) || 0,
+            parseFloat(cofinancing) || 0,
+            parseFloat(wash_finance) || 0,
+            parseFloat(wash_finance_percent) || 0,
+            beneficiaries,
+            objectives,
+            parseInt(direct_beneficiaries, 10) || 0,
+            parseInt(indirect_beneficiaries, 10) || 0,
+            beneficiary_description,
+            gender_inclusion === 'true' || gender_inclusion === true,
+            parseInt(equity_marker, 10) || 0,
+            equity_marker_description,
+            assessment,
+            alignment_nap,
+            alignment_cff,
+            geographic_division,
+            parseFloat(climate_relevance_score) || 0,
+            climate_relevance_category,
+            climate_relevance_justification,
+            hotspot_vulnerability_type,
+            wash_component_description,
+            supporting_document,
         ];
 
         await client.query(insertProjectQuery, values);
 
         // Insert WASH component
+        if (wash_component && typeof wash_component === 'string') {
+            try {
+                wash_component = JSON.parse(wash_component);
+            } catch (err) {
+                throw new Error(`Invalid JSON format for wash_component: ${err.message}`);
+            }
+        }
+
         if (wash_component && wash_component.presence) {
             const { presence, wash_percentage, description } = wash_component;
             const insertWASH = `
-                INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
-                VALUES ($1, $2, $3, $4)
-            `;
-            await client.query(insertWASH, [project_id, presence, wash_percentage || 0, description]);
+                    INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
+                    VALUES ($1, $2, $3, $4)
+                `;
+            await client.query(insertWASH, [
+                project_id,
+                presence,
+                parseFloat(wash_percentage) || 0,
+                description,
+            ]);
         }
 
         // Insert relationships
-        for (const agency_id of agency_ids) {
+        for (const agency_id of parsedAgencyIds) {
             await client.query(
-                'INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)',
+                "INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)",
                 [project_id, agency_id]
             );
         }
 
-        for (const location_id of location_ids) {
+        for (const location_id of parsedLocationIds) {
             await client.query(
-                'INSERT INTO ProjectLocation (project_id, location_id) VALUES ($1, $2)',
+                "INSERT INTO ProjectLocation (project_id, location_id) VALUES ($1, $2)",
                 [project_id, location_id]
             );
         }
 
-        for (const funding_source_id of funding_source_ids) {
+        for (const funding_source_id of parsedFundingSourceIds) {
             await client.query(
-                'INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)',
+                "INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)",
                 [project_id, funding_source_id]
             );
         }
 
-        for (const sdg_id of sdg_ids) {
+        for (const sdg_id of parsedSdgIds) {
             await client.query(
-                'INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)',
+                "INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)",
                 [project_id, sdg_id]
             );
         }
 
-        await client.query('COMMIT');
-        return { project_id };
+        await client.query("COMMIT");
+        return { project_id, status: true, message: "Project added successfully" };
     } catch (err) {
-        await client.query('ROLLBACK');
-        throw err;
+        await client.query("ROLLBACK");
+        throw new Error(`Server Error: ${err.message}`);
     } finally {
         client.release();
     }
-};
+},
 
 Project.getAllProjects = async () => {
     const client = await pool.connect();
@@ -163,32 +235,33 @@ Project.getAllProjects = async () => {
         const fundingSourceMap = {};
         const sdgMap = {};
 
-        agencyResult.rows.forEach(row => {
+        agencyResult.rows.forEach((row) => {
             if (!agencyMap[row.project_id]) agencyMap[row.project_id] = [];
             agencyMap[row.project_id].push({
                 agency_id: row.agency_id,
-                name: row.agency_name
+                name: row.agency_name,
             });
         });
 
-        fundingSourceResult.rows.forEach(row => {
-            if (!fundingSourceMap[row.project_id]) fundingSourceMap[row.project_id] = [];
+        fundingSourceResult.rows.forEach((row) => {
+            if (!fundingSourceMap[row.project_id])
+                fundingSourceMap[row.project_id] = [];
             fundingSourceMap[row.project_id].push({
                 funding_source_id: row.funding_source_id,
-                name: row.funding_source_name
+                name: row.funding_source_name,
             });
         });
 
-        sdgResult.rows.forEach(row => {
+        sdgResult.rows.forEach((row) => {
             if (!sdgMap[row.project_id]) sdgMap[row.project_id] = [];
             sdgMap[row.project_id].push({
                 sdg_id: row.sdg_id,
                 sdg_number: row.sdg_number,
-                title: row.title
+                title: row.title,
             });
         });
 
-        return projectResult.rows.map(row => {
+        return projectResult.rows.map((row) => {
             const {
                 wash_presence,
                 wash_percentage,
@@ -204,8 +277,8 @@ Project.getAllProjects = async () => {
                 wash_component: {
                     presence: wash_presence || false,
                     wash_percentage: wash_percentage || 0,
-                    description: wash_description
-                }
+                    description: wash_description,
+                },
             };
         });
     } catch (err) {
@@ -252,7 +325,9 @@ Project.getProjectById = async (id) => {
             INNER JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
             WHERE pfs.project_id = $1
         `;
-        const fundingSourcesResult = await client.query(fundingSourcesQuery, [id]);
+        const fundingSourcesResult = await client.query(fundingSourcesQuery, [
+            id,
+        ]);
 
         const sdgsQuery = `
             SELECT s.sdg_id, s.sdg_number, s.title
@@ -262,14 +337,17 @@ Project.getProjectById = async (id) => {
         `;
         const sdgsResult = await client.query(sdgsQuery, [id]);
 
-        const { presence, wash_percentage, description, ...projectData } = project;
+        const { presence, wash_percentage, description, ...projectData } =
+            project;
 
         return {
             ...projectData,
-            agencies: agenciesResult.rows.map(row => row.agency_id),
-            locations: locationsResult.rows.map(row => row.location_id),
-            funding_sources: fundingSourcesResult.rows.map(row => row.funding_source_id),
-            sdgs: sdgsResult.rows.map(row => row.sdg_id),
+            agencies: agenciesResult.rows.map((row) => row.agency_id),
+            locations: locationsResult.rows.map((row) => row.location_id),
+            funding_sources: fundingSourcesResult.rows.map(
+                (row) => row.funding_source_id
+            ),
+            sdgs: sdgsResult.rows.map((row) => row.sdg_id),
             projectAgencies: agenciesResult.rows,
             projectLocations: locationsResult.rows,
             projectFundingSources: fundingSourcesResult.rows,
@@ -277,8 +355,8 @@ Project.getProjectById = async (id) => {
             wash_component: {
                 presence: presence || false,
                 wash_percentage: wash_percentage || 0,
-                description
-            }
+                description,
+            },
         };
     } catch (err) {
         throw err;
@@ -290,18 +368,41 @@ Project.getProjectById = async (id) => {
 Project.updateProject = async (id, data) => {
     const client = await pool.connect();
     try {
-        await client.query('BEGIN');
+        await client.query("BEGIN");
 
         const {
-            title, status, approval_fy, beginning, closing, total_cost_usd,
-            gef_grant, cofinancing, wash_finance, wash_finance_percent,
-            beneficiaries, objectives, direct_beneficiaries, indirect_beneficiaries,
-            beneficiary_description, gender_inclusion, equity_marker,
-            equity_marker_description, assessment, alignment_nap, alignment_cff,
-            geographic_division, climate_relevance_score, climate_relevance_category,
-            climate_relevance_justification, hotspot_vulnerability_type,
-            wash_component_description, agency_ids = [], location_ids = [],
-            funding_source_ids = [], sdg_ids = [], wash_component
+            title,
+            status,
+            approval_fy,
+            beginning,
+            closing,
+            total_cost_usd,
+            gef_grant,
+            cofinancing,
+            wash_finance,
+            wash_finance_percent,
+            beneficiaries,
+            objectives,
+            direct_beneficiaries,
+            indirect_beneficiaries,
+            beneficiary_description,
+            gender_inclusion,
+            equity_marker,
+            equity_marker_description,
+            assessment,
+            alignment_nap,
+            alignment_cff,
+            geographic_division,
+            climate_relevance_score,
+            climate_relevance_category,
+            climate_relevance_justification,
+            hotspot_vulnerability_type,
+            wash_component_description,
+            agency_ids = [],
+            location_ids = [],
+            funding_source_ids = [],
+            sdg_ids = [],
+            wash_component,
         } = data;
 
         const updateProjectQuery = `
@@ -321,14 +422,34 @@ Project.updateProject = async (id, data) => {
         `;
 
         const values = [
-            title, status, approval_fy, beginning, closing, total_cost_usd,
-            gef_grant, cofinancing, wash_finance, wash_finance_percent,
-            beneficiaries, objectives, direct_beneficiaries, indirect_beneficiaries,
-            beneficiary_description, gender_inclusion, equity_marker,
-            equity_marker_description, assessment, alignment_nap, alignment_cff,
-            geographic_division, climate_relevance_score, climate_relevance_category,
-            climate_relevance_justification, hotspot_vulnerability_type,
-            wash_component_description, id
+            title,
+            status,
+            approval_fy,
+            beginning,
+            closing,
+            total_cost_usd,
+            gef_grant,
+            cofinancing,
+            wash_finance,
+            wash_finance_percent,
+            beneficiaries,
+            objectives,
+            direct_beneficiaries,
+            indirect_beneficiaries,
+            beneficiary_description,
+            gender_inclusion,
+            equity_marker,
+            equity_marker_description,
+            assessment,
+            alignment_nap,
+            alignment_cff,
+            geographic_division,
+            climate_relevance_score,
+            climate_relevance_category,
+            climate_relevance_justification,
+            hotspot_vulnerability_type,
+            wash_component_description,
+            id,
         ];
 
         const result = await client.query(updateProjectQuery, values);
@@ -342,35 +463,62 @@ Project.updateProject = async (id, data) => {
                 ON CONFLICT (project_id)
                 DO UPDATE SET presence = $2, wash_percentage = $3, description = $4
             `;
-            await client.query(updateWASH, [id, presence, wash_percentage || 0, description]);
+            await client.query(updateWASH, [
+                id,
+                presence,
+                wash_percentage || 0,
+                description,
+            ]);
         }
 
         // Update relationships
-        await client.query('DELETE FROM ProjectAgency WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectLocation WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectFundingSource WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectSDG WHERE project_id = $1', [id]);
+        await client.query("DELETE FROM ProjectAgency WHERE project_id = $1", [
+            id,
+        ]);
+        await client.query(
+            "DELETE FROM ProjectLocation WHERE project_id = $1",
+            [id]
+        );
+        await client.query(
+            "DELETE FROM ProjectFundingSource WHERE project_id = $1",
+            [id]
+        );
+        await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [
+            id,
+        ]);
 
         for (const agency_id of agency_ids) {
-            await client.query('INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)', [id, agency_id]);
+            await client.query(
+                "INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)",
+                [id, agency_id]
+            );
         }
 
         for (const location_id of location_ids) {
-            await client.query('INSERT INTO ProjectLocation (project_id, location_id) VALUES ($1, $2)', [id, location_id]);
+            await client.query(
+                "INSERT INTO ProjectLocation (project_id, location_id) VALUES ($1, $2)",
+                [id, location_id]
+            );
         }
 
         for (const funding_source_id of funding_source_ids) {
-            await client.query('INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)', [id, funding_source_id]);
+            await client.query(
+                "INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)",
+                [id, funding_source_id]
+            );
         }
 
         for (const sdg_id of sdg_ids) {
-            await client.query('INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)', [id, sdg_id]);
+            await client.query(
+                "INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)",
+                [id, sdg_id]
+            );
         }
 
-        await client.query('COMMIT');
+        await client.query("COMMIT");
         return result.rows[0];
     } catch (err) {
-        await client.query('ROLLBACK');
+        await client.query("ROLLBACK");
         throw err;
     } finally {
         client.release();
@@ -380,16 +528,28 @@ Project.updateProject = async (id, data) => {
 Project.deleteProject = async (id) => {
     const client = await pool.connect();
     try {
-        await client.query('BEGIN');
-        await client.query('DELETE FROM ProjectSDG WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectFundingSource WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectLocation WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM ProjectAgency WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM WASHComponent WHERE project_id = $1', [id]);
-        await client.query('DELETE FROM Project WHERE project_id = $1', [id]);
-        await client.query('COMMIT');
+        await client.query("BEGIN");
+        await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [
+            id,
+        ]);
+        await client.query(
+            "DELETE FROM ProjectFundingSource WHERE project_id = $1",
+            [id]
+        );
+        await client.query(
+            "DELETE FROM ProjectLocation WHERE project_id = $1",
+            [id]
+        );
+        await client.query("DELETE FROM ProjectAgency WHERE project_id = $1", [
+            id,
+        ]);
+        await client.query("DELETE FROM WASHComponent WHERE project_id = $1", [
+            id,
+        ]);
+        await client.query("DELETE FROM Project WHERE project_id = $1", [id]);
+        await client.query("COMMIT");
     } catch (err) {
-        await client.query('ROLLBACK');
+        await client.query("ROLLBACK");
         throw err;
     } finally {
         client.release();
@@ -417,7 +577,10 @@ Project.getProjectByStatus = async () => {
         GROUP BY status
     `;
     const { rows } = await pool.query(query);
-    return rows.map(row => ({ name: row.status, value: parseInt(row.value) }));
+    return rows.map((row) => ({
+        name: row.status,
+        value: parseInt(row.value),
+    }));
 };
 
 Project.getProjectTrend = async () => {
@@ -428,7 +591,10 @@ Project.getProjectTrend = async () => {
         ORDER BY approval_fy
     `;
     const { rows } = await pool.query(query);
-    return rows.map(row => ({ year: row.year.toString(), projects: parseInt(row.total_projects) }));
+    return rows.map((row) => ({
+        year: row.year.toString(),
+        projects: parseInt(row.total_projects),
+    }));
 };
 
 Project.getRegionalDistribution = async () => {

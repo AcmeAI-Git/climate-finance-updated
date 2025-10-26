@@ -6,7 +6,9 @@ const path = require("path");
 
 const pool = new Pool({
     connectionString: process.env.PG_URI,
-    ssl: false,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 const connectDB = async () => {
@@ -14,7 +16,6 @@ const connectDB = async () => {
         await pool.connect();
         logger.info("PostgreSQL Connected");
 
-        // Only run init SQL if we're in development or if explicitly requested
         if (
             process.env.NODE_ENV === "production" ||
             process.env.INIT_DB === "true"

@@ -14,6 +14,15 @@ app.use(helmet());
 app.use(express.json());
 app.use(morgan("dev"));
 
+// File Upload Middleware
+const fileUpload = require("express-fileupload");
+app.use(
+    fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp/",
+    })
+);
+
 connectDB();
 
 // Routes

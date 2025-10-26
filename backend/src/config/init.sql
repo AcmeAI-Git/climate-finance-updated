@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS Project (
     climate_relevance_justification TEXT,
     hotspot_vulnerability_type VARCHAR(255),
     wash_component_description TEXT,
+    supporting_document VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
@@ -79,7 +80,8 @@ CREATE TABLE IF NOT EXISTS PendingProject (
     agency_ids INTEGER[],
     location_ids INTEGER[],
     funding_source_ids INTEGER[],
-    wash_component JSONB
+    wash_component JSONB,
+    supporting_document VARCHAR(255)
     );
 
 -- Table: Agency

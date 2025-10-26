@@ -1,8 +1,17 @@
 const PendingProject = require("../models/PendingProject.model");
+const { uploadFile } = require("../utils/fileUpload");
 
 exports.addPendingProject = async (req, res) => {
     try {
-        const result = await PendingProject.addPendingProject(req.body);
+        let projectData = req.body;
+
+        // Handle file upload if present
+        if (req.files && req.files.supporting_document) {
+            const fileUrl = await uploadFile(req.files.supporting_document);
+            projectData.supporting_document = fileUrl;
+        }
+
+        const result = await PendingProject.addPendingProject(projectData);
         res.status(201).json({
             status: true,
             message:
