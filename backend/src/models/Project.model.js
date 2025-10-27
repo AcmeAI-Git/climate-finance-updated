@@ -599,16 +599,23 @@ Project.getProjectTrend = async () => {
 
 Project.getRegionalDistribution = async () => {
     const query = `
-        SELECT l.name AS location_name, COUNT(DISTINCT p.project_id) AS project_count,
-               SUM(p.total_cost_usd) AS total_investment
+        SELECT 
+            p.geographic_division AS region,
+            COUNT(*) AS total,
+            COUNT(*) FILTER (WHERE p.status = 'Active') AS active,
+            COUNT(*) FILTER (WHERE p.status = 'Implemented' OR p.status = 'Completed') AS completed
         FROM Project p
-        INNER JOIN ProjectLocation pl ON p.project_id = pl.project_id
-        INNER JOIN Location l ON pl.location_id = l.location_id
-        GROUP BY l.name
-        ORDER BY total_investment DESC
+        GROUP BY p.geographic_division
+        ORDER BY p.geographic_division;
     `;
     const { rows } = await pool.query(query);
-    return rows;
+    return rows.map(row => ({
+        region: row.region,
+        total: parseInt(row.total) || 0,
+        active: parseInt(row.active) || 0,
+        completed: parseInt(row.completed) || 0,
+    }));
 };
+
 
 module.exports = Project;
