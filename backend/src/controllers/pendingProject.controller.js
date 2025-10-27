@@ -1,5 +1,8 @@
 const PendingProject = require("../models/PendingProject.model");
 const { uploadFile } = require("../utils/fileUpload");
+const Agency = require('../models/Agency.model')
+const FundingSource = require('../models/FundingSource.model')
+const SDGAlignment = require("../models/SDGAlignment.model");
 
 exports.addPendingProject = async (req, res) => {
     try {
@@ -11,7 +14,6 @@ exports.addPendingProject = async (req, res) => {
             projectData.supporting_document = fileUrl;
         }
 
-        console.log(projectData)
         const result = await PendingProject.addPendingProject(projectData);
         res.status(201).json({
             status: true,
@@ -30,11 +32,36 @@ exports.addPendingProject = async (req, res) => {
 exports.getAllPendingProjects = async (req, res) => {
     try {
         const result = await PendingProject.getAllPendingProjects();
-        res.status(200).json({ status: true, data: result });
+
+        const projectsWithAgencies = await Promise.all(
+            result.map(async (project) => {
+                const agencies = await Promise.all(
+                    project.agency_ids.map((id) => Agency.getAgencyById(id))
+                );
+
+                const funding_sources = await Promise.all(
+                    project.funding_source_ids.map((id) => FundingSource.getById(id))
+                );
+
+                const sdg = await Promise.all(
+                    project.sdg_ids.map((id) => SDGAlignment.getSDGById(id))
+                );
+
+                return {
+                    ...project,
+                    agencies,
+                    funding_sources,
+                    sdg
+                };
+            })
+        );
+
+        res.status(200).json({ status: true, data: projectsWithAgencies });
     } catch (e) {
         res.status(500).json({ status: false, message: `Error: ${e.message}` });
     }
 };
+
 
 exports.getPendingProjectById = async (req, res) => {
     try {

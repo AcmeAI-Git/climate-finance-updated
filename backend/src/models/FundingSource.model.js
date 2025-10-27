@@ -27,6 +27,11 @@ FundingSource.getAllFundingSources = async () => {
     return rows;
 };
 
+FundingSource.getById = async (id) => {
+    const { rows } = await pool.query('SELECT * FROM FundingSource WHERE funding_source_id = $1', [id]);
+    return rows[0];
+};
+
 FundingSource.getFundingSourceById = async (id) => {
     const client = await pool.connect();
     try {
