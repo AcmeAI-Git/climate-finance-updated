@@ -485,8 +485,7 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            {/* Charts Section - Three Charts Side by Side */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div
                     className="animate-fade-in-up"
                     style={{ animationDelay: "600ms" }}
@@ -525,28 +524,35 @@ const LandingPage = () => {
                         </Card>
                     )}
                 </div>
+            </div>
+
+            <div className="w-full overflow-hidden">
                 <div
                     className="animate-fade-in-up"
                     style={{ animationDelay: "700ms" }}
                 >
                     {regionalData.length > 0 ? (
-                        <BarChartComponent
-                            title="Regional Distribution"
-                            data={regionalData}
-                            xAxisKey="region"
-                            bars={[
-                                {
-                                    dataKey: "active",
-                                    name: "Active Projects",
-                                    fill: "#8B5CF6",
-                                },
-                                {
-                                    dataKey: "completed",
-                                    name: "Completed Projects",
-                                    fill: "#A78BFA",
-                                },
-                            ]}
-                        />
+                        <div className="w-full">
+                            <div className="w-full">
+                                <BarChartComponent
+                                    title="Regional Distribution"
+                                    data={regionalData}
+                                    xAxisKey="region"
+                                    bars={[
+                                        {
+                                            dataKey: "active",
+                                            name: "Active Projects",
+                                            fill: "#8B5CF6",
+                                        },
+                                        {
+                                            dataKey: "completed",
+                                            name: "Completed Projects",
+                                            fill: "#A78BFA",
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        </div>
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
