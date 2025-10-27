@@ -167,7 +167,6 @@ Project.addProjectWithRelations = async (data) => {
     }
 };
 
-
 Project.getAllProjects = async () => {
     const client = await pool.connect();
     try {
@@ -261,6 +260,168 @@ Project.getAllProjects = async () => {
     }
 };
 
+Project.updateProject = async (id, data) => {
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+
+        let {
+            title,
+            status,
+            approval_fy,
+            beginning,
+            closing,
+            total_cost_usd,
+            gef_grant,
+            cofinancing,
+            objectives,
+            direct_beneficiaries,
+            indirect_beneficiaries,
+            beneficiary_description,
+            gender_inclusion,
+            equity_marker,
+            equity_marker_description,
+            assessment,
+            alignment_nap,
+            alignment_cff,
+            geographic_division,
+            climate_relevance_score,
+            climate_relevance_category,
+            climate_relevance_justification,
+            hotspot_vulnerability_type,
+            wash_component_description,
+            supporting_document,
+            agency_ids = [],
+            funding_source_ids = [],
+            sdg_ids = [],
+            districts = [],
+            wash_component,
+        } = data;
+
+        const parseArrayField = (field, fieldName) => {
+            if (!field) return [];
+            if (Array.isArray(field)) return field;
+            if (typeof field === "string") {
+                try {
+                    return JSON.parse(field);
+                } catch (err) {
+                    throw new Error(`Invalid JSON format for ${fieldName}: ${err.message}`);
+                }
+            }
+            throw new Error(`${fieldName} must be an array or JSON array string`);
+        };
+
+        const parsedAgencyIds = parseArrayField(agency_ids, 'agency_ids');
+        const parsedFundingSourceIds = parseArrayField(funding_source_ids, 'funding_source_ids');
+        const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
+        const parsedDistricts = parseArrayField(districts, 'districts');
+
+        const updateProjectQuery = `
+            UPDATE Project SET 
+                title = $1, status = $2, approval_fy = $3, beginning = $4, closing = $5,
+                total_cost_usd = $6, gef_grant = $7, cofinancing = $8, objectives = $9,
+                direct_beneficiaries = $10, indirect_beneficiaries = $11,
+                beneficiary_description = $12, gender_inclusion = $13, equity_marker = $14,
+                equity_marker_description = $15, assessment = $16, alignment_nap = $17,
+                alignment_cff = $18, geographic_division = $19, climate_relevance_score = $20,
+                climate_relevance_category = $21, climate_relevance_justification = $22,
+                hotspot_vulnerability_type = $23, wash_component_description = $24,
+                supporting_document = $25, districts = $26,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE project_id = $27
+            RETURNING *
+        `;
+
+        const values = [
+            title,
+            status,
+            approval_fy,
+            beginning,
+            closing,
+            parseFloat(total_cost_usd) || 0,
+            parseFloat(gef_grant) || 0,
+            parseFloat(cofinancing) || 0,
+            objectives,
+            parseInt(direct_beneficiaries, 10) || 0,
+            parseInt(indirect_beneficiaries, 10) || 0,
+            beneficiary_description,
+            gender_inclusion,
+            equity_marker,
+            equity_marker_description,
+            assessment,
+            alignment_nap,
+            alignment_cff,
+            geographic_division,
+            parseFloat(climate_relevance_score) || 0,
+            climate_relevance_category,
+            climate_relevance_justification,
+            hotspot_vulnerability_type,
+            wash_component_description,
+            supporting_document,
+            parsedDistricts,
+            id,
+        ];
+
+        const result = await client.query(updateProjectQuery, values);
+
+        // Update WASH component
+        if (wash_component && typeof wash_component === 'string') {
+            wash_component = JSON.parse(wash_component);
+        }
+
+        if (wash_component && wash_component.presence) {
+            const { presence, wash_percentage, description } = wash_component;
+            const updateWASH = `
+                INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (project_id)
+                DO UPDATE SET presence = $2, wash_percentage = $3, description = $4
+            `;
+            await client.query(updateWASH, [
+                id,
+                presence,
+                parseFloat(wash_percentage) || 0,
+                description,
+            ]);
+        }
+
+        // Update relationships
+        await client.query("DELETE FROM ProjectAgency WHERE project_id = $1", [id]);
+        await client.query("DELETE FROM ProjectFundingSource WHERE project_id = $1", [id]);
+        await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [id]);
+
+        for (const agency_id of parsedAgencyIds) {
+            await client.query(
+                "INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)",
+                [id, agency_id]
+            );
+        }
+
+        for (const funding_source_id of parsedFundingSourceIds) {
+            await client.query(
+                "INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)",
+                [id, funding_source_id]
+            );
+        }
+
+        for (const sdg_id of parsedSdgIds) {
+            await client.query(
+                "INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)",
+                [id, sdg_id]
+            );
+        }
+
+        await client.query("COMMIT");
+        return { project_id: id, status: true, message: "Project updated successfully" };
+
+    } catch (err) {
+        await client.query("ROLLBACK");
+        throw new Error(`Server Error: ${err.message}`);
+    } finally {
+        client.release();
+    }
+};
+
 Project.getProjectById = async (id) => {
     const client = await pool.connect();
     try {
@@ -328,166 +489,6 @@ Project.getProjectById = async (id) => {
     }
 };
 
-Project.updateProject = async (id, data) => {
-    const client = await pool.connect();
-    try {
-        await client.query("BEGIN");
-
-        const {
-            title,
-            status,
-            approval_fy,
-            beginning,
-            closing,
-            total_cost_usd,
-            gef_grant,
-            cofinancing,
-            wash_finance,
-            wash_finance_percent,
-            beneficiaries,
-            objectives,
-            direct_beneficiaries,
-            indirect_beneficiaries,
-            beneficiary_description,
-            gender_inclusion,
-            equity_marker,
-            equity_marker_description,
-            assessment,
-            alignment_nap,
-            alignment_cff,
-            geographic_division,
-            climate_relevance_score,
-            climate_relevance_category,
-            climate_relevance_justification,
-            hotspot_vulnerability_type,
-            wash_component_description,
-            agency_ids = [],
-            location_ids = [],
-            funding_source_ids = [],
-            sdg_ids = [],
-            wash_component,
-        } = data;
-
-        const updateProjectQuery = `
-            UPDATE Project SET 
-                title = $1, status = $2, approval_fy = $3, beginning = $4, closing = $5,
-                total_cost_usd = $6, gef_grant = $7, cofinancing = $8, wash_finance = $9,
-                wash_finance_percent = $10, beneficiaries = $11, objectives = $12,
-                direct_beneficiaries = $13, indirect_beneficiaries = $14,
-                beneficiary_description = $15, gender_inclusion = $16, equity_marker = $17,
-                equity_marker_description = $18, assessment = $19, alignment_nap = $20,
-                alignment_cff = $21, geographic_division = $22, climate_relevance_score = $23,
-                climate_relevance_category = $24, climate_relevance_justification = $25,
-                hotspot_vulnerability_type = $26, wash_component_description = $27,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE project_id = $28
-            RETURNING *
-        `;
-
-        const values = [
-            title,
-            status,
-            approval_fy,
-            beginning,
-            closing,
-            total_cost_usd,
-            gef_grant,
-            cofinancing,
-            wash_finance,
-            wash_finance_percent,
-            beneficiaries,
-            objectives,
-            direct_beneficiaries,
-            indirect_beneficiaries,
-            beneficiary_description,
-            gender_inclusion,
-            equity_marker,
-            equity_marker_description,
-            assessment,
-            alignment_nap,
-            alignment_cff,
-            geographic_division,
-            climate_relevance_score,
-            climate_relevance_category,
-            climate_relevance_justification,
-            hotspot_vulnerability_type,
-            wash_component_description,
-            id,
-        ];
-
-        const result = await client.query(updateProjectQuery, values);
-
-        // Update WASH component
-        if (wash_component) {
-            const { presence, wash_percentage, description } = wash_component;
-            const updateWASH = `
-                INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT (project_id)
-                DO UPDATE SET presence = $2, wash_percentage = $3, description = $4
-            `;
-            await client.query(updateWASH, [
-                id,
-                presence,
-                wash_percentage || 0,
-                description,
-            ]);
-        }
-
-        // Update relationships
-        await client.query("DELETE FROM ProjectAgency WHERE project_id = $1", [
-            id,
-        ]);
-        await client.query(
-            "DELETE FROM ProjectLocation WHERE project_id = $1",
-            [id]
-        );
-        await client.query(
-            "DELETE FROM ProjectFundingSource WHERE project_id = $1",
-            [id]
-        );
-        await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [
-            id,
-        ]);
-
-        for (const agency_id of agency_ids) {
-            await client.query(
-                "INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)",
-                [id, agency_id]
-            );
-        }
-
-        for (const location_id of location_ids) {
-            await client.query(
-                "INSERT INTO ProjectLocation (project_id, location_id) VALUES ($1, $2)",
-                [id, location_id]
-            );
-        }
-
-        for (const funding_source_id of funding_source_ids) {
-            await client.query(
-                "INSERT INTO ProjectFundingSource (project_id, funding_source_id) VALUES ($1, $2)",
-                [id, funding_source_id]
-            );
-        }
-
-        for (const sdg_id of sdg_ids) {
-            await client.query(
-                "INSERT INTO ProjectSDG (project_id, sdg_id) VALUES ($1, $2)",
-                [id, sdg_id]
-            );
-        }
-
-        await client.query("COMMIT");
-        return result.rows[0];
-    } catch (err) {
-        await client.query("ROLLBACK");
-        throw err;
-    } finally {
-        client.release();
-    }
-};
-
 Project.deleteProject = async (id) => {
     const client = await pool.connect();
     try {
@@ -525,7 +526,7 @@ Project.getOverviewStats = async () => {
             COUNT(*) AS total_projects,
             SUM(total_cost_usd) AS total_climate_finance,
             COUNT(*) FILTER (WHERE status = 'Active') AS active_projects,
-            COUNT(*) FILTER (WHERE status = 'Implemented') AS completed_projects,
+            COUNT(*) FILTER (WHERE status = 'Completed') AS completed_projects,
             AVG(climate_relevance_score) AS avg_climate_relevance
         FROM Project
     `;
