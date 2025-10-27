@@ -21,9 +21,6 @@ CREATE TABLE IF NOT EXISTS Project (
     total_cost_usd DECIMAL(15,2),
     gef_grant DECIMAL(15,2),
     cofinancing DECIMAL(15,2),
-    wash_finance DECIMAL(15,2),
-    wash_finance_percent DECIMAL(5,2),
-    beneficiaries VARCHAR(255),
     objectives TEXT,
     direct_beneficiaries INTEGER,
     indirect_beneficiaries INTEGER,
@@ -41,9 +38,12 @@ CREATE TABLE IF NOT EXISTS Project (
     hotspot_vulnerability_type VARCHAR(255),
     wash_component_description TEXT,
     supporting_document VARCHAR(255),
+    districts TEXT[],
+    wash_component JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
 
 -- Table: PendingProject (for projects awaiting approval)
 CREATE TABLE IF NOT EXISTS PendingProject (

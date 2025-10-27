@@ -41,7 +41,7 @@ User.updateLastLogin = async (userId) => {
 };
 
 User.getAllUsers = async () => {
-    const response = await pool.query('SELECT * FROM users ORDER BY created_at DESC');
+    const response = await pool.query('SELECT * FROM users');
     return response.rows;
 };
 

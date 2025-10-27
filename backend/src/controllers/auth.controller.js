@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const {use} = require("express/lib/application");
 
 exports.register = async (req, res) => {
   try {
@@ -103,18 +104,12 @@ exports.login = async (req, res) => {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const users = await User.getAllUser();
-    // Remove passwords from all users
-    const usersWithoutPasswords = users.map(user => {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    });
+    const users = await User.getAllUsers();
     
     // Return users in the data field for consistency with other APIs
     res.status(200).json({
       status: true, 
-      data: usersWithoutPasswords,
-      count: usersWithoutPasswords.length
+      data: users
     });
   } catch (error) {
     res.status(500).json({
