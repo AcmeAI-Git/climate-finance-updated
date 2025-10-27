@@ -33,7 +33,7 @@ exports.getAllPendingProjects = async (req, res) => {
     try {
         const result = await PendingProject.getAllPendingProjects();
 
-        const projectsWithAgencies = await Promise.all(
+        const projectsWithDetails = await Promise.all(
             result.map(async (project) => {
                 const agencies = await Promise.all(
                     project.agency_ids.map((id) => Agency.getAgencyById(id))
@@ -56,7 +56,7 @@ exports.getAllPendingProjects = async (req, res) => {
             })
         );
 
-        res.status(200).json({ status: true, data: projectsWithAgencies });
+        res.status(200).json({ status: true, data: projectsWithDetails });
     } catch (e) {
         res.status(500).json({ status: false, message: `Error: ${e.message}` });
     }
@@ -65,15 +65,30 @@ exports.getAllPendingProjects = async (req, res) => {
 
 exports.getPendingProjectById = async (req, res) => {
     try {
-        const result = await PendingProject.getPendingProjectById(
+        const project = await PendingProject.getPendingProjectById(
             req.params.id
         );
-        if (!result) {
+        if (!project) {
             return res
                 .status(404)
                 .json({ status: false, message: "Pending project not found" });
         }
-        res.status(200).json({ status: true, data: result });
+
+        const agencies = await Promise.all(
+            project.agency_ids.map((id) => Agency.getAgencyById(id))
+        );
+
+        const funding_sources = await Promise.all(
+            project.funding_source_ids.map((id) => FundingSource.getById(id))
+        );
+
+        const sdg = await Promise.all(
+            project.sdg_ids.map((id) => SDGAlignment.getSDGById(id))
+        );
+
+
+
+        res.status(200).json({ status: true, data: {...project, agencies, funding_sources, sdg} });
     } catch (e) {
         res.status(500).json({ status: false, message: `Error: ${e.message}` });
     }
