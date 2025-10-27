@@ -161,39 +161,39 @@ const LandingPage = () => {
 
             // Set regional data for map and chart
             // Using dummy data for regional distribution
-            const dummyRegionalData = [
-                { region: "Dhaka", active: 1, completed: 1, total: 2 },
-                {
-                    region: "Chattogram",
-                    active: 0,
-                    completed: 0,
-                    total: 0,
-                },
-                { region: "Rajshahi", active: 2, completed: 0, total: 2 },
-                { region: "Khulna", active: 1, completed: 0, total: 0 },
-                { region: "Barisal", active: 1, completed: 1, total: 2 },
-                { region: "Sylhet", active: 0, completed: 0, total: 0 },
-                { region: "Rangpur", active: 0, completed: 0, total: 0 },
-                {
-                    region: "Mymensingh",
-                    active: 0,
-                    completed: 0,
-                    total: 0,
-                },
-            ];
+            // const dummyRegionalData = [
+            //     { region: "Dhaka", active: 1, completed: 1, total: 2 },
+            //     {
+            //         region: "Chattogram",
+            //         active: 0,
+            //         completed: 0,
+            //         total: 0,
+            //     },
+            //     { region: "Rajshahi", active: 2, completed: 0, total: 2 },
+            //     { region: "Khulna", active: 1, completed: 0, total: 0 },
+            //     { region: "Barisal", active: 1, completed: 1, total: 2 },
+            //     { region: "Sylhet", active: 0, completed: 0, total: 0 },
+            //     { region: "Rangpur", active: 0, completed: 0, total: 0 },
+            //     {
+            //         region: "Mymensingh",
+            //         active: 0,
+            //         completed: 0,
+            //         total: 0,
+            //     },
+            // ];
 
             if (
                 regionalResponse.status &&
                 Array.isArray(regionalResponse.data)
             ) {
                 const backendRegional = regionalResponse.data.map((item) => ({
-                    region: item.location_name
+                    region: item.region
                         .replace(" Division", "")
                         .replace("Chittagong", "Chattogram")
                         .replace("Barishal", "Barisal"),
-                    active: Number(item.active_projects) || 0,
-                    completed: Number(item.completed_projects) || 0,
-                    total: Number(item.total_projects) || 0,
+                    active: Number(item.active) || 0,
+                    completed: Number(item.completed) || 0,
+                    total: Number(item.total) || 0,
                 }));
 
                 // Calculate from projects if backend has 0 values
@@ -260,9 +260,9 @@ const LandingPage = () => {
                     return item;
                 });
 
-                setRegionalData(dummyRegionalData);
+                setRegionalData(finalRegional);
             } else {
-                setRegionalData(dummyRegionalData);
+                setRegionalData(regionalResponse.data);
             }
 
             // Calculate WASH vs Climate Finance distribution
