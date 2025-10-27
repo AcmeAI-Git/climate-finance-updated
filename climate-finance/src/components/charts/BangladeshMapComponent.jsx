@@ -119,15 +119,21 @@ const BangladeshMapComponent = ({
           </div>
           <div style="margin-bottom: 6px;">
             <span style="color: #059669; font-weight: 500;">Active Projects:</span>
-            <span style="color: #374151; margin-left: 4px;">${data.active || 0}</span>
+            <span style="color: #374151; margin-left: 4px;">${
+                data.active || 0
+            }</span>
           </div>
           <div style="margin-bottom: 6px;">
             <span style="color: #6366F1; font-weight: 500;">Completed Projects:</span>
-            <span style="color: #374151; margin-left: 4px;">${data.completed || 0}</span>
+            <span style="color: #374151; margin-left: 4px;">${
+                data.completed || 0
+            }</span>
           </div>
           <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E5E7EB;">
             <span style="color: #7C3AED; font-weight: 600; font-size: 14px;">Total Projects:</span>
-            <span style="color: #1F2937; font-weight: 600; margin-left: 4px;">${data.total || (data.active || 0) + (data.completed || 0)}</span>
+            <span style="color: #1F2937; font-weight: 600; margin-left: 4px;">${
+                data.total || (data.active || 0) + (data.completed || 0)
+            }</span>
           </div>
         </div>
       `);
@@ -147,11 +153,11 @@ const BangladeshMapComponent = ({
 
     // Center of Bangladesh
     const center = [23.685, 90.3563];
-    
+
     // Define bounds to limit panning - covering Bangladesh and surrounding areas
     const maxBounds = [
         [20.0, 88.0], // Southwest corner (south, west)
-        [27.0, 93.0]  // Northeast corner (north, east)
+        [27.0, 93.0], // Northeast corner (north, east)
     ];
 
     return (
