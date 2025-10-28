@@ -330,7 +330,7 @@ const FundingSources = () => {
                         <StatCard
                             title="Total Funding Sources"
                             value={fundingOverview.total_funding_sources}
-                            change="From overview API"
+                            change=""
                             color="primary"
                             icon={<Building size={20} />}
                         />
@@ -343,7 +343,7 @@ const FundingSources = () => {
                         <StatCard
                             title="Total Projects Supported"
                             value={fundingOverview.total_projects_supported}
-                            change="From overview API"
+                            change=""
                             color="success"
                             icon={<CheckCircle size={20} />}
                         />
@@ -356,7 +356,7 @@ const FundingSources = () => {
                         <StatCard
                             title="Development Partners"
                             value={fundingOverview.total_development_partners}
-                            change="From overview API"
+                            change=""
                             color="secondary"
                             icon={<Globe size={20} />}
                         />
