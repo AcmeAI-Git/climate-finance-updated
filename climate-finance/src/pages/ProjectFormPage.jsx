@@ -450,7 +450,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     presence: formData.wash_component.presence,
                     wash_percentage:
                         formData.wash_component.wash_percentage || 0,
-                    description: formData.wash_component_description || "",
+                    description: formData.wash_component.description || "",
                 })
             );
 

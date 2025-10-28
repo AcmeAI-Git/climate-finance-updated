@@ -93,6 +93,7 @@ const ProjectFormSections = ({
     const handleWashSliderChange = (value) => {
         handleWashComponentChange((prev) => ({
             ...prev,
+            presence: value > 0 ? true : false,
             wash_percentage: value,
         }));
     };

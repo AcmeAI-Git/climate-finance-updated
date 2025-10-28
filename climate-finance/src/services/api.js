@@ -242,6 +242,10 @@ export const fundingSourceApi = {
     getFundingSource: () => apiRequest("/project/get-funding-source"),
     getFundingSourceSectorAllocation: () =>
         apiRequest("/project/get-funding-source-sector-allocation"),
+    getFundingSourceCount: () =>
+        apiRequest("/funding-source/get-funding-source-count"),
+    getFundingSourceOverviewStats: () =>
+        apiRequest("/funding-source/get-funding-source-overview"),
 };
 
 // Focal Area API endpoints (from Postman)

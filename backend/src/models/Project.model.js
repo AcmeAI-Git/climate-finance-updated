@@ -552,14 +552,18 @@ Project.getProjectByStatus = async () => {
 
 Project.getProjectTrend = async () => {
     const query = `
-        SELECT approval_fy AS year, COUNT(*) AS total_projects
+        SELECT 
+            SUBSTRING(beginning, 1, 4) AS year,
+            COUNT(*) AS total_projects
         FROM Project
-        GROUP BY approval_fy
-        ORDER BY approval_fy
+        WHERE beginning IS NOT NULL AND beginning <> ''
+        GROUP BY year
+        ORDER BY year;
     `;
+
     const { rows } = await pool.query(query);
     return rows.map((row) => ({
-        year: row.year.toString(),
+        year: row.year,
         projects: parseInt(row.total_projects),
     }));
 };

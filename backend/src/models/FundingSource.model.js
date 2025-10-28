@@ -27,6 +27,36 @@ FundingSource.getAllFundingSources = async () => {
     return rows;
 };
 
+FundingSource.getFundingSourceCount = async () => {
+    const query = `
+        SELECT
+            fs.funding_source_id,
+            fs.name AS funding_source_name,
+            COUNT(DISTINCT pfs.project_id) AS total_projects
+        FROM ProjectFundingSource pfs
+                 JOIN FundingSource fs ON pfs.funding_source_id = fs.funding_source_id
+        GROUP BY fs.funding_source_id, fs.name
+        ORDER BY total_projects DESC;
+
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+};
+
+FundingSource.getFundingSourceOverview = async () => {
+    const query = `
+        SELECT
+            COUNT(DISTINCT fs.funding_source_id) AS total_funding_sources,
+            COUNT(DISTINCT pfs.project_id) AS total_projects_supported,
+            COUNT(DISTINCT fs.dev_partner) AS total_development_partners
+        FROM FundingSource fs
+                 LEFT JOIN ProjectFundingSource pfs
+                           ON fs.funding_source_id = pfs.funding_source_id;
+    `;
+    const { rows } = await pool.query(query);
+    return rows;
+};
+
 FundingSource.getById = async (id) => {
     const { rows } = await pool.query('SELECT * FROM FundingSource WHERE funding_source_id = $1', [id]);
     return rows[0];
