@@ -16,11 +16,12 @@ CREATE TABLE IF NOT EXISTS Project (
     title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
     approval_fy INTEGER,
-    beginning DATE,
-    closing DATE,
+    beginning VARCHAR(50),
+    closing VARCHAR(50),
     total_cost_usd DECIMAL(15,2),
     gef_grant DECIMAL(15,2),
     cofinancing DECIMAL(15,2),
+    loan_amount Decimal(15,3),
     objectives TEXT,
     direct_beneficiaries INTEGER,
     indirect_beneficiaries INTEGER,
@@ -44,18 +45,18 @@ CREATE TABLE IF NOT EXISTS Project (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-
 -- Table: PendingProject (for projects awaiting approval)
 CREATE TABLE IF NOT EXISTS PendingProject (
                                               pending_id SERIAL PRIMARY KEY,
                                               title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
     approval_fy INTEGER,
-    beginning DATE,
-    closing DATE,
+    beginning VARCHAR(50),
+    closing VARCHAR(50),
     total_cost_usd DECIMAL(15,2),
     gef_grant DECIMAL(15,2),
     cofinancing DECIMAL(15,2),
+    loan_amount Decimal(15,3),
     objectives TEXT,
     direct_beneficiaries INTEGER,
     indirect_beneficiaries INTEGER,
@@ -81,8 +82,6 @@ CREATE TABLE IF NOT EXISTS PendingProject (
     wash_component JSONB,
     supporting_document VARCHAR(255)
     );
-
-
 
 -- Table: Agency
 CREATE TABLE IF NOT EXISTS Agency (

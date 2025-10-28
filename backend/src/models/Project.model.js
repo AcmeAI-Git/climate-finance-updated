@@ -17,6 +17,7 @@ Project.addProjectWithRelations = async (data) => {
             total_cost_usd,
             gef_grant,
             cofinancing,
+            loan_amount,
             objectives,
             direct_beneficiaries,
             indirect_beneficiaries,
@@ -69,7 +70,7 @@ Project.addProjectWithRelations = async (data) => {
         const insertProjectQuery = `
             INSERT INTO Project (
                 project_id, title, status, approval_fy, beginning, closing,
-                total_cost_usd, gef_grant, cofinancing, objectives,
+                total_cost_usd, gef_grant, cofinancing, loan_amount, objectives,
                 direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
                 gender_inclusion, equity_marker, equity_marker_description,
                 assessment, alignment_nap, alignment_cff, geographic_division,
@@ -79,7 +80,7 @@ Project.addProjectWithRelations = async (data) => {
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
-                $21,$22,$23,$24,$25,$26,$27
+                $21,$22,$23,$24,$25,$26,$27, $28
             ) RETURNING *
         `;
 
@@ -93,6 +94,7 @@ Project.addProjectWithRelations = async (data) => {
             parseFloat(total_cost_usd) || 0,
             parseFloat(gef_grant) || 0,
             parseFloat(cofinancing) || 0,
+            parseFloat(loan_amount) || 0,
             objectives,
             parseInt(direct_beneficiaries, 10) || 0,
             parseInt(indirect_beneficiaries, 10) || 0,

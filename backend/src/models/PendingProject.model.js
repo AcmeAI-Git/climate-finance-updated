@@ -35,6 +35,7 @@ PendingProject.addPendingProject = async (data) => {
                 total_cost_usd,
                 gef_grant,
                 cofinancing,
+                loan_amount,
                 objectives,
                 direct_beneficiaries,
                 indirect_beneficiaries,
@@ -69,7 +70,7 @@ PendingProject.addPendingProject = async (data) => {
             const insertQuery = `
                 INSERT INTO PendingProject (
                     title, status, approval_fy, beginning, closing, total_cost_usd,
-                    gef_grant, cofinancing, objectives, direct_beneficiaries,
+                    gef_grant, cofinancing, loan_amount, objectives, direct_beneficiaries,
                     indirect_beneficiaries, beneficiary_description, gender_inclusion,
                     equity_marker, equity_marker_description, assessment, alignment_nap,
                     alignment_cff, geographic_division, climate_relevance_score,
@@ -80,7 +81,7 @@ PendingProject.addPendingProject = async (data) => {
                 )
                 VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31
+                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31, $32
                 )
                 RETURNING *;
             `;
@@ -94,6 +95,7 @@ PendingProject.addPendingProject = async (data) => {
                 total_cost_usd,
                 gef_grant,
                 cofinancing,
+                loan_amount,
                 objectives,
                 direct_beneficiaries,
                 indirect_beneficiaries,

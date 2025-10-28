@@ -23,6 +23,7 @@ const defaultFormData = {
     total_cost_usd: "",
     gef_grant: "",
     cofinancing: "",
+    loan_amount: "0",
     beginning: "",
     closing: "",
     approval_fy: "",
@@ -107,6 +108,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     total_cost_usd: projectData.total_cost_usd,
                     gef_grant: projectData.gef_grant,
                     cofinancing: projectData.cofinancing,
+                    loan_amount: projectData.loan_amount || "0",
                     beginning: formatDateForInput(projectData.beginning),
                     closing: formatDateForInput(projectData.closing),
                     approval_fy: projectData.approval_fy,
@@ -321,6 +323,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const totalCost = parseFloat(formData.total_cost_usd) || 0;
             const gefGrant = parseFloat(formData.gef_grant) || 0;
             const cofinancing = parseFloat(formData.cofinancing) || 0;
+            const loanAmount = parseFloat(formData.loan_amount) || 0;
 
             // Calculate WASH finance based on WASH component presence and total cost
             const washFinance = formData.wash_component.presence
@@ -341,6 +344,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("total_cost_usd", totalCost.toString());
             formDataToSend.append("gef_grant", gefGrant.toString());
             formDataToSend.append("cofinancing", cofinancing.toString());
+            formDataToSend.append("loan_amount", loanAmount.toString());
             formDataToSend.append("beginning", formData.beginning);
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
@@ -773,6 +777,20 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                     min="0"
                                 />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Loan Amount (USD)
+                                </label>
+                                <input
+                                    type="number"
+                                    name="loan_amount"
+                                    value={formData.loan_amount}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    step="0.01"
+                                    min="0"
+                                />
+                            </div>
 
                             {/* Disbursement field - Only show in edit mode */}
                             {actualMode === "edit" && (
@@ -813,27 +831,72 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 <label className="block text-sm font-medium text-gray-700">
                                     Beginning Date
                                 </label>
-                                <input
-                                    type="date"
-                                    name="beginning"
-                                    value={formatDateForInput(
-                                        formData.beginning
-                                    )}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                />
+                                <div className="flex flex-col gap-2">
+                                    <input
+                                        type="date"
+                                        name="beginning"
+                                        value={
+                                            formData.beginning &&
+                                            !isNaN(
+                                                Date.parse(formData.beginning)
+                                            )
+                                                ? formatDateForInput(
+                                                      formData.beginning
+                                                  )
+                                                : ""
+                                        }
+                                        onChange={handleInputChange}
+                                        className="block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
                                     Closing Date
                                 </label>
-                                <input
-                                    type="date"
-                                    name="closing"
-                                    value={formatDateForInput(formData.closing)}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                />
+                                <div className="flex flex-col gap-2">
+                                    <input
+                                        type="date"
+                                        name="closing"
+                                        value={
+                                            formData.closing &&
+                                            formData.closing !== "Ongoing"
+                                                ? formatDateForInput(
+                                                      formData.closing
+                                                  )
+                                                : ""
+                                        }
+                                        onChange={handleInputChange}
+                                        disabled={
+                                            formData.closing === "Ongoing"
+                                        }
+                                        className={`block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                            formData.closing === "Ongoing"
+                                                ? "bg-gray-100"
+                                                : ""
+                                        }`}
+                                    />
+                                    <label className="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="checkbox"
+                                            checked={
+                                                formData.closing === "Ongoing"
+                                            }
+                                            onChange={(e) =>
+                                                handleInputChange({
+                                                    target: {
+                                                        name: "closing",
+                                                        value: e.target.checked
+                                                            ? "Ongoing"
+                                                            : "",
+                                                    },
+                                                })
+                                            }
+                                            className="rounded text-purple-600 focus:ring-purple-500"
+                                        />
+                                        <span>Ongoing</span>
+                                    </label>
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">

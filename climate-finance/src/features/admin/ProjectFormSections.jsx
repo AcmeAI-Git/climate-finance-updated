@@ -309,7 +309,7 @@ const ProjectFormSections = ({
                             Equity Marker Level
                         </label>
                         <div className="flex space-x-6">
-                            {["strong", "medium", "weak"].map((level) => (
+                            {["Strong", "Partial", "Weak"].map((level) => (
                                 <label
                                     key={level}
                                     className="flex items-center"
