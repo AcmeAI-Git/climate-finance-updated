@@ -28,7 +28,7 @@ Project.addProjectWithRelations = async (data) => {
             assessment,
             alignment_nap,
             alignment_cff,
-            geographic_division,
+            geographic_division = [],
             climate_relevance_score,
             climate_relevance_category,
             climate_relevance_justification,
@@ -60,6 +60,7 @@ Project.addProjectWithRelations = async (data) => {
         const parsedFundingSourceIds = parseArrayField(funding_source_ids, 'funding_source_ids');
         const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
         const parsedDistricts = parseArrayField(districts, 'districts');
+        const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
 
         if (!title || !status || !approval_fy) {
             throw new Error('Missing required fields: title, status, or approval_fy');
@@ -105,7 +106,7 @@ Project.addProjectWithRelations = async (data) => {
             assessment,
             alignment_nap,
             alignment_cff,
-            geographic_division,
+            parsedGeographicDivision,
             parseFloat(climate_relevance_score) || 0,
             climate_relevance_category,
             climate_relevance_justification,

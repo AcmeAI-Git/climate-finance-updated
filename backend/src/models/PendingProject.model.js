@@ -46,7 +46,7 @@ PendingProject.addPendingProject = async (data) => {
                 assessment,
                 alignment_nap,
                 alignment_cff,
-                geographic_division,
+                geographic_division = [],
                 climate_relevance_score,
                 climate_relevance_category,
                 climate_relevance_justification,
@@ -66,6 +66,7 @@ PendingProject.addPendingProject = async (data) => {
             const parsedFundingSourceIds = parseArray(funding_source_ids);
             const parsedSdgIds = parseArray(sdg_ids);
             const parsedDistricts = parseArray(districts);
+            const parsedGeographicDivision = parseArray(geographic_division);
 
             const insertQuery = `
                 INSERT INTO PendingProject (
@@ -106,7 +107,7 @@ PendingProject.addPendingProject = async (data) => {
                 assessment,
                 alignment_nap,
                 alignment_cff,
-                geographic_division,
+                parsedGeographicDivision,
                 climate_relevance_score,
                 climate_relevance_category,
                 climate_relevance_justification,
