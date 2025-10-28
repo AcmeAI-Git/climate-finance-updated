@@ -187,10 +187,13 @@ const LandingPage = () => {
                 Array.isArray(regionalResponse.data)
             ) {
                 const backendRegional = regionalResponse.data.map((item) => ({
-                    region: item.region
-                        .replace(" Division", "")
-                        .replace("Chittagong", "Chattogram")
-                        .replace("Barishal", "Barisal"),
+                    region:
+                        typeof item.region === "string"
+                            ? item.region
+                                  .replace(" Division", "")
+                                  .replace("Chittagong", "Chattogram")
+                                  .replace("Barishal", "Barisal")
+                            : String(item.region),
                     active: Number(item.active) || 0,
                     completed: Number(item.completed) || 0,
                     total: Number(item.total) || 0,

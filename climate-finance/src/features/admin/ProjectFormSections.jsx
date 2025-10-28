@@ -16,6 +16,7 @@ const ProjectFormSections = ({
     const navigate = useNavigate();
     const [districtsData, setDistrictsData] = useState({});
     const [availableDistricts, setAvailableDistricts] = useState([]);
+    const [availableDivisions, setAvailableDivisions] = useState([]);
 
     // Load districts data
     useEffect(() => {
@@ -23,6 +24,12 @@ const ProjectFormSections = ({
             .then((res) => res.json())
             .then((data) => {
                 setDistrictsData(data);
+                // Set available divisions
+                const divisions = Object.keys(data).map((name, index) => ({
+                    id: index + 1,
+                    name: name,
+                }));
+                setAvailableDivisions(divisions);
                 // Initially show all districts
                 const allDistricts = Object.values(data)
                     .flat()
@@ -35,21 +42,28 @@ const ProjectFormSections = ({
             .catch((err) => console.error("Error loading districts:", err));
     }, []);
 
-    // Filter districts based on selected geographic division
+    // Filter districts based on selected geographic divisions (multi)
     useEffect(() => {
         if (
-            formData.geographic_division &&
-            districtsData[formData.geographic_division]
+            Array.isArray(formData.geographic_division) &&
+            formData.geographic_division.length > 0
         ) {
-            const filteredDistricts = districtsData[
-                formData.geographic_division
-            ].map((name, index) => ({
-                id: index + 1,
-                name: name,
-            }));
-            setAvailableDistricts(filteredDistricts);
+            // Collect districts from all selected divisions
+            let filteredDistricts = [];
+            formData.geographic_division.forEach((division) => {
+                if (districtsData[division]) {
+                    filteredDistricts = filteredDistricts.concat(
+                        districtsData[division].map((name) => ({ name }))
+                    );
+                }
+            });
+            // Remove duplicates and add id
+            const uniqueDistricts = Array.from(
+                new Set(filteredDistricts.map((d) => d.name))
+            ).map((name, index) => ({ id: index + 1, name }));
+            setAvailableDistricts(uniqueDistricts);
             // Clear selected districts if they're not in the filtered list
-            const validDistrictNames = filteredDistricts.map((d) => d.name);
+            const validDistrictNames = uniqueDistricts.map((d) => d.name);
             const validSelectedDistricts = formData.districts.filter(
                 (districtName) => validDistrictNames.includes(districtName)
             );
@@ -160,19 +174,19 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Division <span className="text-red-500">*</span>
                         </label>
-                        <select
-                            name="geographic_division"
-                            value={formData.geographic_division}
-                            onChange={handleInputChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        >
-                            <option value="">Select Division</option>
-                            {Object.keys(districtsData).map((division) => (
-                                <option key={division} value={division}>
-                                    {division}
-                                </option>
-                            ))}
-                        </select>
+                        <CheckboxGroup
+                            label="Select Divisions"
+                            options={availableDivisions}
+                            selectedValues={formData.geographic_division || []}
+                            onChange={(values) =>
+                                handleMultiSelectChange(
+                                    { target: { value: values } },
+                                    "geographic_division"
+                                )
+                            }
+                            getOptionId={(division) => division.name}
+                            getOptionLabel={(division) => division.name}
+                        />
                     </div>
 
                     <div>
@@ -182,7 +196,7 @@ const ProjectFormSections = ({
                         <CheckboxGroup
                             label="Select Districts"
                             options={availableDistricts}
-                            selectedValues={formData.districts}
+                            selectedValues={formData.districts || []}
                             onChange={(values) =>
                                 handleMultiSelectChange(
                                     { target: { value: values } },

@@ -51,7 +51,7 @@ const defaultFormData = {
     alignment_sdg: [],
     alignment_nap: "",
     alignment_cff: "",
-    geographic_division: "",
+    geographic_division: [],
     districts: [],
 };
 
@@ -122,7 +122,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         wash_percentage: 0,
                     },
                     submitter_email: projectData.submitter_email || "",
-                    geographic_division: projectData.geographic_division || "",
+                    geographic_division: projectData.geographic_division || [],
                     districts: projectData.districts || [],
                 });
             } else {
@@ -358,10 +358,12 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 "submitter_email",
                 formData.submitter_email || ""
             );
+            // Convert geographic_division array to JSON string before sending
             formDataToSend.append(
                 "geographic_division",
-                formData.geographic_division || ""
+                JSON.stringify(formData.geographic_division || [])
             );
+
             formDataToSend.append(
                 "hotspot_vulnerability_type",
                 formData.hotspot_vulnerability_type || ""
