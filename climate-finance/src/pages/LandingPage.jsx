@@ -40,6 +40,7 @@ const LandingPage = () => {
     const [projectsByStatus, setProjectsByStatus] = useState([]);
     const [regionalData, setRegionalData] = useState([]);
     const [washDistribution, setWashDistribution] = useState([]);
+    const [projects, setProjects] = useState([]);
 
     // Fetch all dashboard data
     useEffect(() => {
@@ -64,6 +65,8 @@ const LandingPage = () => {
                 projectApi.getAll(),
             ]);
 
+            setProjects(projectsResponse.status ? projectsResponse.data : []);
+
             // Set overview stats
             if (overviewResponse.status && overviewResponse.data) {
                 const data = overviewResponse.data;
@@ -75,6 +78,7 @@ const LandingPage = () => {
                     Array.isArray(projectsResponse.data)
                 ) {
                     const projects = projectsResponse.data;
+
                     calculatedStats = {
                         total_projects: projects.length,
                         active_projects: projects.filter(
@@ -97,8 +101,6 @@ const LandingPage = () => {
                         ),
                     };
                 }
-
-                console.log(data);
 
                 setOverviewStats([
                     {
@@ -284,26 +286,12 @@ const LandingPage = () => {
 
     // Prepare export data
     const getExportData = () => {
-        if (overviewStats.length === 0) {
-            return null;
-        }
-
         return {
             overview: overviewStats,
             projectsByStatus,
             regionalData,
             washDistribution,
-            summary: {
-                totalProjects:
-                    overviewStats.find((s) => s.title.includes("Projects"))
-                        ?.value || 0,
-                totalFunding:
-                    overviewStats.find((s) => s.title.includes("Finance"))
-                        ?.value || 0,
-                activeSources:
-                    overviewStats.find((s) => s.title.includes("Sources"))
-                        ?.value || 0,
-            },
+            projects: projects || [],
         };
     };
 

@@ -54,7 +54,7 @@ const apiRequest = async (endpoint, options = {}) => {
 // Project API endpoints
 export const projectApi = {
     // Basic CRUD Operations
-    getAll: (query = "") => apiRequest(`/project/all-project${query}`),
+    getAll: () => apiRequest(`/project/all-project`),
     getById: (id) => {
         if (!id) throw new Error("Project ID is required");
         return apiRequest(`/project/get/${id}`);

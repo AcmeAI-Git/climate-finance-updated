@@ -12,7 +12,7 @@ const ExportButton = ({
     variant = "outline",
     size = "sm",
     className = "",
-    exportFormats = ["pdf"], // Changed default to only PDF
+    exportFormats = ["pdf"],
     customPDFTemplate = null,
     ...props
 }) => {
@@ -62,12 +62,13 @@ const ExportButton = ({
                 });
                 showSuccess("PDF exported successfully");
             } else if (format === "csv") {
+                console.log(data);
                 const keysToExport = [
                     "overview",
-                    "projectsBySector",
                     "projectsByStatus",
                     "regionalData",
-                    "summary",
+                    "washDistribution",
+                    "projects",
                 ];
 
                 for (const key of keysToExport) {
@@ -82,11 +83,70 @@ const ExportButton = ({
 
                     const headers = Object.keys(arrayData[0]);
 
+                    const escapeCSV = (str) =>
+                        String(str ?? "").replace(/"/g, '""');
+
+                    const formatCell = (value) => {
+                        if (value === null || value === undefined) return "";
+
+                        // Arrays: join strings or object names
+                        if (Array.isArray(value)) {
+                            if (!value.length) return "";
+
+                            // If array of primitives, join them
+                            if (value.every((v) => typeof v !== "object")) {
+                                return value.join("; ");
+                            }
+
+                            // Array of objects: try to join by common 'name' or 'title' keys
+                            const names = value
+                                .map((v) => {
+                                    if (!v) return "";
+                                    if (typeof v === "string") return v;
+                                    if (v.name) return v.name;
+                                    if (v.title) return v.title;
+                                    // fallback: try id fields or stringify
+                                    if (v.agency_id)
+                                        return v.name ?? String(v.agency_id);
+                                    if (v.funding_source_id)
+                                        return (
+                                            v.name ??
+                                            String(v.funding_source_id)
+                                        );
+                                    if (v.sdg_number)
+                                        return v.title ?? String(v.sdg_number);
+                                    return JSON.stringify(v);
+                                })
+                                .filter(Boolean);
+
+                            return names.join("; ");
+                        }
+
+                        // Objects: pick friendly field if available
+                        if (typeof value === "object") {
+                            if (value.name) return value.name;
+                            if (value.title) return value.title;
+                            try {
+                                return JSON.stringify(value);
+                            } catch (e) {
+                                return String(value);
+                            }
+                        }
+
+                        // Primitives
+                        return String(value);
+                    };
+
                     const csvContent = [
                         headers.join(","),
                         ...arrayData.map((row) =>
                             headers
-                                .map((header) => `"${row[header] ?? ""}"`)
+                                .map(
+                                    (header) =>
+                                        `"${escapeCSV(
+                                            formatCell(row[header])
+                                        )}"`
+                                )
                                 .join(",")
                         ),
                     ].join("\n");
