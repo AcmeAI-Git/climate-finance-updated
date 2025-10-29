@@ -47,7 +47,7 @@ const Projects = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilters, setActiveFilters] = useState({
         status: "All",
-        division: "All",
+        geographic_division: "All",
         approval_fy: "All",
         agency_id: "All",
         funding_source_id: "All",
@@ -214,9 +214,16 @@ const Projects = () => {
         }
 
         // Create unique option arrays using the actual fields available
+        // geographic_division may be a string or an array on projects; normalize by flattening
         const divisions = Array.from(
             new Set(
-                projectsList.map((p) => p.geographic_division).filter(Boolean)
+                projectsList
+                    .flatMap((p) =>
+                        Array.isArray(p.geographic_division)
+                            ? p.geographic_division
+                            : [p.geographic_division]
+                    )
+                    .filter(Boolean)
             )
         ).sort();
         const statuses = Array.from(
@@ -574,8 +581,7 @@ const Projects = () => {
                             setSearchTerm("");
                             setActiveFilters({
                                 status: "All",
-                                division: "All",
-                                approval_fy: "All",
+                                geographic_division: "All",
                                 agency_id: "All",
                                 funding_source_id: "All",
                             });
@@ -781,7 +787,7 @@ const Projects = () => {
                                     sector: "All",
                                     status: "All",
                                     type: "All",
-                                    division: "All",
+                                    geographic_division: "All",
                                     approval_fy: "All",
                                     agency_id: "All",
                                     funding_source_id: "All",
