@@ -163,6 +163,19 @@ CREATE TABLE IF NOT EXISTS ProjectSDG (
     FOREIGN KEY (sdg_id) REFERENCES SDGAlignment(sdg_id) ON DELETE CASCADE
     );
 
+CREATE TABLE IF NOT EXISTS DocumentRepository (
+    repo_id SERIAL PRIMARY KEY,
+    Heading TEXT,
+    sub_heading TEXT,
+    Agency_name TEXT,
+    document_size DECIMAL(5,2),
+    document_link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_project_title ON Project(title);
 CREATE INDEX IF NOT EXISTS idx_project_status ON Project(status);

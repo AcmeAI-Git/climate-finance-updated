@@ -236,9 +236,6 @@ const ProjectDetails = () => {
                             >
                                 {project.status}
                             </span>
-                            <span className="text-sm text-gray-500 font-medium">
-                                #{project.project_id}
-                            </span>
                         </div>
                         <ExportButton
                             data={exportData}

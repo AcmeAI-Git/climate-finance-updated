@@ -8,6 +8,7 @@ const fundingSource = require("./fundingSource.routes");
 const focalArea = require("./focalArea.routes");
 const pendingProjectRoutes = require("./pendingProject.routes");
 const sdgRoutes = require("./sdg.routes");
+const documentRepositoryRoutes = require("./documentRepository.routes");
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use("/funding-source", fundingSource);
 router.use("/focal-area", focalArea);
 router.use("/pending-project", pendingProjectRoutes);
 router.use("/sdg", sdgRoutes);
+router.use("/document-repository", documentRepositoryRoutes);
 
 module.exports = router;

@@ -73,12 +73,12 @@ FundingSource.getFundingSourceById = async (id) => {
         const fundingSource = fundingSourceResult.rows[0];
 
         const projectsQuery = `
-            SELECT p.project_id, p.title, p.status, p.approval_fy, p.total_cost_usd,
+            SELECT p.project_id, p.title, p.status, p.beginning, p.closing, p.total_cost_usd,
                    p.climate_relevance_category
             FROM Project p
             INNER JOIN ProjectFundingSource pfs ON p.project_id = pfs.project_id
             WHERE pfs.funding_source_id = $1
-            ORDER BY p.approval_fy DESC
+            ORDER BY p.beginning DESC
         `;
         const projectsResult = await client.query(projectsQuery, [id]);
 
