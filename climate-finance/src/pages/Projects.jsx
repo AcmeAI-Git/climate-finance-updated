@@ -131,7 +131,9 @@ const Projects = () => {
                     },
                     {
                         title: "Total Investment",
-                        value: formatCurrency(overviewData.total_investment),
+                        value: `${formatCurrency(
+                            overviewData.total_investment
+                        )} M`,
                         change: "",
                     },
                     {
@@ -648,7 +650,8 @@ const Projects = () => {
                                                     <span className="text-green-600 font-semibold text-xs sm:text-sm">
                                                         {formatCurrency(
                                                             project.total_cost_usd
-                                                        )}
+                                                        )}{" "}
+                                                        M
                                                     </span>
                                                 </div>
                                             )}
@@ -656,12 +659,13 @@ const Projects = () => {
                                             {project.gef_grant && (
                                                 <div className="flex items-center justify-between text-sm">
                                                     <span className="text-gray-600 font-medium">
-                                                        GEF Grant:
+                                                        Grant:
                                                     </span>
                                                     <span className="text-blue-600 font-semibold text-xs sm:text-sm">
                                                         {formatCurrency(
                                                             project.gef_grant
-                                                        )}
+                                                        )}{" "}
+                                                        M
                                                     </span>
                                                 </div>
                                             )}

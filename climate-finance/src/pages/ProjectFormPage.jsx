@@ -349,9 +349,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
                 "approval_fy",
-                (
-                    parseInt(formData.approval_fy) || new Date().getFullYear()
-                ).toString()
+                formData.approval_fy &&
+                    parseInt(formData.approval_fy).toString()
             );
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
@@ -739,7 +738,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Total Cost (USD)
+                                    Total Cost (million USD)
                                 </label>
                                 <input
                                     type="number"
@@ -753,7 +752,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    GEF Grant (USD)
+                                    Grant (million USD)
                                 </label>
                                 <input
                                     type="number"
@@ -767,7 +766,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Co-financing (USD)
+                                    Co-financing (million USD)
                                 </label>
                                 <input
                                     type="number"
@@ -781,7 +780,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Loan Amount (USD)
+                                    Loan Amount (million USD)
                                 </label>
                                 <input
                                     type="number"
@@ -902,7 +901,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Approval FY
+                                    Approval Year
                                 </label>
                                 <input
                                     type="number"

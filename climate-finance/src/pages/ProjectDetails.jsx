@@ -46,14 +46,19 @@ const ProjectDetails = () => {
 
             const projectData = projectResponse.data;
 
-            console.log(projectData);
-
-            // Since mock data already contains complete objects, use them directly
+            // Prefer full related objects when they exist (mock API sometimes returns both IDs and full objects)
             const enrichedProject = {
                 ...projectData,
-                projectAgencies: projectData.agencies || [],
-                projectLocations: projectData.locations || [],
-                projectFundingSources: projectData.funding_sources || [],
+                // project may already include detailed arrays (projectAgencies/projectFundingSources/projectSDGs)
+                projectAgencies:
+                    projectData.projectAgencies || projectData.agencies || [],
+                projectLocations:
+                    projectData.projectLocations || projectData.locations || [],
+                projectFundingSources:
+                    projectData.projectFundingSources ||
+                    projectData.funding_sources ||
+                    [],
+                projectSDGs: projectData.projectSDGs || projectData.sdgs || [],
             };
 
             setProject(enrichedProject);
@@ -164,9 +169,12 @@ const ProjectDetails = () => {
     };
 
     const getTotalBudget = (proj) => {
-        return (
-            proj.total_cost_usd || proj.totalFunding || proj.totalBudget || 0
+        const val =
+            proj.total_cost_usd || proj.totalFunding || proj.totalBudget || 0;
+        const num = parseFloat(
+            typeof val === "string" ? val.replace(/,/g, "") : val
         );
+        return Number.isFinite(num) ? num : 0;
     };
 
     const exportData = {
@@ -178,6 +186,8 @@ const ProjectDetails = () => {
         location: getLocation(project),
         timeline: getTimeline(project),
         beneficiaries: project?.beneficiaries,
+        indirect_beneficiaries: project?.indirect_beneficiaries,
+        direct_beneficiaries: project?.direct_beneficiaries,
         agencies: project?.projectAgencies?.map((a) => a.name) || [],
         fundingSources:
             project?.projectFundingSources?.map((f) => f.name) || [],
@@ -261,7 +271,10 @@ const ProjectDetails = () => {
                                 Total Budget
                             </div>
                             <div className="text-base sm:text-lg font-bold text-gray-900">
-                                {formatCurrency(getTotalBudget(project))}
+                                {formatCurrency(
+                                    parseFloat(getTotalBudget(project) || 0)
+                                )}{" "}
+                                M
                             </div>
                         </div>
 
@@ -270,7 +283,10 @@ const ProjectDetails = () => {
                                 Grant
                             </div>
                             <div className="text-base sm:text-lg font-bold text-success-600">
-                                {formatCurrency(project.gef_grant || 0)}
+                                {formatCurrency(
+                                    parseFloat(project.gef_grant || 0)
+                                )}{" "}
+                                M
                             </div>
                         </div>
                     </div>
@@ -297,25 +313,41 @@ const ProjectDetails = () => {
                             </div>
                         )}
 
-                        {project.beneficiaries && (
-                            <div>
-                                <span className="font-semibold text-gray-800">
-                                    Beneficiaries:
-                                </span>
-                                <span className="text-gray-600 ml-2">
-                                    {project.beneficiaries}
-                                </span>
-                            </div>
-                        )}
+                        {project.direct_beneficiaries !== undefined &&
+                            project.direct_beneficiaries !== null && (
+                                <div className="flex items-center gap-x-2">
+                                    <span className="font-semibold text-gray-800">
+                                        Direct Beneficiaries:
+                                    </span>
+                                    <span className="text-gray-600 ml-2">
+                                        {Number(
+                                            project.direct_beneficiaries
+                                        ).toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+                        {project.indirect_beneficiaries !== undefined &&
+                            project.indirect_beneficiaries !== null && (
+                                <div className="flex items-center gap-x-2">
+                                    <div className="font-semibold text-gray-800">
+                                        Indirect Beneficiaries:
+                                    </div>
+                                    <span className="text-gray-600 ml-2">
+                                        {Number(
+                                            project.indirect_beneficiaries
+                                        ).toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
                     </div>
                 </Card>
 
                 {/* Secondary Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* Agencies */}
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Implementing Agencies
+                            Implementing & Executing Agencies
                         </h3>
                         {Array.isArray(project.projectAgencies) &&
                         project.projectAgencies.length > 0 ? (
@@ -359,17 +391,49 @@ const ProjectDetails = () => {
                         project.projectFundingSources.length > 0 ? (
                             <div className="space-y-3">
                                 {project.projectFundingSources
-                                    .slice(0, 4)
+                                    .slice(0, 6)
                                     .map((source, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center justify-between p-3 bg-primary-50 rounded-lg border border-primary-100"
+                                            className="p-3 bg-primary-50 rounded-lg border border-primary-100"
                                         >
-                                            <div className="font-medium text-gray-900">
-                                                {source.name}
+                                            <div className="flex items-center justify-between">
+                                                <div className="font-medium text-gray-900">
+                                                    {source.name}
+                                                </div>
+                                                <div className="text-sm text-primary-700 font-medium">
+                                                    {source.dev_partner}
+                                                </div>
                                             </div>
-                                            <div className="text-sm text-primary-700 font-medium">
-                                                {source.dev_partner}
+                                            <div className="mt-2 text-sm text-gray-600 flex gap-3">
+                                                <div>
+                                                    <div className="text-xs text-gray-500">
+                                                        Grant
+                                                    </div>
+                                                    <div className="font-semibold">
+                                                        {formatCurrency(
+                                                            parseFloat(
+                                                                source.grant_amount ||
+                                                                    0
+                                                            )
+                                                        )}{" "}
+                                                        M
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs text-gray-500">
+                                                        Loan
+                                                    </div>
+                                                    <div className="font-semibold">
+                                                        {formatCurrency(
+                                                            parseFloat(
+                                                                source.loan_amount ||
+                                                                    0
+                                                            )
+                                                        )}{" "}
+                                                        M
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -414,8 +478,20 @@ const ProjectDetails = () => {
                                         WASH Percentage
                                     </div>
                                     <div className="text-2xl font-bold text-primary-700">
-                                        {project.wash_component
-                                            .wash_percentage || 0}
+                                        {(() => {
+                                            const pct = parseFloat(
+                                                project.wash_component
+                                                    .wash_percentage || 0
+                                            );
+                                            return Number.isFinite(pct)
+                                                ? pct.toLocaleString(
+                                                      undefined,
+                                                      {
+                                                          maximumFractionDigits: 2,
+                                                      }
+                                                  )
+                                                : 0;
+                                        })()}
                                         %
                                     </div>
                                 </div>
@@ -444,7 +520,7 @@ const ProjectDetails = () => {
                                     Total Cost
                                 </div>
                                 <div className="text-xl font-bold text-primary-700">
-                                    {formatCurrency(getTotalBudget(project))}
+                                    {formatCurrency(getTotalBudget(project))} M
                                 </div>
                             </div>
                             <div className="text-center p-4 bg-success-50 rounded-lg border border-success-100">
@@ -452,7 +528,10 @@ const ProjectDetails = () => {
                                     Grant
                                 </div>
                                 <div className="text-xl font-bold text-success-700">
-                                    {formatCurrency(project.gef_grant || 0)}
+                                    {formatCurrency(
+                                        parseFloat(project.gef_grant || 0)
+                                    )}{" "}
+                                    M
                                 </div>
                             </div>
                             <div className="text-center p-4 bg-warning-50 rounded-lg border border-warning-100">
@@ -460,7 +539,10 @@ const ProjectDetails = () => {
                                     Co-financing
                                 </div>
                                 <div className="text-xl font-bold text-warning-700">
-                                    {formatCurrency(project.cofinancing || 0)}
+                                    {formatCurrency(
+                                        parseFloat(project.cofinancing || 0)
+                                    )}{" "}
+                                    M
                                 </div>
                             </div>
                         </div>
@@ -475,26 +557,25 @@ const ProjectDetails = () => {
                             Beneficiaries & Vulnerability
                         </h3>
                         <div className="space-y-4">
-                            {project.direct_beneficiaries && (
-                                <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
-                                        Direct Beneficiaries
-                                    </div>
-                                    <div className="text-lg font-semibold text-gray-900">
-                                        {project.direct_beneficiaries.toLocaleString()}
-                                    </div>
+                            <div className="flex items-center gap-x-2">
+                                <div className="text-sm text-gray-600 font-medium mb-1">
+                                    Direct Beneficiaries:
                                 </div>
-                            )}
-                            {project.indirect_beneficiaries && (
-                                <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
-                                        Indirect Beneficiaries
-                                    </div>
-                                    <div className="text-lg font-semibold text-gray-900">
-                                        {project.indirect_beneficiaries.toLocaleString()}
-                                    </div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                    {" " +
+                                        project.direct_beneficiaries.toLocaleString()}
                                 </div>
-                            )}
+                            </div>
+
+                            <div className="flex items-center gap-x-2">
+                                <div className="text-sm text-gray-600 font-medium mb-1">
+                                    Indirect Beneficiaries
+                                </div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                    {project.indirect_beneficiaries.toLocaleString()}
+                                </div>
+                            </div>
+
                             {project.hotspot_vulnerability_type && (
                                 <div>
                                     <div className="text-sm text-gray-600 font-medium mb-1">
@@ -539,7 +620,7 @@ const ProjectDetails = () => {
                                     <div className="text-sm text-gray-600 font-medium mb-1">
                                         Equity Marker
                                     </div>
-                                    <div className="text-sm text-gray-700 capitalize">
+                                    <div className="text-sm text-gray-700 capitalize font-bold">
                                         {project.equity_marker}
                                     </div>
                                 </div>
@@ -575,7 +656,13 @@ const ProjectDetails = () => {
                                             Division
                                         </div>
                                         <div className="text-sm text-gray-700">
-                                            {project.geographic_division}
+                                            {Array.isArray(
+                                                project.geographic_division
+                                            )
+                                                ? project.geographic_division.join(
+                                                      ", "
+                                                  )
+                                                : project.geographic_division}
                                         </div>
                                     </div>
                                 )}
@@ -609,6 +696,28 @@ const ProjectDetails = () => {
                             Alignment
                         </h3>
                         <div className="space-y-3">
+                            {project.projectSDGs.length > 0 && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        SDGs
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {project.projectSDGs.map(
+                                            (sdg, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="px-2 py-1 bg-indigo-50 text-indigo-800 text-xs rounded font-medium"
+                                                >
+                                                    SDG{" "}
+                                                    {sdg.sdg_number ||
+                                                        sdg.sdg_id}{" "}
+                                                    — {sdg.title || sdg}
+                                                </span>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                             {project.alignment_nap && (
                                 <div>
                                     <div className="text-sm text-gray-600 font-medium mb-1">

@@ -24,7 +24,6 @@ const BangladeshMapComponent = ({
     const [countryGeojson, setCountryGeojson] = useState(null);
 
     useEffect(() => {
-        console.log(data);
         // Load division boundaries
         fetch("/geoBoundaries-BGD-ADM1.geojson")
             .then((res) => {

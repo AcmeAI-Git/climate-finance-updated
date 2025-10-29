@@ -64,8 +64,6 @@ const LandingPage = () => {
                 projectApi.getAll(),
             ]);
 
-            // console.log(overviewResponse, regionalResponse);
-
             // Set overview stats
             if (overviewResponse.status && overviewResponse.data) {
                 const data = overviewResponse.data;
@@ -98,28 +96,18 @@ const LandingPage = () => {
                             0
                         ),
                     };
-
-                    // Debug logging
-                    console.log("LandingPage Debug:", {
-                        backendActive: data.active_projects,
-                        backendCompleted: data.completed_projects,
-                        calculatedActive: calculatedStats.active_projects,
-                        calculatedCompleted: calculatedStats.completed_projects,
-                        projectsCount: projects.length,
-                        projectStatuses: projects.map((p) => p.status),
-                    });
                 }
 
                 setOverviewStats([
                     {
                         title: "Total Climate Finance",
-                        value: formatCurrency(
+                        value: `${formatCurrency(
                             Number(
                                 data.total_climate_finance ||
                                     calculatedStats.total_climate_finance ||
                                     0
                             )
-                        ),
+                        )} M`,
                         change: "",
                     },
                     {
@@ -158,29 +146,6 @@ const LandingPage = () => {
             } else {
                 setProjectsByStatus([]);
             }
-
-            // Set regional data for map and chart
-            // Using dummy data for regional distribution
-            // const dummyRegionalData = [
-            //     { region: "Dhaka", active: 1, completed: 1, total: 2 },
-            //     {
-            //         region: "Chattogram",
-            //         active: 0,
-            //         completed: 0,
-            //         total: 0,
-            //     },
-            //     { region: "Rajshahi", active: 2, completed: 0, total: 2 },
-            //     { region: "Khulna", active: 1, completed: 0, total: 0 },
-            //     { region: "Barisal", active: 1, completed: 1, total: 2 },
-            //     { region: "Sylhet", active: 0, completed: 0, total: 0 },
-            //     { region: "Rangpur", active: 0, completed: 0, total: 0 },
-            //     {
-            //         region: "Mymensingh",
-            //         active: 0,
-            //         completed: 0,
-            //         total: 0,
-            //     },
-            // ];
 
             if (
                 regionalResponse.status &&
