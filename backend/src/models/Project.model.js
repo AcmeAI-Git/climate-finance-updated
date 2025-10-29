@@ -527,11 +527,13 @@ Project.getOverviewStats = async () => {
     const query = `
         SELECT
             COUNT(*) AS total_projects,
-            SUM(total_cost_usd) AS total_climate_finance,
-            COUNT(*) FILTER (WHERE status = 'Active') AS active_projects,
-            COUNT(*) FILTER (WHERE status = 'Completed') AS completed_projects,
-            AVG(climate_relevance_score) AS avg_climate_relevance
-        FROM Project
+            SUM(p.total_cost_usd) AS total_climate_finance,
+            COUNT(*) FILTER (WHERE p.status = 'Active') AS active_projects,
+            COUNT(*) FILTER (WHERE p.status = 'Completed') AS completed_projects,
+            AVG(p.climate_relevance_score) AS avg_climate_relevance,
+            SUM(p.total_cost_usd * COALESCE(wc.wash_percentage/100, 0)) AS total_wash_finance
+        FROM Project p
+        LEFT JOIN WASHComponent wc ON p.project_id = wc.project_id
     `;
     const { rows } = await pool.query(query);
     return rows[0];

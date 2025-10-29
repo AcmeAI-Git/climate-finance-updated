@@ -98,41 +98,33 @@ const LandingPage = () => {
                     };
                 }
 
+                console.log(data);
+
                 setOverviewStats([
                     {
                         title: "Total Climate Finance",
                         value: `${formatCurrency(
-                            Number(
-                                data.total_climate_finance ||
-                                    calculatedStats.total_climate_finance ||
-                                    0
-                            )
+                            Number(data.total_climate_finance || 0)
+                        )} M`,
+                        change: "",
+                    },
+                    {
+                        title: "Total WASH Finance",
+                        value: `${formatCurrency(
+                            Number(data.total_wash_finance || 0)
                         )} M`,
                         change: "",
                     },
                     {
                         title: "Total Projects",
-                        value:
-                            data.total_projects ||
-                            calculatedStats.total_projects ||
-                            0,
+                        value: data.total_projects || 0,
                         change: "",
                     },
                     {
-                        title: "Active Projects",
-                        value:
-                            data.active_projects && data.active_projects > 0
-                                ? data.active_projects
-                                : calculatedStats.active_projects || 0,
-                        change: "",
-                    },
-                    {
-                        title: "Completed Projects",
-                        value:
-                            data.completed_projects &&
-                            data.completed_projects > 0
-                                ? data.completed_projects
-                                : calculatedStats.completed_projects || 0,
+                        title: "Average Climate Relevance",
+                        value: `${Number(
+                            data.avg_climate_relevance || 0
+                        ).toFixed(1)}%`,
                         change: "",
                     },
                 ]);
@@ -317,12 +309,12 @@ const LandingPage = () => {
 
     // Add icons to stats
     const statsData = overviewStats.map((stat, index) => {
-        const colors = ["success", "warning", "primary", "success"];
+        const colors = ["success", "info", "warning", "primary"];
         const icons = [
             <DollarSign size={20} />, // Total Climate Finance
+            <Activity size={20} />, // Total WASH Finance
             <FolderTree size={20} />, // Total Projects
-            <TrendingUp size={20} />, // Active Projects
-            <CheckCircle size={20} />, // Completed Projects
+            <Target size={20} />, // Average Climate Relevance
         ];
 
         return {
