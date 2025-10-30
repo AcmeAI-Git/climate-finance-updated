@@ -174,6 +174,18 @@ CREATE TABLE IF NOT EXISTS DocumentRepository (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS PendingDocumentRepository (
+      repo_id SERIAL PRIMARY KEY,
+      Heading TEXT,
+      sub_heading TEXT,
+      Agency_name TEXT,
+      document_size DECIMAL(5,2),
+    document_link TEXT,
+    submitter_email TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
 
 
 -- Indexes for performance
