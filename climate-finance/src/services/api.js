@@ -139,6 +139,70 @@ export const pendingProjectApi = {
     },
 };
 
+export const pendingRepositoryApi = {
+    // Public submission
+    submitRepository: (repositoryData) => {
+        if (!repositoryData) throw new Error("Repository data is required");
+        const isFormData = repositoryData instanceof FormData;
+        return apiRequest("/pending-document-repository/create", {
+            method: "POST",
+            headers: isFormData ? {} : { "Content-Type": "application/json" },
+            body: isFormData ? repositoryData : JSON.stringify(repositoryData),
+        });
+    },
+
+    // Admin operations
+    getAll: () => apiRequest("/pending-document-repository"),
+    getById: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/${id}`);
+    },
+    approve: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/approve/${id}`, {
+            method: "PUT",
+        });
+    },
+    reject: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/reject/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
+export const RepositoryApi = {
+    // Public submission
+    submitRepository: (repositoryData) => {
+        if (!repositoryData) throw new Error("Repository data is required");
+        const isFormData = repositoryData instanceof FormData;
+        return apiRequest("/document-repository/create", {
+            method: "POST",
+            headers: isFormData ? {} : { "Content-Type": "application/json" },
+            body: isFormData ? repositoryData : JSON.stringify(repositoryData),
+        });
+    },
+
+    // Admin operations
+    getAll: () => apiRequest("/document-repository"),
+    getById: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/${id}`);
+    },
+    approve: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/approve/${id}`, {
+            method: "PUT",
+        });
+    },
+    reject: (id) => {
+        if (!id) throw new Error("Pending project ID is required");
+        return apiRequest(`/pending-project/reject/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
 // Location API endpoints
 export const locationApi = {
     getAll: () => apiRequest("/location/all"),

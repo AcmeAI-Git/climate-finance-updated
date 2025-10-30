@@ -27,6 +27,16 @@ const Navbar = () => {
         }
     };
 
+    const getAddRepositoryPath = () => {
+        if (isAuthenticated) {
+            // For admins, go to admin project form
+            return "/admin/repository/new";
+        } else {
+            // For viewers, go to public submission form
+            return "/repository/new?mode=public";
+        }
+    };
+
     const navLinks = [
         { to: "/", label: "Dashboard", isActive: path === "/" },
         {
@@ -102,6 +112,15 @@ const Navbar = () => {
                         >
                             <Plus size={16} className="mr-2" />
                             Add Project
+                        </Link>
+
+                        <Link
+                            to={getAddRepositoryPath()}
+                            state={{ from: path }}
+                            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200"
+                        >
+                            <Plus size={16} className="mr-2" />
+                            Add Repository
                         </Link>
 
                         <LanguageSwitcher />
