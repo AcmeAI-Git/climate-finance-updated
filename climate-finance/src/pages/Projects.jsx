@@ -241,7 +241,7 @@ const Projects = () => {
                 key: "status",
                 label: "Status",
                 options: [
-                    { value: "All", label: "All Statuses" },
+                    { value: "All", label: "All Status" },
                     ...statuses.map((status) => ({
                         value: status,
                         label: status,
@@ -538,20 +538,20 @@ const Projects = () => {
             {/* Project Trend */}
             {projectTrend.length > 0 && (
                 <div
-                    className="animate-fade-in-up"
+                    className="animate-fade-in-up  mb-6"
                     style={{ animationDelay: "600ms" }}
                 >
                     <Card hover padding={true}>
                         <LineChartComponent
                             title={Transliteration(
-                                getChartTitle(language, "projectTrend"),
+                                getChartTitle(language, "projectByYear"),
                                 language
                             )}
                             data={projectTrend}
                             xAxisKey="year"
                             yAxisKey="projects"
                             lineName={Transliteration(
-                                getChartTitle(language, "projectTrend"),
+                                getChartTitle(language, "projectYear"),
                                 language
                             )}
                             formatYAxis={false}

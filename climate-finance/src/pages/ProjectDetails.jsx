@@ -178,19 +178,7 @@ const ProjectDetails = () => {
     };
 
     const exportData = {
-        projectId: project?.project_id,
-        title: project?.title,
-        status: project?.status,
-        description: project?.objectives,
-        totalBudget: getTotalBudget(project),
-        location: getLocation(project),
-        timeline: getTimeline(project),
-        beneficiaries: project?.beneficiaries,
-        indirect_beneficiaries: project?.indirect_beneficiaries,
-        direct_beneficiaries: project?.direct_beneficiaries,
-        agencies: project?.projectAgencies?.map((a) => a.name) || [],
-        fundingSources:
-            project?.projectFundingSources?.map((f) => f.name) || [],
+        project: [project],
     };
 
     const getStatusColor = (status) => {
@@ -262,7 +250,7 @@ const ProjectDetails = () => {
                     </div>
 
                     {/* Key Metrics Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-gray-50 rounded-xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 p-3 sm:p-4 bg-gray-50 rounded-xl">
                         <div className="text-center">
                             <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
                                 Total Budget
@@ -282,6 +270,28 @@ const ProjectDetails = () => {
                             <div className="text-base sm:text-lg font-bold text-success-600">
                                 {formatCurrency(
                                     parseFloat(project.gef_grant || 0)
+                                )}{" "}
+                                M
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                                Co-financing
+                            </div>
+                            <div className="text-base sm:text-lg font-bold text-success-600">
+                                {formatCurrency(
+                                    parseFloat(project.cofinancing || 0)
+                                )}{" "}
+                                M
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                                Loan
+                            </div>
+                            <div className="text-base sm:text-lg font-bold text-success-600">
+                                {formatCurrency(
+                                    parseFloat(project.loan_amount || 0)
                                 )}{" "}
                                 M
                             </div>
@@ -553,7 +563,7 @@ const ProjectDetails = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Beneficiaries & Vulnerability
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <div className="flex items-center gap-x-2">
                                 <div className="text-sm text-gray-600 font-medium mb-1">
                                     Direct Beneficiaries:
@@ -575,7 +585,7 @@ const ProjectDetails = () => {
 
                             {project.hotspot_vulnerability_type && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="text-md f text-gray-600 font-semibold mb-1">
                                         Vulnerability Type
                                     </div>
                                     <div className="text-sm text-gray-700">
@@ -585,7 +595,7 @@ const ProjectDetails = () => {
                             )}
                             {project.beneficiary_description && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
                                         Beneficiary Description
                                     </div>
                                     <div className="text-sm text-gray-700">
@@ -601,10 +611,10 @@ const ProjectDetails = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Gender & Equity
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             {project.gender_inclusion && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
                                         Gender Inclusion
                                     </div>
                                     <div className="text-sm text-gray-700">
@@ -614,10 +624,10 @@ const ProjectDetails = () => {
                             )}
                             {project.equity_marker && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
                                         Equity Marker
                                     </div>
-                                    <div className="text-sm text-gray-700 capitalize font-bold">
+                                    <div className="text-sm text-gray-700 capitalize">
                                         {project.equity_marker}
                                     </div>
                                 </div>
@@ -646,10 +656,10 @@ const ProjectDetails = () => {
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">
                                 Geographic Information
                             </h3>
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {project.geographic_division && (
                                     <div>
-                                        <div className="text-sm text-gray-600 font-medium mb-1">
+                                        <div className="text-md text-gray-600 font-semibold mb-1">
                                             Division
                                         </div>
                                         <div className="text-sm text-gray-700">
@@ -666,7 +676,7 @@ const ProjectDetails = () => {
                                 {project.districts &&
                                     project.districts.length > 0 && (
                                         <div>
-                                            <div className="text-sm text-gray-600 font-medium mb-1">
+                                            <div className="text-md text-gray-600 font-semibold mb-1">
                                                 Districts
                                             </div>
                                             <div className="flex flex-wrap gap-1">
@@ -692,10 +702,10 @@ const ProjectDetails = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Alignment
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-6">
                             {project.projectSDGs.length > 0 && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
                                         SDGs
                                     </div>
                                     <div className="flex flex-wrap gap-1">

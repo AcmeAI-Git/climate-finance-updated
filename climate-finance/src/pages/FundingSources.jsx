@@ -380,7 +380,7 @@ const FundingSources = () => {
                             <h3 className="text-lg font-semibold text-gray-800">
                                 Top 5 Funding Sources
                             </h3>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 capitalize">
                                 by number of projects
                             </p>
                         </div>
@@ -431,16 +431,9 @@ const FundingSources = () => {
                             onSearchChange={setSearchTerm}
                             searchPlaceholder="Search funding sources by name, partner, ID..."
                             entityType="fundingSources"
-                            activeFilters={activeFilters}
-                            onFiltersChange={setActiveFilters}
                             showAdvancedSearch={true}
                             onClearAll={() => {
                                 setSearchTerm("");
-                                setActiveFilters({
-                                    type: "All",
-                                    region: "All",
-                                    status: "All",
-                                });
                             }}
                         />
                     </div>

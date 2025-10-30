@@ -61,100 +61,88 @@ const ExportButton = ({
                     customStyles: customPDFTemplate,
                 });
                 showSuccess("PDF exported successfully");
-            } else if (format === "csv") {
+            } // … inside the ExportButton component …
+            else if (format === "csv") {
+                const keysToExport = Object.keys(data ?? {});
+
                 console.log(data);
-                const keysToExport = [
-                    "overview",
-                    "projectsByStatus",
-                    "regionalData",
-                    "washDistribution",
-                    "projects",
-                ];
+
+                const escapeCSV = (str) =>
+                    String(str ?? "").replace(/"/g, '""');
+
+                const formatCell = (value) => {
+                    if (value === null || value === undefined) return "";
+
+                    // ---- array ------------------------------------------------
+                    if (Array.isArray(value)) {
+                        if (!value.length) return "";
+                        if (value.every((v) => typeof v !== "object"))
+                            return value.join("; ");
+
+                        // array of objects → join a “display” field
+                        return value
+                            .map((v) => {
+                                if (!v) return "";
+                                if (typeof v === "string") return v;
+                                if (v.name) return v.name;
+                                if (v.title) return v.title;
+                                // fallback identifiers
+                                if (v.agency_id)
+                                    return v.name ?? String(v.agency_id);
+                                if (v.funding_source_id)
+                                    return (
+                                        v.name ?? String(v.funding_source_id)
+                                    );
+                                if (v.sdg_number)
+                                    return v.title ?? String(v.sdg_number);
+                                return JSON.stringify(v);
+                            })
+                            .filter(Boolean)
+                            .join("; ");
+                    }
+
+                    if (typeof value === "object") {
+                        if (value.name) return value.name;
+                        if (value.title) return value.title;
+                        try {
+                            return JSON.stringify(value);
+                        } catch {
+                            return String(value);
+                        }
+                    }
+
+                    return String(value);
+                };
 
                 for (const key of keysToExport) {
                     let arrayData = data[key];
 
-                    // Convert non-array object (like `summary`) into an array of single row
+                    // Convert a single object (e.g. `summary`) into a one-row array
                     if (!Array.isArray(arrayData)) {
                         arrayData = [arrayData];
                     }
 
-                    if (!arrayData.length) continue;
+                    if (!arrayData.length) continue; // skip empty tables
 
                     const headers = Object.keys(arrayData[0]);
 
-                    const escapeCSV = (str) =>
-                        String(str ?? "").replace(/"/g, '""');
-
-                    const formatCell = (value) => {
-                        if (value === null || value === undefined) return "";
-
-                        // Arrays: join strings or object names
-                        if (Array.isArray(value)) {
-                            if (!value.length) return "";
-
-                            // If array of primitives, join them
-                            if (value.every((v) => typeof v !== "object")) {
-                                return value.join("; ");
-                            }
-
-                            // Array of objects: try to join by common 'name' or 'title' keys
-                            const names = value
-                                .map((v) => {
-                                    if (!v) return "";
-                                    if (typeof v === "string") return v;
-                                    if (v.name) return v.name;
-                                    if (v.title) return v.title;
-                                    // fallback: try id fields or stringify
-                                    if (v.agency_id)
-                                        return v.name ?? String(v.agency_id);
-                                    if (v.funding_source_id)
-                                        return (
-                                            v.name ??
-                                            String(v.funding_source_id)
-                                        );
-                                    if (v.sdg_number)
-                                        return v.title ?? String(v.sdg_number);
-                                    return JSON.stringify(v);
-                                })
-                                .filter(Boolean);
-
-                            return names.join("; ");
-                        }
-
-                        // Objects: pick friendly field if available
-                        if (typeof value === "object") {
-                            if (value.name) return value.name;
-                            if (value.title) return value.title;
-                            try {
-                                return JSON.stringify(value);
-                            } catch (e) {
-                                return String(value);
-                            }
-                        }
-
-                        // Primitives
-                        return String(value);
-                    };
-
-                    const csvContent = [
-                        headers.join(","),
+                    const csvRows = [
+                        headers.join(","), // header line
                         ...arrayData.map((row) =>
                             headers
                                 .map(
-                                    (header) =>
-                                        `"${escapeCSV(
-                                            formatCell(row[header])
-                                        )}"`
+                                    (h) => `"${escapeCSV(formatCell(row[h]))}"`
                                 )
                                 .join(",")
                         ),
-                    ].join("\n");
+                    ];
 
-                    const dataBlob = new Blob([csvContent], {
+                    const csvContent = csvRows.join("\n");
+
+                    const blob = new Blob([csvContent], {
                         type: "text/csv;charset=utf-8;",
                     });
-                    const url = URL.createObjectURL(dataBlob);
+                    const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
                     link.href = url;
                     link.download = `${filename}_${key}_${

@@ -298,7 +298,7 @@ const FundingSourceDetails = () => {
                                 Funding Information
                             </h3>
                             <div className="space-y-2">
-                                {source.grant_amount > 0 && (
+                                {
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Grant Amount
@@ -309,39 +309,42 @@ const FundingSourceDetails = () => {
                                             )}
                                         </span>
                                     </div>
-                                )}
-                                {source.loan_amount > 0 && (
+                                }
+                                {
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Loan Amount
                                         </span>
                                         <span className="text-sm font-semibold text-blue-600">
-                                            {formatCurrency(source.loan_amount)}
+                                            {formatCurrency(
+                                                source.loan_amount ?? "0"
+                                            )}
                                         </span>
                                     </div>
-                                )}
-                                {source.counterpart_funding > 0 && (
+                                }
+                                {
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Counterpart Funding
                                         </span>
                                         <span className="text-sm font-semibold text-purple-600">
                                             {formatCurrency(
-                                                source.counterpart_funding
+                                                source.counterpart_funding ??
+                                                    "0"
                                             )}
                                         </span>
                                     </div>
-                                )}
-                                {source.non_grant_instrument && (
+                                }
+                                {
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Non-Grant Instrument
                                         </span>
                                         <span className="text-sm font-semibold text-gray-900">
-                                            {source.non_grant_instrument}
+                                            {source.non_grant_instrument ?? "0"}
                                         </span>
                                     </div>
-                                )}
+                                }
                             </div>
                         </div>
 
