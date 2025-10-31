@@ -63,7 +63,7 @@ const Navbar = () => {
                     <div className="flex-shrink-0">
                         <button
                             onClick={() => (window.location.href = "/")}
-                            className="flex items-start group flex-col hover:opacity-90 transition-all duration-300 focus:outline-none"
+                            className="flex items-start group flex-col hover:opacity-90 transition-all duration-300 focus:outline-none cursor-pointer"
                         >
                             <div className="flex items-center gap-2.5 mb-1">
                                 <h1 className="text-lg font-bold bg-gradient-to-r from-violet-700 via-violet-600 to-violet-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity duration-200">
@@ -99,7 +99,7 @@ const Navbar = () => {
                                     className={`text-sm font-semibold transition-all duration-300 px-4 py-2.5 rounded-lg relative group ${
                                         link.isActive
                                             ? "text-violet-700 bg-violet-50/60"
-                                            : "text-gray-600 hover:text-violet-700 hover:bg-green-50/40"
+                                            : "text-gray-600 hover:text-violet-700 hover:bg-violet-50/40"
                                     }`}
                                 >
                                     {link.label}
@@ -116,7 +116,7 @@ const Navbar = () => {
                         <Link
                             to={getAddProjectPath()}
                             state={{ from: path }}
-                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-green-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
+                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
                         >
                             <Plus
                                 size={16}

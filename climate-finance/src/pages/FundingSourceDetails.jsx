@@ -248,13 +248,11 @@ const FundingSourceDetails = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
                         <div className="text-center">
                             <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                                Committed
+                                Total Funding Amount
                             </div>
                             <div className="text-lg font-bold text-gray-900">
                                 {formatCurrency(
-                                    source.total_committed ||
-                                        source.grant_amount ||
-                                        0
+                                    source.total_grant + source.total_loan
                                 )}
                             </div>
                         </div>
@@ -304,9 +302,7 @@ const FundingSourceDetails = () => {
                                             Grant Amount
                                         </span>
                                         <span className="text-sm font-semibold text-green-600">
-                                            {formatCurrency(
-                                                source.grant_amount
-                                            )}
+                                            {formatCurrency(source.total_grant)}
                                         </span>
                                     </div>
                                 }
@@ -317,31 +313,8 @@ const FundingSourceDetails = () => {
                                         </span>
                                         <span className="text-sm font-semibold text-blue-600">
                                             {formatCurrency(
-                                                source.loan_amount ?? "0"
+                                                source.total_loan ?? "0"
                                             )}
-                                        </span>
-                                    </div>
-                                }
-                                {
-                                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                                        <span className="text-sm text-gray-600">
-                                            Counterpart Funding
-                                        </span>
-                                        <span className="text-sm font-semibold text-purple-600">
-                                            {formatCurrency(
-                                                source.counterpart_funding ??
-                                                    "0"
-                                            )}
-                                        </span>
-                                    </div>
-                                }
-                                {
-                                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                                        <span className="text-sm text-gray-600">
-                                            Non-Grant Instrument
-                                        </span>
-                                        <span className="text-sm font-semibold text-gray-900">
-                                            {source.non_grant_instrument ?? "0"}
                                         </span>
                                     </div>
                                 }

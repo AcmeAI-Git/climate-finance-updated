@@ -236,7 +236,7 @@ export default function ResearchRepository() {
                                                     doc.title
                                                 )
                                             }
-                                            className="w-full bg-violet-900 hover:bg-violet-800 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                            className="w-full bg-violet-900 hover:bg-violet-800 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
                                         >
                                             <Download size={18} />
                                             DOWNLOAD NOW

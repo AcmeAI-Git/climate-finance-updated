@@ -48,7 +48,6 @@ const Projects = () => {
     const [activeFilters, setActiveFilters] = useState({
         status: "All",
         geographic_division: "All",
-        approval_fy: "All",
         agency_id: "All",
         funding_source_id: "All",
     });
@@ -229,9 +228,6 @@ const Projects = () => {
         const statuses = Array.from(
             new Set(projectsList.map((p) => p.status).filter(Boolean))
         ).sort();
-        const approvalYears = Array.from(
-            new Set(projectsList.map((p) => p.approval_fy).filter(Boolean))
-        ).sort();
         const equityMarkers = Array.from(
             new Set(projectsList.map((p) => p.equity_marker).filter(Boolean))
         ).sort();
@@ -258,21 +254,6 @@ const Projects = () => {
                               ...divisions.map((division) => ({
                                   value: division,
                                   label: division,
-                              })),
-                          ],
-                      },
-                  ]
-                : []),
-            ...(approvalYears.length > 0
-                ? [
-                      {
-                          key: "approval_fy",
-                          label: "Approval Year",
-                          options: [
-                              { value: "All", label: "All Approval Years" },
-                              ...approvalYears.map((year) => ({
-                                  value: year,
-                                  label: year,
                               })),
                           ],
                       },
@@ -687,9 +668,12 @@ const Projects = () => {
                                                                 project.beginning
                                                             )}{" "}
                                                             -{" "}
-                                                            {formatDate(
-                                                                project.closing
-                                                            )}
+                                                            {project.closing ===
+                                                            "Ongoing"
+                                                                ? project.closing
+                                                                : formatDate(
+                                                                      project.closing
+                                                                  )}
                                                         </div>
                                                     </div>
                                                 )}
@@ -788,7 +772,6 @@ const Projects = () => {
                                     status: "All",
                                     type: "All",
                                     geographic_division: "All",
-                                    approval_fy: "All",
                                     agency_id: "All",
                                     funding_source_id: "All",
                                 });

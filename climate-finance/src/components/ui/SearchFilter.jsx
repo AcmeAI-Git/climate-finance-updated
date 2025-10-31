@@ -282,6 +282,7 @@ const SearchFilter = ({
                                     <option
                                         key={`${filter.key}-${option.value}-${index}`}
                                         value={option.value}
+                                        className="overflow-hidden text-ellipsis"
                                     >
                                         {option.label}
                                     </option>
