@@ -16,6 +16,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
     const location = useLocation();
 
     const [formData, setFormData] = useState({
+        category: "",
         heading: "",
         sub_heading: "",
         agency_name: "",
@@ -85,6 +86,8 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         const newErrors = {};
 
         if (!formData.heading.trim()) newErrors.heading = "Heading is required";
+        if (!formData.category.trim())
+            newErrors.heading = "Category is required";
         if (!formData.sub_heading.trim())
             newErrors.sub_heading = "Sub-heading is required";
         if (!formData.agency_name.trim())
@@ -113,6 +116,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         setIsLoading(true);
         const formDataToSend = new FormData();
 
+        formDataToSend.append("categories", formData.category);
         formDataToSend.append("heading", formData.heading);
         formDataToSend.append("sub_heading", formData.sub_heading);
         formDataToSend.append("agency_name", formData.agency_name);
@@ -239,6 +243,35 @@ const RepositoryFormPage = ({ mode = "add" }) => {
 
                 <Card padding="p-8">
                     <form onSubmit={handleSubmit} className="space-y-7">
+                        {/* Category */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Category <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                    errors.status
+                                        ? "border-red-300"
+                                        : "border-gray-300"
+                                }`}
+                                required
+                            >
+                                <option value="">Select Category</option>
+                                <option value="CASE STUDY">CASE STUDY</option>
+                                <option value="IMPACT REPORT">
+                                    IMPACT REPORT
+                                </option>
+                                <option value="FIELD NOTES">FIELD NOTES</option>
+                            </select>
+                            {errors.category && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.category}
+                                </p>
+                            )}
+                        </div>
                         {/* Heading */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Plus } from "lucide-react";
+import { Menu, X, Plus, Leaf } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { getClimateFinanceTransliteration } from "../../utils/transliteration";
@@ -19,20 +19,16 @@ const Navbar = () => {
 
     const getAddProjectPath = () => {
         if (isAuthenticated) {
-            // For admins, go to admin project form
             return "/admin/projects/new";
         } else {
-            // For viewers, go to public submission form
             return "/projects/new?mode=public";
         }
     };
 
     const getAddRepositoryPath = () => {
         if (isAuthenticated) {
-            // For admins, go to admin project form
             return "/admin/repository/new";
         } else {
-            // For viewers, go to public submission form
             return "/repository/new?mode=public";
         }
     };
@@ -60,31 +56,38 @@ const Navbar = () => {
     ];
 
     return (
-        <header className="shadow-sm border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    {/* Logo */}
+        <header className="sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-white via-white to-violet-50/30 border-b border-violet-100/40 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-18 py-2">
+                    {/* Logo with Icon */}
                     <div className="flex-shrink-0">
-                        <Link
-                            to="/"
-                            className="flex items-center group"
-                            onClick={() => setIsMobileMenuOpen(false)}
+                        <button
+                            onClick={() => (window.location.href = "/")}
+                            className="flex items-start group flex-col hover:opacity-90 transition-all duration-300 focus:outline-none"
                         >
-                            <h1 className="text-xl font-bold text-purple-700 group-hover:text-purple-600 transition-colors duration-200 select-none">
-                                <span className="notranslate" translate="no">
-                                    {getClimateFinanceTransliteration(language)}
-                                </span>
-                            </h1>
-                        </Link>
+                            <div className="flex items-center gap-2.5 mb-1">
+                                <h1 className="text-lg font-bold bg-gradient-to-r from-violet-700 via-violet-600 to-violet-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity duration-200">
+                                    <span
+                                        className="notranslate"
+                                        translate="no"
+                                    >
+                                        Green Accountability Monitor
+                                    </span>
+                                </h1>
+                            </div>
+                            <p className="text-xs text-gray-500 font-medium tracking-wide">
+                                Climate-resilient WASH finance tracker
+                            </p>
+                        </button>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center space-x-6 lg:space-x-8">
+                    <nav className="hidden lg:flex items-center space-x-1">
                         {navLinks.map((link, index) =>
                             link.isDisabled ? (
                                 <span
                                     key={index}
-                                    className="text-gray-400 cursor-not-allowed text-sm font-medium"
+                                    className="text-gray-300 cursor-not-allowed text-sm font-medium px-3 py-2"
                                     title="Coming Soon"
                                 >
                                     {link.label}
@@ -93,69 +96,81 @@ const Navbar = () => {
                                 <Link
                                     key={index}
                                     to={link.to}
-                                    className={`text-sm font-medium transition-colors duration-200 px-3 py-2 rounded-lg ${
+                                    className={`text-sm font-semibold transition-all duration-300 px-4 py-2.5 rounded-lg relative group ${
                                         link.isActive
-                                            ? "text-purple-700"
-                                            : "text-gray-600 hover:text-purple-600"
+                                            ? "text-violet-700 bg-violet-50/60"
+                                            : "text-gray-600 hover:text-violet-700 hover:bg-green-50/40"
                                     }`}
                                 >
                                     {link.label}
+                                    {link.isActive && (
+                                        <span className="absolute bottom-0 left-4 right-4 h-1 bg-gradient-to-r from-violet-500 to-violet-600 rounded-full"></span>
+                                    )}
                                 </Link>
                             )
                         )}
+                    </nav>
 
-                        {/* Add Project Button */}
+                    {/* Action Buttons and Switcher */}
+                    <div className="hidden lg:flex items-center gap-3">
                         <Link
                             to={getAddProjectPath()}
                             state={{ from: path }}
-                            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200"
+                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-green-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
                         >
-                            <Plus size={16} className="mr-2" />
-                            Add Project
+                            <Plus
+                                size={16}
+                                className="mr-2 group-hover:rotate-90 transition-transform duration-300"
+                            />
+                            Project
                         </Link>
 
                         <Link
                             to={getAddRepositoryPath()}
                             state={{ from: path }}
-                            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors duration-200"
+                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
                         >
-                            <Plus size={16} className="mr-2" />
-                            Add Repository
+                            <Plus
+                                size={16}
+                                className="mr-2 group-hover:rotate-90 transition-transform duration-300"
+                            />
+                            Repository
                         </Link>
 
+                        <div className="h-6 w-px bg-gray-200"></div>
                         <LanguageSwitcher />
-                    </nav>
+                    </div>
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="lg:hidden p-2.5 rounded-lg hover:bg-violet-100/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                         onClick={toggleMobileMenu}
                         aria-label="Toggle navigation menu"
                         aria-expanded={isMobileMenuOpen}
                     >
                         {isMobileMenuOpen ? (
-                            <X size={24} className="text-gray-600" />
+                            <X size={24} className="text-violet-700" />
                         ) : (
-                            <Menu size={24} className="text-gray-600" />
+                            <Menu size={24} className="text-violet-700" />
                         )}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Navigation - Improved */}
+            {/* Mobile Navigation */}
             <div
                 className={`lg:hidden transition-all duration-300 ease-in-out ${
                     isMobileMenuOpen
-                        ? "max-h-96 opacity-100"
+                        ? "max-h-[32rem] opacity-100"
                         : "max-h-0 opacity-0"
-                } overflow-hidden bg-white border-t border-gray-100 shadow-lg`}
+                } overflow-hidden bg-gradient-to-b from-white to-violet-50/50 border-t border-violet-100/40`}
             >
-                <nav className="px-4 py-4 space-y-1">
+                <nav className="px-4 py-4 space-y-2">
                     {navLinks.map((link, index) =>
                         link.isDisabled ? (
                             <div
                                 key={index}
-                                className="px-4 py-3 text-gray-400 cursor-not-allowed text-sm font-medium"
+                                className="px-4 py-3 text-gray-300 cursor-not-allowed text-sm font-medium"
                                 title="Coming Soon"
                             >
                                 {link.label}
@@ -164,10 +179,10 @@ const Navbar = () => {
                             <Link
                                 key={index}
                                 to={link.to}
-                                className={`block px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                                className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
                                     link.isActive
-                                        ? "text-purple-700"
-                                        : "text-gray-600 hover:text-purple-600"
+                                        ? "text-violet-700 bg-violet-100/60 border-l-4 border-violet-600"
+                                        : "text-gray-600 hover:text-violet-700 hover:bg-violet-50/60"
                                 }`}
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
@@ -176,11 +191,13 @@ const Navbar = () => {
                         )
                     )}
 
-                    {/* Mobile Add Project Button */}
+                    <div className="my-3 h-px bg-violet-100/40"></div>
+
+                    {/* Mobile Action Buttons */}
                     <Link
                         to={getAddProjectPath()}
                         state={{ from: path }}
-                        className="block px-4 py-3 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200"
+                        className="block px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-600 rounded-lg hover:from-violet-700 hover:to-violet-700 transition-all duration-300 mb-2"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <div className="flex items-center">
@@ -188,8 +205,21 @@ const Navbar = () => {
                             Add Project
                         </div>
                     </Link>
+
+                    <Link
+                        to={getAddRepositoryPath()}
+                        state={{ from: path }}
+                        className="block px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-violet-600 rounded-lg hover:from-violet-700 hover:to-violet-700 transition-all duration-300"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <div className="flex items-center">
+                            <Plus size={16} className="mr-2" />
+                            Add Repository
+                        </div>
+                    </Link>
                 </nav>
-                <div className="px-4 pb-4">
+
+                <div className="px-4 pb-4 border-t border-violet-100/40 pt-3">
                     <LanguageSwitcher />
                 </div>
             </div>

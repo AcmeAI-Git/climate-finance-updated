@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS ProjectSDG (
 
 CREATE TABLE IF NOT EXISTS DocumentRepository (
     repo_id SERIAL PRIMARY KEY,
+    categories VARCHAR(255),
     Heading TEXT,
     sub_heading TEXT,
     Agency_name TEXT,
@@ -176,6 +177,7 @@ CREATE TABLE IF NOT EXISTS DocumentRepository (
 
 CREATE TABLE IF NOT EXISTS PendingDocumentRepository (
       repo_id SERIAL PRIMARY KEY,
+      categories VARCHAR(255),
       Heading TEXT,
       sub_heading TEXT,
       Agency_name TEXT,
@@ -185,7 +187,6 @@ CREATE TABLE IF NOT EXISTS PendingDocumentRepository (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-
 
 
 -- Indexes for performance

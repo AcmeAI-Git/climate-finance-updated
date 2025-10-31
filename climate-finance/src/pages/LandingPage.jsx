@@ -26,6 +26,7 @@ import ExportButton from "../components/ui/ExportButton";
 import PageHeader from "../components/layouts/PageHeader";
 import { useLanguage } from "../context/LanguageContext";
 import { translateChartData, getChartTitle } from "../utils/chartTranslations";
+import ResearchRepository from "../components/ui/ResearchRepository";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -513,9 +514,17 @@ const LandingPage = () => {
                 </div>
             </div>
 
+            {/* {Repository section} */}
+            <div
+                className="my-4 bg-white rounded-2xl shadow-soft animate-fade-in-up"
+                style={{ animationDelay: "800ms" }}
+            >
+                <ResearchRepository />
+            </div>
+
             {/* Quick Actions */}
             <div
-                className="mt-8 p-6 bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up"
+                className="p-6 bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up"
                 style={{ animationDelay: "900ms" }}
             >
                 <div className="text-center mb-6">

@@ -5,6 +5,7 @@ const PendingDocumentRepository = {};
 // Create a new document record
 PendingDocumentRepository.create = async (data) => {
     const {
+        categories,
         heading,
         sub_heading,
         agency_name,
@@ -15,11 +16,11 @@ PendingDocumentRepository.create = async (data) => {
 
     const query = `
         INSERT INTO PendingDocumentRepository 
-        (heading, sub_heading, agency_name, submitter_email, document_size, document_link)
+        (categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *;
     `;
-    const values = [heading, sub_heading, agency_name, submitter_email, document_size, document_link];
+    const values = [categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
@@ -47,6 +48,7 @@ PendingDocumentRepository.getById = async (repo_id) => {
 // Update a document
 PendingDocumentRepository.update = async (repo_id, data) => {
     const {
+        categories,
         heading,
         sub_heading,
         agency_name,
@@ -64,11 +66,12 @@ PendingDocumentRepository.update = async (repo_id, data) => {
             submitter_email = $4,
             document_size = $5,
             document_link = $6,
+            categories = $7
             updated_at = CURRENT_TIMESTAMP
-        WHERE repo_id = $7
+        WHERE repo_id = $8
         RETURNING *;
     `;
-    const values = [heading, sub_heading, agency_name, submitter_email, document_size, document_link, repo_id];
+    const values = [heading, sub_heading, agency_name, submitter_email, document_size, document_link, categories, repo_id];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };

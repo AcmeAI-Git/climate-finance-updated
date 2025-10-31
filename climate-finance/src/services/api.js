@@ -183,7 +183,6 @@ export const RepositoryApi = {
         });
     },
 
-    // Admin operations
     getAll: () => apiRequest("/document-repository"),
     getById: (id) => {
         if (!id) throw new Error("Pending project ID is required");
