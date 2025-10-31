@@ -73,7 +73,7 @@ FundingSource.getFundingSourceById = async (id) => {
         const fundingSource = fundingSourceResult.rows[0];
 
         const projectsQuery = `
-            SELECT p.project_id, p.title, p.status, p.beginning, p.closing, p.total_cost_usd,
+            SELECT p.project_id, p.title, p.status, p.beginning, p.closing, p.total_cost_usd, p.gef_grant, p.cofinancing, p.loan_amount,
                    p.climate_relevance_category
             FROM Project p
             INNER JOIN ProjectFundingSource pfs ON p.project_id = pfs.project_id
@@ -86,7 +86,10 @@ FundingSource.getFundingSourceById = async (id) => {
             ...fundingSource,
             projects: projectsResult.rows,
             active_projects: projectsResult.rows.filter(p => p.status === 'Active').length,
-            total_funded: projectsResult.rows.reduce((sum, p) => sum + (p.total_cost_usd || 0), 0)
+            total_grant: projectsResult.rows.reduce((sum, p) => sum + (parseFloat(p.gef_grant) || 0), 0),
+            total_loan: projectsResult.rows.reduce((sum, p) => sum + (parseFloat(p.loan_amount) || 0), 0),
+            total_co_finance: projectsResult.rows.reduce((sum, p) => sum + (parseFloat(p.cofinancing) || 0), 0),
+            total_funded: projectsResult.rows.reduce((sum, p) => sum + (parseFloat(p.total_cost_usd) || 0), 0)
         };
     } catch (err) {
         throw err;

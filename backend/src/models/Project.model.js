@@ -573,14 +573,20 @@ Project.getProjectTrend = async () => {
 Project.getRegionalDistribution = async () => {
     const query = `
         SELECT 
-            p.geographic_division AS region,
+            region,
             COUNT(*) AS total,
-            COUNT(*) FILTER (WHERE p.status = 'Active') AS active,
-            COUNT(*) FILTER (WHERE p.status = 'Implemented' OR p.status = 'Completed') AS completed
-        FROM Project p
-        GROUP BY p.geographic_division
-        ORDER BY p.geographic_division;
+            COUNT(*) FILTER (WHERE status = 'Active') AS active,
+            COUNT(*) FILTER (WHERE status IN ('Implemented', 'Completed')) AS completed
+        FROM (
+            SELECT 
+                unnest(p.geographic_division) AS region,
+                p.status
+            FROM Project p
+        ) AS sub
+        GROUP BY region
+        ORDER BY region;
     `;
+
     const { rows } = await pool.query(query);
     return rows.map(row => ({
         region: row.region,
@@ -589,6 +595,7 @@ Project.getRegionalDistribution = async () => {
         completed: parseInt(row.completed) || 0,
     }));
 };
+
 
 
 module.exports = Project;
