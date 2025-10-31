@@ -32,9 +32,7 @@ const uploadFile = async (file, customName = null) => {
             });
         });
 
-        // Generate public URL (adjust base URL for your domain)
-        const BASE_URL = process.env.APP_URL || 'https://climate-finance-new.onrender.com';
-        return `${BASE_URL}/download/${fileName}`;
+        return `${fileName}`;
 
     } catch (error) {
         console.error('PDF upload failed:', error.message);

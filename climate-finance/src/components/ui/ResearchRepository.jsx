@@ -9,7 +9,7 @@ import {
     Loader,
     FileText,
 } from "lucide-react";
-import { RepositoryApi } from "../../services/api";
+import { RepositoryApi, downloadDocumentApi } from "../../services/api";
 
 export default function ResearchRepository() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -83,7 +83,7 @@ export default function ResearchRepository() {
 
     const handleDownload = (docLink, docTitle) => {
         if (docLink) {
-            window.open(docLink, "_blank");
+            downloadDocumentApi.previewDocument(docLink);
         }
     };
 

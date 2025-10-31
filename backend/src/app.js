@@ -29,8 +29,9 @@ connectDB();
 // Routes
 app.use("/api", routes);
 
-app.get('/download/:filename', (req, res) => {
+app.get('/document/:filename', (req, res) => {
     const { filename } = req.params;
+    const { download } = req.query; // ?download=true
     const filePath = path.join(__dirname, 'public', 'uploads', 'documents', filename);
 
     // Security: Prevent directory traversal
@@ -45,20 +46,13 @@ app.get('/download/:filename', (req, res) => {
         return res.status(404).send('File not found');
     }
 
-    // Extract original name (remove timestamp)
     const originalName = filename.split('-').slice(1).join('-');
+    const disposition = download === 'true' ? 'attachment' : 'inline';
 
-    // Force download
-    res.setHeader('Content-Disposition', `attachment; filename="${originalName}"`);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${originalName}"`);
     res.setHeader('Content-Type', 'application/pdf');
 
-    // Stream file
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            console.error('Download error:', err);
-            res.status(500).send('Download failed');
-        }
-    });
+    res.sendFile(filePath);
 });
 
 // Error Handling Middleware

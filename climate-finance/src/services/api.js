@@ -1,4 +1,3 @@
-// Backend API service - production ready
 // Base API configuration
 const BASE_URL =
     import.meta.env.VITE_BASE_URL || "https://climate-finance-new.onrender.com";
@@ -48,6 +47,11 @@ const makeBackendRequest = async (url, options = {}) => {
 // Generic API request function
 const apiRequest = async (endpoint, options = {}) => {
     const url = `${BASE_URL}/api${endpoint}`;
+    return await makeBackendRequest(url, options);
+};
+
+const DownloadRequest = async (endpoint, options = {}) => {
+    const url = `${BASE_URL}${endpoint}`;
     return await makeBackendRequest(url, options);
 };
 
@@ -168,6 +172,18 @@ export const pendingRepositoryApi = {
         return apiRequest(`/pending-project/reject/${id}`, {
             method: "DELETE",
         });
+    },
+};
+
+export const downloadDocumentApi = {
+    downloadDocument: (documentId) => {
+        if (!documentId) throw new Error("Document ID is required");
+        return DownloadRequest(`/document/${documentId}`);
+    },
+
+    previewDocument: (documentId) => {
+        if (!documentId) throw new Error("Document ID is required");
+        window.open(`${BASE_URL}/document/${documentId}`, "_blank");
     },
 };
 
