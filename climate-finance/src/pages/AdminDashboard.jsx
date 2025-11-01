@@ -14,7 +14,7 @@ import {
     FolderTree,
     DollarSign,
     Building2,
-    MapPin,
+    Book,
     Target,
     Plus,
     User,
@@ -24,7 +24,7 @@ import {
     CheckCircle,
 } from "lucide-react";
 import { getChartTranslation } from "../utils/chartTranslations";
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from "../context/LanguageContext";
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
@@ -47,31 +47,46 @@ const AdminDashboard = () => {
 
             if (response.status && response.data) {
                 const data = response.data;
-                
+
                 setDashboardStats([
                     {
-                        title: getChartTranslation(language, null, 'projectsByStatus'),
+                        title: getChartTranslation(
+                            language,
+                            null,
+                            "projectsByStatus"
+                        ),
                         value: data.total_projects || 0,
                         change: "All projects",
                         color: "primary",
                         icon: <FolderTree size={20} />,
                     },
                     {
-                        title: getChartTranslation(language, null, 'projectsByType'),
+                        title: getChartTranslation(
+                            language,
+                            null,
+                            "projectsByType"
+                        ),
                         value: data.active_projects || 0,
                         change: "Currently active",
                         color: "success",
                         icon: <Activity size={20} />,
                     },
                     {
-                        title: getChartTranslation(language, null, 'fundingByType'),
+                        title: getChartTranslation(
+                            language,
+                            null,
+                            "fundingByType"
+                        ),
                         value: formatCurrency(data.total_climate_finance || 0),
                         change: "All-time total",
                         color: "warning",
                         icon: <Banknote size={20} />,
                     },
                     {
-                        title: language === 'bn' ? 'সম্পূর্ণ প্রকল্প' : 'Completed Projects',
+                        title:
+                            language === "bn"
+                                ? "সম্পূর্ণ প্রকল্প"
+                                : "Completed Projects",
                         value: data.completed_projects || 0,
                         change: "Successfully completed",
                         color: "primary",
@@ -87,28 +102,39 @@ const AdminDashboard = () => {
             // Fallback to default values
             setDashboardStats([
                 {
-                    title: getChartTranslation(language, null, 'projectsByStatus'),
+                    title: getChartTranslation(
+                        language,
+                        null,
+                        "projectsByStatus"
+                    ),
                     value: 0,
                     change: "No data available",
                     color: "primary",
                     icon: <FolderTree size={20} />,
                 },
                 {
-                    title: getChartTranslation(language, null, 'projectsByType'),
+                    title: getChartTranslation(
+                        language,
+                        null,
+                        "projectsByType"
+                    ),
                     value: 0,
                     change: "No data available",
                     color: "success",
                     icon: <Activity size={20} />,
                 },
                 {
-                    title: getChartTranslation(language, null, 'fundingByType'),
+                    title: getChartTranslation(language, null, "fundingByType"),
                     value: formatCurrency(0),
                     change: "No data available",
                     color: "warning",
                     icon: <Banknote size={20} />,
                 },
                 {
-                    title: language === 'bn' ? 'অ্যাডাপটেশন ফাইন্যান্স' : 'Adaptation Finance',
+                    title:
+                        language === "bn"
+                            ? "অ্যাডাপটেশন ফাইন্যান্স"
+                            : "Adaptation Finance",
                     value: formatCurrency(0),
                     change: "No data available",
                     color: "primary",
@@ -146,7 +172,7 @@ const AdminDashboard = () => {
             icon: <Users size={20} />,
             path: "/admin/users",
             color: "bg-success-600",
-            disabled: user?.role === 'Project Manager',
+            disabled: user?.role === "Project Manager",
         },
         {
             title: "Funding Sources",
@@ -163,10 +189,10 @@ const AdminDashboard = () => {
             color: "bg-primary-500",
         },
         {
-            title: "Locations",
-            description: "Manage project locations",
-            icon: <MapPin size={20} />,
-            path: "/admin/locations",
+            title: "Repository Approve",
+            description: "Review and approve pending repository submissions",
+            icon: <Book size={20} />,
+            path: "/admin/repository-approval",
             color: "bg-success-500",
         },
     ];
@@ -231,7 +257,7 @@ const AdminDashboard = () => {
                     Quick Actions
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {menuItems.map((item, index) => (
+                    {menuItems.map((item, index) =>
                         item.disabled ? (
                             <div
                                 key={index}
@@ -272,7 +298,7 @@ const AdminDashboard = () => {
                                 </div>
                             </Link>
                         )
-                    ))}
+                    )}
                 </div>
             </Card>
 

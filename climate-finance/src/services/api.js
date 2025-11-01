@@ -163,13 +163,13 @@ export const pendingRepositoryApi = {
     },
     approve: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/approve/${id}`, {
+        return apiRequest(`/pending-document-repository/accept/${id}`, {
             method: "PUT",
         });
     },
     reject: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/reject/${id}`, {
+        return apiRequest(`/pending-document-repository/${id}`, {
             method: "DELETE",
         });
     },

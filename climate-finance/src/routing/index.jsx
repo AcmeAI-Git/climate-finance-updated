@@ -23,6 +23,7 @@ import AgencyFormPage from "../pages/AgencyFormPage";
 import LocationFormPage from "../pages/LocationFormPage";
 import AboutPage from "../pages/AboutPage";
 import RepositoryFormPage from "../pages/RepositoryFormPage";
+import AdminRepositoryApproval from "../pages/AdminRepositoryApproval";
 
 // Protected route wrapper that uses AuthContext
 function ProtectedRoute({ children, requireAuth = true }) {
@@ -299,6 +300,16 @@ const Routing = () => {
                 element={
                     <AdminRoute>
                         <AdminProjectApproval />
+                    </AdminRoute>
+                }
+            />
+
+            {/* Admin Repository Approval */}
+            <Route
+                path="/admin/repository-approval"
+                element={
+                    <AdminRoute>
+                        <AdminRepositoryApproval />
                     </AdminRoute>
                 }
             />
