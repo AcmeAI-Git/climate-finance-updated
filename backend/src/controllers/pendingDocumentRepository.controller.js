@@ -1,5 +1,6 @@
 const PendingDocumentRepository = require('../models/PendingDocumentRepository.model');
-const { uploadFile } = require('../utils/fileUpload'); // adjust path if needed
+const { uploadFile } = require('../utils/fileUpload');
+const documentRepository = require("../models/documentRepository.model"); // adjust path if needed
 
 const PendingDocumentRepositoryController = {};
 
@@ -77,11 +78,31 @@ PendingDocumentRepositoryController.update = async (req, res) => {
     }
 };
 
+PendingDocumentRepositoryController.accept = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await PendingDocumentRepository.getById(id);
+        const data = { categories: result.categories, heading:result.heading, sub_heading: result.sub_heading, document_link: result.document_link, agency_name: result.agency_name, document_size: result.document_size };
+
+        if (!result) {
+            return res.status(404).json({ status: false, data: "Document not found" });
+        }
+
+        const response = await documentRepository.create(data)
+        await PendingDocumentRepository.delete({repo_id: result.repo_id})
+
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        console.error("Error fetching document:", e);
+        res.status(500).json({ status: false, data: `Server Error: ${e.message}` });
+    }
+};
+
 // ✅ Delete a document
 PendingDocumentRepositoryController.delete = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await PendingDocumentRepository.delete(id);
+        const result = await PendingDocumentRepository.delete({repo_id:id});
 
         if (!result) {
             return res.status(404).json({ status: false, data: "Document not found or already deleted" });

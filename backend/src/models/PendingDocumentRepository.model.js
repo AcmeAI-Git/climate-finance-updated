@@ -17,7 +17,7 @@ PendingDocumentRepository.create = async (data) => {
     const query = `
         INSERT INTO PendingDocumentRepository 
         (categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *;
     `;
     const values = [categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link];
@@ -36,12 +36,12 @@ PendingDocumentRepository.getAll = async () => {
 };
 
 // Get a single document by ID
-PendingDocumentRepository.getById = async (repo_id) => {
+PendingDocumentRepository.getById = async (id) => {
     const query = `
         SELECT * FROM PendingDocumentRepository
         WHERE repo_id = $1;
     `;
-    const { rows } = await pool.query(query, [repo_id]);
+    const { rows } = await pool.query(query, [id]);
     return rows[0];
 };
 
@@ -77,7 +77,7 @@ PendingDocumentRepository.update = async (repo_id, data) => {
 };
 
 // Delete a document
-PendingDocumentRepository.delete = async (repo_id) => {
+PendingDocumentRepository.delete = async ({repo_id}) => {
     const query = `
         DELETE FROM PendingDocumentRepository
         WHERE repo_id = $1
