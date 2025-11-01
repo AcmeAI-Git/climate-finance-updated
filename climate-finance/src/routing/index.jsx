@@ -24,6 +24,7 @@ import LocationFormPage from "../pages/LocationFormPage";
 import AboutPage from "../pages/AboutPage";
 import RepositoryFormPage from "../pages/RepositoryFormPage";
 import AdminRepositoryApproval from "../pages/AdminRepositoryApproval";
+import AdminRepositories from "../pages/AdminRepositories";
 
 // Protected route wrapper that uses AuthContext
 function ProtectedRoute({ children, requireAuth = true }) {
@@ -310,6 +311,16 @@ const Routing = () => {
                 element={
                     <AdminRoute>
                         <AdminRepositoryApproval />
+                    </AdminRoute>
+                }
+            />
+
+            {/* Admin Repository Approval */}
+            <Route
+                path="/admin/repository-management"
+                element={
+                    <AdminRoute>
+                        <AdminRepositories />
                     </AdminRoute>
                 }
             />

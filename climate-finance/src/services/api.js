@@ -159,7 +159,7 @@ export const pendingRepositoryApi = {
     getAll: () => apiRequest("/pending-document-repository"),
     getById: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/${id}`);
+        return apiRequest(`/pending-document-repository/${id}`);
     },
     approve: (id) => {
         if (!id) throw new Error("Pending project ID is required");
@@ -202,17 +202,17 @@ export const RepositoryApi = {
     getAll: () => apiRequest("/document-repository"),
     getById: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/${id}`);
+        return apiRequest(`/document-repository/${id}`);
     },
-    approve: (id) => {
+    edit: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/approve/${id}`, {
+        return apiRequest(`/document-repository/${id}`, {
             method: "PUT",
         });
     },
-    reject: (id) => {
+    delete: (id) => {
         if (!id) throw new Error("Pending project ID is required");
-        return apiRequest(`/pending-project/reject/${id}`, {
+        return apiRequest(`/document-repository/${id}`, {
             method: "DELETE",
         });
     },

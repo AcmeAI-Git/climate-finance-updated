@@ -15,7 +15,7 @@ import {
     DollarSign,
     Building2,
     Book,
-    Target,
+    BookOpenText,
     Plus,
     User,
     Banknote,
@@ -189,10 +189,17 @@ const AdminDashboard = () => {
             color: "bg-primary-500",
         },
         {
-            title: "Repository Approve",
+            title: "Repository Approval",
             description: "Review and approve pending repository submissions",
             icon: <Book size={20} />,
             path: "/admin/repository-approval",
+            color: "bg-success-500",
+        },
+        {
+            title: "Repository Management",
+            description: "Edit, and manage climate repositories",
+            icon: <BookOpenText size={20} />,
+            path: "/admin/repository-management",
             color: "bg-success-500",
         },
     ];
