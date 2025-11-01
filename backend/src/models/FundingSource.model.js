@@ -23,7 +23,22 @@ FundingSource.addFundingSource = async (data) => {
 };
 
 FundingSource.getAllFundingSources = async () => {
-    const { rows } = await pool.query('SELECT * FROM FundingSource ORDER BY name');
+    const query = `
+        SELECT
+            fs.funding_source_id,
+            fs.name,
+            fs.dev_partner,
+            fs.type,
+            COALESCE(SUM(p.gef_grant), 0) as grant_amount,
+            COALESCE(SUM(p.loan_amount), 0) as loan_amount,
+            COALESCE(SUM(p.cofinancing), 0) as counterpart_funding
+        FROM FundingSource fs
+                 LEFT JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
+                 LEFT JOIN Project p ON pfs.project_id = p.project_id
+        GROUP BY fs.funding_source_id, fs.name, fs.dev_partner
+        ORDER BY fs.name
+    `;
+    const { rows } = await pool.query(query);
     return rows;
 };
 

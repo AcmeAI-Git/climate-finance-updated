@@ -191,41 +191,56 @@ const AdminListPage = ({
     });
 
     // Prepare table actions
-    const defaultActions = [
-        {
-            label: "Edit",
-            icon: <Edit size={14} />,
-            variant: "outline",
-            onClick: (row) => {
-                let id;
-                if (entityName === "agency") {
-                    id = row.agency_id;
-                } else if (entityName === "project") {
-                    id = row.project_id;
-                } else if (entityName === "location") {
-                    id = row.location_id;
-                } else if (entityName === "funding-source") {
-                    id = row.funding_source_id;
-                } else if (entityName === "user") {
-                    id = row.id;
-                } else {
-                    id = row.id || row[`${entityName}_id`];
-                }
-                if (!id) {
-                    alert(`Cannot edit ${entityName}: No valid ID found`);
-                    return;
-                }
-                navigate(`/admin/${entityName}s/${id}/edit`);
-            },
-        },
-        {
-            label: "Delete",
-            icon: <Trash2 size={14} />,
-            variant: "outline",
-            onClick: (row) => setDeleteModal({ isOpen: true, item: row }),
-            className: "text-red-600 border-red-300 hover:bg-red-50",
-        },
-    ];
+    const defaultActions =
+        entityName === "repository"
+            ? [
+                  {
+                      label: "Delete",
+                      icon: <Trash2 size={14} />,
+                      variant: "outline",
+                      onClick: (row) =>
+                          setDeleteModal({ isOpen: true, item: row }),
+                      className: "text-red-600 border-red-300 hover:bg-red-50",
+                  },
+              ]
+            : [
+                  {
+                      label: "Edit",
+                      icon: <Edit size={14} />,
+                      variant: "outline",
+                      onClick: (row) => {
+                          let id;
+                          if (entityName === "agency") {
+                              id = row.agency_id;
+                          } else if (entityName === "project") {
+                              id = row.project_id;
+                          } else if (entityName === "location") {
+                              id = row.location_id;
+                          } else if (entityName === "funding-source") {
+                              id = row.funding_source_id;
+                          } else if (entityName === "user") {
+                              id = row.id;
+                          } else {
+                              id = row.id || row[`${entityName}_id`];
+                          }
+                          if (!id) {
+                              alert(
+                                  `Cannot edit ${entityName}: No valid ID found`
+                              );
+                              return;
+                          }
+                          navigate(`/admin/${entityName}s/${id}/edit`);
+                      },
+                  },
+                  {
+                      label: "Delete",
+                      icon: <Trash2 size={14} />,
+                      variant: "outline",
+                      onClick: (row) =>
+                          setDeleteModal({ isOpen: true, item: row }),
+                      className: "text-red-600 border-red-300 hover:bg-red-50",
+                  },
+              ];
 
     // If getRowActions is provided and returns actions, use those; otherwise use defaultActions
     const customActions = getRowActions(defaultActions);
