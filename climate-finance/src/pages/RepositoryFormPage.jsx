@@ -298,7 +298,6 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Sub-heading{" "}
-                                <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -323,7 +322,6 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Agency Name / Funding Source{" "}
-                                <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -348,7 +346,6 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Programme Code{" "}
-                                <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
