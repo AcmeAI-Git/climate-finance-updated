@@ -41,6 +41,11 @@ const Navbar = () => {
             isActive: path === "/projects" || path.startsWith("/projects/"),
         },
         {
+            to: "/repository",
+            label: "Repositories",
+            isActive: path === "/repository" || path.startsWith("/repository/"),
+        },
+        {
             to: "/funding-sources",
             label: "Funding Sources",
             isActive:
@@ -82,12 +87,12 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center space-x-1">
+                    <nav className="hidden lg:flex items-center space-x-0.5">
                         {navLinks.map((link, index) =>
                             link.isDisabled ? (
                                 <span
                                     key={index}
-                                    className="text-gray-300 cursor-not-allowed text-sm font-medium px-3 py-2"
+                                    className="text-gray-300 cursor-not-allowed text-xs font-medium px-2 py-2"
                                     title="Coming Soon"
                                 >
                                     {link.label}
@@ -96,7 +101,7 @@ const Navbar = () => {
                                 <Link
                                     key={index}
                                     to={link.to}
-                                    className={`text-sm font-semibold transition-all duration-300 px-4 py-2.5 rounded-lg relative group ${
+                                    className={`text-xs font-semibold transition-all duration-300 px-2 py-2.5 rounded-lg relative group ${
                                         link.isActive
                                             ? "text-violet-700 bg-violet-50/60"
                                             : "text-gray-600 hover:text-violet-700 hover:bg-violet-50/40"
@@ -116,7 +121,7 @@ const Navbar = () => {
                         <Link
                             to={getAddProjectPath()}
                             state={{ from: path }}
-                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
+                            className="inline-flex items-center px-2 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
                         >
                             <Plus
                                 size={16}
@@ -128,7 +133,7 @@ const Navbar = () => {
                         <Link
                             to={getAddRepositoryPath()}
                             state={{ from: path }}
-                            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
+                            className="inline-flex items-center px-2 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
                         >
                             <Plus
                                 size={16}
@@ -219,7 +224,7 @@ const Navbar = () => {
                     </Link>
                 </nav>
 
-                <div className="px-4 pb-4 border-t border-violet-100/40 pt-3">
+                <div className="px-2 pb-4 border-t border-violet-100/40 pt-3">
                     <LanguageSwitcher />
                 </div>
             </div>

@@ -1,4 +1,4 @@
-'use client'; // Add this if using Next.js App Router
+"use client"; // Add this if using Next.js App Router
 
 import React, { useEffect, useState } from "react";
 import Button from "./Button";
@@ -6,7 +6,8 @@ import { useLanguage } from "../../context/LanguageContext";
 
 const LanguageSwitcher = () => {
     const { language, updateLanguage } = useLanguage();
-    const [isGoogleTranslateLoaded, setIsGoogleTranslateLoaded] = useState(false);
+    const [isGoogleTranslateLoaded, setIsGoogleTranslateLoaded] =
+        useState(false);
 
     useEffect(() => {
         // Language is now managed by LanguageContext
@@ -24,7 +25,8 @@ const LanguageSwitcher = () => {
                 {
                     pageLanguage: "en",
                     includedLanguages: "bn,en",
-                    layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    layout: window.google.translate.TranslateElement
+                        .InlineLayout.SIMPLE,
                     autoDisplay: false,
                 },
                 "google_translate_element"
@@ -48,28 +50,29 @@ const LanguageSwitcher = () => {
 
         // Fix domain logic for Vercel and other deployments
         const hostname = window.location.hostname;
-        const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-        
+        const isLocalhost =
+            hostname === "localhost" || hostname === "127.0.0.1";
+
         // Get appropriate domain for cookie - simplified for Vercel
         const getCookieDomain = () => {
             if (isLocalhost) return null; // No domain for localhost
-            
+
             // For Vercel deployments, don't set domain at all to avoid cross-domain issues
-            if (hostname.includes('.vercel.app')) {
+            if (hostname.includes(".vercel.app")) {
                 return null; // Let browser handle domain automatically
             }
-            
+
             // For custom domains
-            const parts = hostname.split('.');
+            const parts = hostname.split(".");
             if (parts.length <= 2) {
                 return null; // Let browser handle simple domains
             } else {
                 return "." + parts.slice(-2).join(".");
             }
         };
-        
+
         const cookieDomain = getCookieDomain();
-        
+
         // Set or clear translation cookie with proper format
         if (newLang === "en") {
             // Clear cookie - try multiple approaches for Vercel
@@ -88,11 +91,15 @@ const LanguageSwitcher = () => {
             // Also try to set with SameSite for Vercel
             document.cookie = `googtrans=/en/${newLang}; path=/; SameSite=Lax`;
         }
-        
+
         updateLanguage(newLang);
-        
+
         // Try to trigger translation programmatically if Google Translate is loaded
-        if (isGoogleTranslateLoaded && window.google && window.google.translate) {
+        if (
+            isGoogleTranslateLoaded &&
+            window.google &&
+            window.google.translate
+        ) {
             const translateElement = window.google.translate.TranslateElement;
             if (translateElement) {
                 // Trigger immediate translation if possible
@@ -102,7 +109,7 @@ const LanguageSwitcher = () => {
                 return;
             }
         }
-        
+
         // Fallback: reload page with small delay to ensure cookie setting
         setTimeout(() => {
             window.location.reload();
@@ -115,16 +122,15 @@ const LanguageSwitcher = () => {
                 language === "bn" ? "noto-sans-bengali" : ""
             }`}
         >
-            <Button
-                className="w-full"
-                onClick={toggleLanguage}
-                leftIcon="⇆"
-            >
-                {language === "en" ? "English" : "বাংলা"}
+            <Button className="text-sm" onClick={toggleLanguage} leftIcon="⇆">
+                {language === "en" ? "En" : "বাংলা"}
             </Button>
 
             {/* Hidden Google Translate element */}
-            <div id="google_translate_element" style={{ display: "none" }}></div>
+            <div
+                id="google_translate_element"
+                style={{ display: "none" }}
+            ></div>
 
             {/* Force-hide unwanted Google Translate UI elements */}
             <style>{`

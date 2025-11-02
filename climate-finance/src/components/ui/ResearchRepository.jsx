@@ -88,9 +88,9 @@ export default function ResearchRepository() {
     };
 
     return (
-        <div className="w-full bg-white rounded-xl overflow-hidden">
+        <div className="w-full rounded-xl overflow-hidden bg-gray-50">
             {/* Header */}
-            <div className="p-6">
+            <div className="">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                     Research & Documentation Repository
                 </h1>
@@ -101,7 +101,7 @@ export default function ResearchRepository() {
             </div>
 
             {/* Filters */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 border-b border-gray-200 bg-white">
                 <div className="flex flex-col gap-4">
                     {/* Search */}
                     <div className="relative">
@@ -143,7 +143,7 @@ export default function ResearchRepository() {
 
             {/* Loading State */}
             {loading && (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-12 bg-white">
                     <Loader
                         className="animate-spin text-purple-600 mr-2"
                         size={24}
@@ -162,7 +162,7 @@ export default function ResearchRepository() {
 
             {/* Results count */}
             {!loading && (
-                <div className="px-6 py-4 text-sm text-gray-600">
+                <div className="px-6 py-4 text-sm text-gray-600 bg-white">
                     Showing {filteredDocuments.length} of {documents.length}{" "}
                     documents
                 </div>
@@ -170,7 +170,7 @@ export default function ResearchRepository() {
 
             {/* Documents List */}
             {!loading && !error && (
-                <div className="px-6 pb-6 space-y-4">
+                <div className="px-6 pb-6 space-y-4 bg-white">
                     {filteredDocuments.length > 0 ? (
                         filteredDocuments.map((doc) => (
                             <div

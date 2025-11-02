@@ -91,7 +91,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         if (!formData.sub_heading.trim())
             newErrors.sub_heading = "Sub-heading is required";
         if (!formData.agency_name.trim())
-            newErrors.agency_name = "Agency name is required";
+            newErrors.agency_name = "Agency name/Funding Source is required";
         if (actualMode === "public" && !formData.submitter_email.trim())
             newErrors.submitter_email = "Email is required";
         if (
@@ -324,7 +324,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         {/* Agency Name */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Agency Name{" "}
+                                Agency Name / Funding Source{" "}
                                 <span className="text-red-500">*</span>
                             </label>
                             <input

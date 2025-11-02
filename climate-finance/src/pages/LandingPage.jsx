@@ -26,7 +26,7 @@ import ExportButton from "../components/ui/ExportButton";
 import PageHeader from "../components/layouts/PageHeader";
 import { useLanguage } from "../context/LanguageContext";
 import { translateChartData, getChartTitle } from "../utils/chartTranslations";
-import ResearchRepository from "../components/ui/ResearchRepository";
+import ResearchDocsCard from "../components/ui/ResearchDocsCard";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -514,13 +514,7 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            {/* {Repository section} */}
-            <div
-                className="my-4 bg-white rounded-2xl shadow-soft animate-fade-in-up"
-                style={{ animationDelay: "800ms" }}
-            >
-                <ResearchRepository />
-            </div>
+            <ResearchDocsCard />
 
             {/* Quick Actions */}
             <div

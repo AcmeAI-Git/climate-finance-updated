@@ -25,6 +25,7 @@ import AboutPage from "../pages/AboutPage";
 import RepositoryFormPage from "../pages/RepositoryFormPage";
 import AdminRepositoryApproval from "../pages/AdminRepositoryApproval";
 import AdminRepositories from "../pages/AdminRepositories";
+import Repository from "../pages/Repository";
 
 // Protected route wrapper that uses AuthContext
 function ProtectedRoute({ children, requireAuth = true }) {
@@ -85,6 +86,7 @@ const Routing = () => {
 
             {/* Projects routes */}
             <Route path="/projects" element={<Projects />} />
+            <Route path="/repository" element={<Repository />} />
             <Route path="/projects/:id" element={<ProjectDetails />} />
             <Route
                 path="/projects/new"
