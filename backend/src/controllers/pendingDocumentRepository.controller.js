@@ -7,8 +7,8 @@ const PendingDocumentRepositoryController = {};
 // ✅ Create a new document
 PendingDocumentRepositoryController.create = async (req, res) => {
     try {
-        const { categories, heading, sub_heading, agency_name, submitter_email, document_size } = req.body;
-        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size };
+        const { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code } = req.body;
+        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code };
 
         // Handle file upload if provided
         if (req.files && req.files.supporting_document) {
@@ -56,8 +56,8 @@ PendingDocumentRepositoryController.getById = async (req, res) => {
 PendingDocumentRepositoryController.update = async (req, res) => {
     try {
         const { id } = req.params;
-        const { categories, heading, sub_heading, agency_name, submitter_email, document_size } = req.body;
-        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size };
+        const { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code } = req.body;
+        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code };
 
         // Handle file upload if new document file is provided
         if (req.files && req.files.supporting_document) {
@@ -82,7 +82,7 @@ PendingDocumentRepositoryController.accept = async (req, res) => {
     try {
         const { id } = req.params;
         const result = await PendingDocumentRepository.getById(id);
-        const data = { categories: result.categories, heading:result.heading, sub_heading: result.sub_heading, document_link: result.document_link, agency_name: result.agency_name, document_size: result.document_size };
+        const data = { categories: result.categories, heading:result.heading, sub_heading: result.sub_heading, document_link: result.document_link, agency_name: result.agency_name, document_size: result.document_size, programme_code: result.programme_code };
 
         if (!result) {
             return res.status(404).json({ status: false, data: "Document not found" });

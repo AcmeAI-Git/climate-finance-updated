@@ -10,16 +10,17 @@ documentRepository.create = async (data) => {
         sub_heading,
         agency_name,
         document_size,
+        programme_code,
         document_link,
     } = data;
 
     const query = `
         INSERT INTO DocumentRepository 
-        (categories, heading, sub_heading, agency_name, document_size, document_link)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        (categories, heading, sub_heading, agency_name, document_size, document_link, programme_code)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *;
     `;
-    const values = [categories, heading, sub_heading, agency_name, document_size, document_link];
+    const values = [categories, heading, sub_heading, agency_name, document_size, document_link, programme_code];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
@@ -53,6 +54,7 @@ documentRepository.update = async (repo_id, data) => {
         agency_name,
         document_size,
         document_link,
+        programme_code,
     } = data;
 
     const query = `
@@ -63,12 +65,13 @@ documentRepository.update = async (repo_id, data) => {
             agency_name = $3,
             document_size = $4,
             document_link = $5,
-            categories = $6
+            categories = $6,
+            programme_code = $7
             updated_at = CURRENT_TIMESTAMP
-        WHERE repo_id = $7
+        WHERE repo_id = $8
         RETURNING *;
     `;
-    const values = [heading, sub_heading, agency_name, document_size, document_link, categories, repo_id];
+    const values = [heading, sub_heading, agency_name, document_size, document_link, categories, programme_code, repo_id];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };

@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS DocumentRepository (
     Agency_name TEXT,
     document_size DECIMAL(5,2),
     document_link TEXT,
+    programme_code TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -181,6 +182,7 @@ CREATE TABLE IF NOT EXISTS PendingDocumentRepository (
       Heading TEXT,
       sub_heading TEXT,
       Agency_name TEXT,
+      programme_code TEXT,
       document_size DECIMAL(5,2),
     document_link TEXT,
     submitter_email TEXT,

@@ -20,6 +20,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         heading: "",
         sub_heading: "",
         agency_name: "",
+        programme_code: "",
         document_size: 0,
         submitter_email: "",
     });
@@ -87,11 +88,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
 
         if (!formData.heading.trim()) newErrors.heading = "Heading is required";
         if (!formData.category.trim())
-            newErrors.heading = "Category is required";
-        if (!formData.sub_heading.trim())
-            newErrors.sub_heading = "Sub-heading is required";
-        if (!formData.agency_name.trim())
-            newErrors.agency_name = "Agency name/Funding Source is required";
+            newErrors.category = "Category is required";
         if (actualMode === "public" && !formData.submitter_email.trim())
             newErrors.submitter_email = "Email is required";
         if (
@@ -120,6 +117,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         formDataToSend.append("heading", formData.heading);
         formDataToSend.append("sub_heading", formData.sub_heading);
         formDataToSend.append("agency_name", formData.agency_name);
+        formDataToSend.append("programme_code", formData.programme_code);
         if (actualMode === "public") {
             formDataToSend.append("submitter_email", formData.submitter_email);
         }
@@ -342,6 +340,31 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                             {errors.agency_name && (
                                 <p className="mt-1 text-sm text-red-600">
                                     {errors.agency_name}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Programme Code */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Programme Code{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="programme_code"
+                                value={formData.programme_code}
+                                onChange={handleInputChange}
+                                placeholder="AK32134D"
+                                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 ${
+                                    errors.programme_code
+                                        ? "border-red-300"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            {errors.programme_code && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.programme_code}
                                 </p>
                             )}
                         </div>
