@@ -122,7 +122,12 @@ const LanguageSwitcher = () => {
                 language === "bn" ? "noto-sans-bengali" : ""
             }`}
         >
-            <Button className="text-sm" onClick={toggleLanguage} leftIcon="⇆">
+            <Button
+                className="text-sm"
+                onClick={toggleLanguage}
+                leftIcon="⇆"
+                size="md"
+            >
                 {language === "en" ? "En" : "বাংলা"}
             </Button>
 
