@@ -22,7 +22,7 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }));
-app.use('/uploads', express.static('public/uploads'));
+app.use('/uploads', express.static('/var/repository/data/uploads/documents'));
 
 connectDB();
 
@@ -32,21 +32,27 @@ app.use("/api", routes);
 app.get('/document/:filename', (req, res) => {
     const { filename } = req.params;
     const { download } = req.query; // ?download=true
-    const filePath = path.join(__dirname, 'public', 'uploads', 'documents', filename);
 
-    // Security: Prevent directory traversal
+    // Use persistent disk path instead of local public folder
+    const BASE_UPLOAD_DIR = '/var/repository/data/uploads/documents';
+    const filePath = path.join(BASE_UPLOAD_DIR, filename);
+
+    // Security: prevent directory traversal attacks
     const resolvedPath = path.resolve(filePath);
-    const uploadDir = path.resolve(path.join(__dirname, 'public', 'uploads', 'documents'));
-    if (!resolvedPath.startsWith(uploadDir)) {
+    const safeBase = path.resolve(BASE_UPLOAD_DIR);
+    if (!resolvedPath.startsWith(safeBase)) {
         return res.status(403).send('Forbidden');
     }
 
-    // Check if file exists
+    // Check file existence
     if (!fs.existsSync(filePath)) {
         return res.status(404).send('File not found');
     }
 
-    const originalName = filename.split('-').slice(1).join('-');
+    // Derive original filename (removing timestamp prefix)
+    const originalName = filename.split('-').slice(1).join('-') || filename;
+
+    // If ?download=true, force download; otherwise, open inline
     const disposition = download === 'true' ? 'attachment' : 'inline';
 
     res.setHeader('Content-Disposition', `${disposition}; filename="${originalName}"`);

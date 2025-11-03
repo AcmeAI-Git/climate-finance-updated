@@ -1,30 +1,30 @@
 const path = require('path');
 const fs = require('fs');
 
-// Ensure upload directory exists
-const UPLOAD_DIR = path.join(__dirname, '..', 'public', 'uploads', 'documents');
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+// Use Render persistent disk mount path
+const DISK_PATH = '/var/repository/data/uploads/documents';
+
+// Ensure directory exists
+fs.mkdirSync(DISK_PATH, { recursive: true });
 
 /**
- * Uploads a PDF file to the server and returns a public URL
+ * Uploads a PDF file to the persistent disk and returns the file name
  * @param {Object} file - File object from express-fileupload
  * @param {string} [customName] - Optional: override filename
- * @returns {Promise<string>} - Public URL of the uploaded PDF
+ * @returns {Promise<string>} - Uploaded file name
  */
 const uploadFile = async (file, customName = null) => {
     try {
-        // Validate: must be PDF
         if (file.mimetype !== 'application/pdf') {
             throw new Error('Only PDF files are allowed');
         }
 
-        // Use original name or custom name, sanitize
         const originalName = customName || file.name;
-        const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_'); // Prevent path traversal
-        const fileName = `${Date.now()}-${safeName}`; // Prevent overwrites
-        const filePath = path.join(UPLOAD_DIR, fileName);
+        const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const fileName = `${Date.now()}-${safeName}`;
+        const filePath = path.join(DISK_PATH, fileName);
 
-        // Move file from temp to permanent location
+        // Save file
         await new Promise((resolve, reject) => {
             file.mv(filePath, (err) => {
                 if (err) return reject(err);
@@ -32,7 +32,8 @@ const uploadFile = async (file, customName = null) => {
             });
         });
 
-        return `${fileName}`;
+        console.log('File uploaded:', filePath);
+        return fileName;
 
     } catch (error) {
         console.error('PDF upload failed:', error.message);
