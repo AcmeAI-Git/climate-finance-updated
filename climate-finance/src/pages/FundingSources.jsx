@@ -376,7 +376,7 @@ const FundingSources = () => {
                     style={{ animationDelay: "550ms" }}
                 >
                     <Card hover padding={true} className="mb-6">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-4 cursor-default">
                             <h3 className="text-lg font-semibold text-gray-800">
                                 Top 5 Funding Sources
                             </h3>
@@ -386,11 +386,11 @@ const FundingSources = () => {
                         </div>
 
                         {topFundingSources && topFundingSources.length > 0 ? (
-                            <div className="grid gap-3">
+                            <div className="grid gap-3 cursor-default">
                                 {topFundingSources.map((fs, idx) => (
                                     <div
                                         key={fs.id || idx}
-                                        className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-100"
+                                        className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-100 "
                                     >
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="text-sm font-medium text-gray-800 truncate">

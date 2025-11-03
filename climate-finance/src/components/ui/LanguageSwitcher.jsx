@@ -122,14 +122,12 @@ const LanguageSwitcher = () => {
                 language === "bn" ? "noto-sans-bengali" : ""
             }`}
         >
-            <Button
-                className="text-sm"
+            <button
                 onClick={toggleLanguage}
-                leftIcon="⇆"
-                size="md"
+                className="inline-flex items-center px-2 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
             >
-                {language === "en" ? "En" : "বাংলা"}
-            </Button>
+                {language === "en" ? "⇆  English" : "⇆  বাংলা"}
+            </button>
 
             {/* Hidden Google Translate element */}
             <div
