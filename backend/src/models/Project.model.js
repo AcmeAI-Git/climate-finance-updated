@@ -277,6 +277,7 @@ Project.updateProject = async (id, data) => {
             total_cost_usd,
             gef_grant,
             cofinancing,
+            loan_amount,
             objectives,
             direct_beneficiaries,
             indirect_beneficiaries,
@@ -287,7 +288,7 @@ Project.updateProject = async (id, data) => {
             assessment,
             alignment_nap,
             alignment_cff,
-            geographic_division,
+            geographic_division = [],
             climate_relevance_score,
             climate_relevance_category,
             climate_relevance_justification,
@@ -318,6 +319,7 @@ Project.updateProject = async (id, data) => {
         const parsedFundingSourceIds = parseArrayField(funding_source_ids, 'funding_source_ids');
         const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
         const parsedDistricts = parseArrayField(districts, 'districts');
+        const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
 
         const updateProjectQuery = `
             UPDATE Project SET 
@@ -329,9 +331,9 @@ Project.updateProject = async (id, data) => {
                 alignment_cff = $18, geographic_division = $19, climate_relevance_score = $20,
                 climate_relevance_category = $21, climate_relevance_justification = $22,
                 hotspot_vulnerability_type = $23, wash_component_description = $24,
-                supporting_document = $25, districts = $26,
+                supporting_document = $25, districts = $26, loan_amount = $27,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE project_id = $27
+            WHERE project_id = $28
             RETURNING *
         `;
 
@@ -354,7 +356,7 @@ Project.updateProject = async (id, data) => {
             assessment,
             alignment_nap,
             alignment_cff,
-            geographic_division,
+            parsedGeographicDivision,
             parseFloat(climate_relevance_score) || 0,
             climate_relevance_category,
             climate_relevance_justification,
@@ -362,6 +364,7 @@ Project.updateProject = async (id, data) => {
             wash_component_description,
             supporting_document,
             parsedDistricts,
+            parseFloat(loan_amount) || 0,
             id,
         ];
 
