@@ -101,6 +101,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const response = await projectApi.getById(id);
             if (response.status && response.data) {
                 const projectData = response.data;
+                console.log(projectData);
+
                 setFormData({
                     project_id: projectData.project_id,
                     title: projectData.title,
@@ -124,6 +126,30 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     submitter_email: projectData.submitter_email || "",
                     geographic_division: projectData.geographic_division || [],
                     districts: projectData.districts || [],
+                    alignment_sdg: projectData.sdgs || [],
+                    assessment: projectData.assessment || "",
+                    hotspot_vulnerability_type:
+                        projectData.hotspot_vulnerability_type || "",
+                    wash_component_description:
+                        projectData.wash_component_description || "",
+                    direct_beneficiaries:
+                        projectData.direct_beneficiaries || "",
+                    indirect_beneficiaries:
+                        projectData.indirect_beneficiaries || "",
+                    beneficiary_description:
+                        projectData.beneficiary_description || "",
+                    gender_inclusion: projectData.gender_inclusion || "",
+                    equity_marker: projectData.equity_marker || "",
+                    equity_marker_description:
+                        projectData.equity_marker_description || "",
+                    alignment_nap: projectData.alignment_nap || "",
+                    alignment_cff: projectData.alignment_cff || "",
+                    climate_relevance_score:
+                        projectData.climate_relevance_score || "",
+                    climate_relevance_category:
+                        projectData.climate_relevance_category || "",
+                    climate_relevance_justification:
+                        projectData.climate_relevance_justification || "",
                 });
             } else {
                 throw new Error("Project not found");
@@ -792,34 +818,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                     min="0"
                                 />
                             </div>
-
-                            {/* Disbursement field - Only show in edit mode */}
-                            {actualMode === "edit" && (
-                                <div className="md:col-span-3">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Disbursement (USD)
-                                        <span className="text-sm text-gray-500 ml-1">
-                                            (Amount already disbursed from
-                                            funding sources)
-                                        </span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="disbursement"
-                                        value={formData.disbursement || ""}
-                                        onChange={handleInputChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                        step="0.01"
-                                        min="0"
-                                        placeholder="Enter disbursed amount..."
-                                    />
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        This field tracks the actual amount
-                                        disbursed from the funding sources for
-                                        this project.
-                                    </p>
-                                </div>
-                            )}
                         </div>
                     </div>
 
