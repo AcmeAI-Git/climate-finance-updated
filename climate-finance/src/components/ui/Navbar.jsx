@@ -45,7 +45,7 @@ const Navbar = () => {
         },
         {
             to: "/repository",
-            label: "Repositories",
+            label: getRepositoryTransliteration(language),
             isActive: path === "/repository" || path.startsWith("/repository/"),
         },
         {
