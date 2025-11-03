@@ -57,17 +57,26 @@ const ProjectFormSections = ({
                     );
                 }
             });
+
             // Remove duplicates and add id
             const uniqueDistricts = Array.from(
                 new Set(filteredDistricts.map((d) => d.name))
             ).map((name, index) => ({ id: index + 1, name }));
+
             setAvailableDistricts(uniqueDistricts);
-            // Clear selected districts if they're not in the filtered list
+
+            // FIX: Only clear districts if they're actually invalid
+            // Don't trigger a change if districts are already valid
             const validDistrictNames = uniqueDistricts.map((d) => d.name);
-            const validSelectedDistricts = formData.districts.filter(
-                (districtName) => validDistrictNames.includes(districtName)
+            const invalidDistricts = formData.districts.filter(
+                (districtName) => !validDistrictNames.includes(districtName)
             );
-            if (validSelectedDistricts.length !== formData.districts.length) {
+
+            // Only call handleMultiSelectChange if there are actually invalid districts
+            if (invalidDistricts.length > 0) {
+                const validSelectedDistricts = formData.districts.filter(
+                    (districtName) => validDistrictNames.includes(districtName)
+                );
                 handleMultiSelectChange(
                     { target: { value: validSelectedDistricts } },
                     "districts"

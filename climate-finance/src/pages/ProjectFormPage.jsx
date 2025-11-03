@@ -36,7 +36,7 @@ const defaultFormData = {
         wash_percentage: 0,
         description: "",
     },
-    submitter_email: "", // Added for public mode
+    submitter_email: "",
 
     // New fields for client requirements
     hotspot_vulnerability_type: "",
@@ -53,6 +53,9 @@ const defaultFormData = {
     alignment_cff: "",
     geographic_division: [],
     districts: [],
+    climate_relevance_score: "",
+    climate_relevance_category: "",
+    climate_relevance_justification: "",
 };
 
 const formatDateForInput = (dateStr) => {
@@ -101,32 +104,67 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const response = await projectApi.getById(id);
             if (response.status && response.data) {
                 const projectData = response.data;
-                console.log(projectData);
 
                 setFormData({
-                    project_id: projectData.project_id,
-                    title: projectData.title,
-                    status: projectData.status,
-                    total_cost_usd: projectData.total_cost_usd,
-                    gef_grant: projectData.gef_grant,
-                    cofinancing: projectData.cofinancing,
+                    project_id: projectData.project_id || "",
+                    title: projectData.title || "",
+                    status: projectData.status || "",
+                    total_cost_usd: projectData.total_cost_usd || "",
+                    gef_grant: projectData.gef_grant || "",
+                    cofinancing: projectData.cofinancing || "",
                     loan_amount: projectData.loan_amount || "0",
                     beginning: formatDateForInput(projectData.beginning),
                     closing: formatDateForInput(projectData.closing),
-                    approval_fy: projectData.approval_fy,
+                    approval_fy: projectData.approval_fy || "",
                     beneficiaries: projectData.beneficiaries || "",
                     objectives: projectData.objectives || "",
-                    agencies: projectData.agencies || [],
-                    funding_sources: projectData.funding_sources || [],
+                    // FIX: Extract IDs from nested objects or use direct array
+                    agencies:
+                        Array.isArray(projectData.agencies) &&
+                        projectData.agencies.length > 0 &&
+                        typeof projectData.agencies[0] === "number"
+                            ? projectData.agencies
+                            : projectData.projectAgencies &&
+                              Array.isArray(projectData.projectAgencies)
+                            ? projectData.projectAgencies.map(
+                                  (pa) => pa.agency_id
+                              )
+                            : [],
+                    funding_sources:
+                        Array.isArray(projectData.funding_sources) &&
+                        projectData.funding_sources.length > 0 &&
+                        typeof projectData.funding_sources[0] === "number"
+                            ? projectData.funding_sources
+                            : projectData.projectFundingSources &&
+                              Array.isArray(projectData.projectFundingSources)
+                            ? projectData.projectFundingSources.map(
+                                  (pfs) => pfs.funding_source_id
+                              )
+                            : [],
                     wash_component: projectData.wash_component || {
                         presence: false,
                         description: "",
                         wash_percentage: 0,
                     },
                     submitter_email: projectData.submitter_email || "",
-                    geographic_division: projectData.geographic_division || [],
-                    districts: projectData.districts || [],
-                    alignment_sdg: projectData.sdgs || [],
+                    // FIX: Ensure these are always arrays
+                    geographic_division: Array.isArray(
+                        projectData.geographic_division
+                    )
+                        ? projectData.geographic_division
+                        : [],
+                    districts: Array.isArray(projectData.districts)
+                        ? projectData.districts
+                        : [],
+                    alignment_sdg:
+                        Array.isArray(projectData.sdgs) &&
+                        projectData.sdgs.length > 0 &&
+                        typeof projectData.sdgs[0] === "number"
+                            ? projectData.sdgs
+                            : projectData.projectSDGs &&
+                              Array.isArray(projectData.projectSDGs)
+                            ? projectData.projectSDGs.map((ps) => ps.sdg_id)
+                            : [],
                     assessment: projectData.assessment || "",
                     hotspot_vulnerability_type:
                         projectData.hotspot_vulnerability_type || "",
@@ -202,7 +240,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             );
         } catch (error) {
             console.error("Error fetching form data:", error);
-            // Set empty arrays as fallback
             setAgencies([]);
             setFundingSources([]);
         } finally {
@@ -216,6 +253,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
+        // Clear error for this field when user starts editing
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: "" }));
         }
@@ -229,6 +267,10 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             ...prev,
             [field]: selectedValues,
         }));
+        // Clear error for this field
+        if (errors[field]) {
+            setErrors((prev) => ({ ...prev, [field]: "" }));
+        }
     };
 
     const handleWashComponentChange = (washData) => {
@@ -289,6 +331,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
         }
     };
 
+    // FIX: Updated validation function with proper array checking
     const validateForm = () => {
         const newErrors = {};
 
@@ -296,11 +339,19 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             newErrors.title = "Project title is required";
         }
 
-        if (!formData.geographic_division) {
+        // FIX: Properly check if array exists AND has items
+        if (
+            !Array.isArray(formData.geographic_division) ||
+            formData.geographic_division.length === 0
+        ) {
             newErrors.geographic_division = "Geographic division is required";
         }
 
-        if (!formData.districts || formData.districts.length === 0) {
+        // FIX: Properly check if array exists AND has items
+        if (
+            !Array.isArray(formData.districts) ||
+            formData.districts.length === 0
+        ) {
             newErrors.districts = "At least one district must be selected";
         }
 
@@ -315,7 +366,11 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            // Scroll to top to show errors
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+        }
 
         // Additional validation for public mode
         if (actualMode === "public") {
@@ -485,23 +540,35 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 if (response.status) {
                     setSuccess(true);
                     setSelectedFile(null); // Reset file state on success
-                    toast({
-                        title: "Success",
-                        message:
-                            "Project submitted successfully! It will be visible once approved by an administrator.",
-                        type: "success",
-                    });
+                    toast.success(
+                        "Project submitted successfully! It will be visible once approved by an administrator.",
+                        "Success!"
+                    );
                 } else {
                     throw new Error(
                         response.message || "Failed to submit project"
                     );
                 }
             } else if (actualMode === "add") {
-                await projectApi.add(formDataToSend);
-                navigate("/admin/projects");
-            } else {
-                await projectApi.update(id, formDataToSend);
-                navigate("/admin/projects");
+                const response = await projectApi.add(formDataToSend);
+                if (response.status) {
+                    toast.success("Project created successfully!", "Success!");
+                    navigate("/admin/projects");
+                } else {
+                    throw new Error(
+                        response.message || "Failed to create project"
+                    );
+                }
+            } else if (actualMode === "edit") {
+                const response = await projectApi.update(id, formDataToSend);
+                if (response.status) {
+                    toast.success("Project updated successfully!", "Success!");
+                    navigate("/admin/projects");
+                } else {
+                    throw new Error(
+                        response.message || "Failed to update project"
+                    );
+                }
             }
         } catch (error) {
             console.error("Error saving project:", error);
@@ -660,9 +727,35 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             {/* Form Card */}
             <Card padding={true} className="max-w-none">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* FIX: Enhanced error display */}
                     {error && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                            <p className="text-red-600 text-sm">{error}</p>
+                            <p className="text-red-600 text-sm font-medium">
+                                {error}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* FIX: Error summary for all validation errors */}
+                    {Object.keys(errors).length > 0 && !error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <p className="text-red-600 text-sm font-medium mb-2">
+                                Please fix the following errors before
+                                submitting:
+                            </p>
+                            <ul className="space-y-1">
+                                {Object.entries(errors).map(
+                                    ([field, message]) => (
+                                        <li
+                                            key={field}
+                                            className="text-red-600 text-sm flex items-start"
+                                        >
+                                            <span className="mr-2">•</span>
+                                            <span>{message}</span>
+                                        </li>
+                                    )
+                                )}
+                            </ul>
                         </div>
                     )}
 
@@ -755,6 +848,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         handleWashComponentChange={handleWashComponentChange}
                         agencies={agencies}
                         fundingSources={fundingSources}
+                        errors={errors}
                     />
 
                     <div>
