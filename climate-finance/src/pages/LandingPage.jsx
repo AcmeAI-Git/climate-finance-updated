@@ -26,6 +26,10 @@ import ExportButton from "../components/ui/ExportButton";
 import PageHeader from "../components/layouts/PageHeader";
 import { useLanguage } from "../context/LanguageContext";
 import { translateChartData, getChartTitle } from "../utils/chartTranslations";
+import {
+    getDeshboardDescriptionTransliteration,
+    getInsightsTransliteration,
+} from "../utils/transliteration";
 import ResearchDocsCard from "../components/ui/ResearchDocsCard";
 
 const LandingPage = () => {
@@ -333,21 +337,7 @@ const LandingPage = () => {
         <PageLayout bgColor="bg-gray-50">
             <PageHeader
                 title="Dashboard"
-                subtitle={
-                    language === "bn" ? (
-                        <span className="no-translate">
-                            বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ রিয়েল-টাইমে
-                            ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন—সহজ ও বিস্তারিত
-                            প্রতিবেদনের মাধ্যমে।
-                        </span>
-                    ) : (
-                        <span className="no-translate">
-                            Track, analyze and visualize climate finance flows
-                            in Bangladesh with real-time overview and
-                            comprehensive reporting.
-                        </span>
-                    )
-                }
+                subtitle={getDeshboardDescriptionTransliteration(language)}
                 actions={
                     <>
                         <Button
@@ -460,7 +450,7 @@ const LandingPage = () => {
                 >
                     {washDistribution.length > 0 ? (
                         <PieChartComponent
-                            title="WASH vs Climate Finance"
+                            title={getChartTitle(language, "washvsnonwash")}
                             data={washDistribution}
                         />
                     ) : (
@@ -526,7 +516,7 @@ const LandingPage = () => {
                         Explore Climate Finance Data
                     </h3>
                     <p className="text-gray-600">
-                        Access detailed reports and analytics
+                        {getInsightsTransliteration(language)}
                     </p>
                 </div>
 

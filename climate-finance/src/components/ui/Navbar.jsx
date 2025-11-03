@@ -3,7 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Plus, Leaf } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { getClimateFinanceTransliteration } from "../../utils/transliteration";
+import {
+    getClimateFinanceTransliteration,
+    getRepositoryTransliteration,
+} from "../../utils/transliteration";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const Navbar = () => {
@@ -139,7 +142,7 @@ const Navbar = () => {
                                 size={16}
                                 className="mr-2 group-hover:rotate-90 transition-transform duration-300"
                             />
-                            Repository
+                            {getRepositoryTransliteration(language)}
                         </Link>
 
                         <div className="h-6 w-px bg-gray-200"></div>

@@ -16,6 +16,7 @@ export const chartTranslations = {
         projectYear: "Number of Projects",
         projectByYear: "Projects By Year",
         regionalDistributionMap: "Regional Distribution Map",
+        washvsnonwash: "WASH vs Climate Finance",
 
         // Status translations
         status: {
@@ -70,14 +71,14 @@ export const chartTranslations = {
         },
         // Regions/Divisions
         region: {
-            "Barisal Division": "Barisal Division",
-            "Chattogram Division": "Chattogram Division",
-            "Dhaka Division": "Dhaka Division",
-            "Khulna Division": "Khulna Division",
-            "Mymensingh Division": "Mymensingh Division",
-            "Rajshahi Division": "Rajshahi Division",
-            "Rangpur Division": "Rangpur Division",
-            "Sylhet Division": "Sylhet Division",
+            Barisal: "Barisal",
+            Chattogram: "Chattogram",
+            Dhaka: "Dhaka",
+            Khulna: "Khulna",
+            Mymensingh: "Mymensingh",
+            Rajshahi: "Rajshahi",
+            Rangpur: "Rangpur",
+            Sylhet: "Sylhet",
         },
         // Agencies, Funding Sources, Focal Areas (add as needed)
         agency: {
@@ -131,13 +132,15 @@ export const chartTranslations = {
         value: "মান",
 
         // Chart titles
-        projectsByStatus: "অবস্থা অনুযায়ী প্রকল্প",
+        projectsByStatus: "স্ট্যাটাস অনুযায়ী প্রকল্প",
         projectsByType: "ধরন অনুযায়ী প্রকল্প",
         projectsBySector: "খাত অনুযায়ী প্রকল্প",
         fundingByType: "ধরন অনুযায়ী অর্থায়ন",
         fundingBySource: "উৎস অনুযায়ী অর্থায়ন",
         projectYear: "প্রকল্প গতি",
+        projectByYear: "বছর অনুযায়ী প্রকল্প",
         regionalDistributionMap: "আঞ্চলিক বণ্টন চিত্র",
+        washvsnonwash: "ওয়াশ বনাম ক্লাইমেট ফাইন্যান্স",
 
         // Status translations
         status: {
@@ -192,14 +195,14 @@ export const chartTranslations = {
         },
         // Regions/Divisions
         region: {
-            "Barisal Division": "বরিশাল বিভাগ",
-            "Chattogram Division": "চট্টগ্রাম বিভাগ",
-            "Dhaka Division": "ঢাকা বিভাগ",
-            "Khulna Division": "খুলনা বিভাগ",
-            "Mymensingh Division": "ময়মনসিংহ বিভাগ",
-            "Rajshahi Division": "রাজশাহী বিভাগ",
-            "Rangpur Division": "রংপুর বিভাগ",
-            "Sylhet Division": "সিলেট বিভাগ",
+            Barisal: "বরিশাল বিভাগ",
+            Chattogram: "চট্টগ্রাম বিভাগ",
+            Dhaka: "ঢাকা বিভাগ",
+            Khulna: "খুলনা বিভাগ",
+            Mymensingh: "ময়মনসিংহ বিভাগ",
+            Rajshahi: "রাজশাহী বিভাগ",
+            Rangpur: "রংপুর বিভাগ",
+            Sylhet: "সিলেট বিভাগ",
         },
         // Agencies, Funding Sources, Focal Areas (add as needed)
         agency: {

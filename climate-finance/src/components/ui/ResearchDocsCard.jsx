@@ -1,8 +1,14 @@
 import { ArrowRight, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
+import {
+    getRepositoryCardDescriptionTransliteration,
+    getRepositoryTitleTransliteration,
+} from "../../utils/transliteration";
 
 export default function ResearchDocsCard() {
     const navigate = useNavigate();
+    const { language } = useLanguage();
 
     return (
         <div className="p-6 my-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl border border-purple-200 animate-fade-in-up">
@@ -29,13 +35,9 @@ export default function ResearchDocsCard() {
                     {/* Info Box */}
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 mb-4 border border-purple-200">
                         <p className="text-xs text-purple-700 font-medium">
-                            Where to find: Click the{" "}
-                            <span className="font-semibold">
-                                Browse Documents
-                            </span>{" "}
-                            button or navigate to the Documents Repository page
-                            to browse and download all available research
-                            documentation.
+                            {getRepositoryCardDescriptionTransliteration(
+                                language
+                            )}
                         </p>
                     </div>
 

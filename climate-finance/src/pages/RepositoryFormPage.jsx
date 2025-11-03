@@ -8,12 +8,20 @@ import Card from "../components/ui/Card";
 import PageLayout from "../components/layouts/PageLayout";
 import { ArrowLeft, CheckCircle, Upload, FileText, X } from "lucide-react";
 import { useToast } from "../components/ui/Toast";
+import { useLanguage } from "../context/LanguageContext";
+import {
+    getYourMailTransliteration,
+    getRepoDescriptionTransliteration,
+    getRepositoryCategoryIMPACTTransliteration,
+    getRepositoryCategoryCASESTUDYTransliteration,
+} from "../utils/transliteration";
 
 const RepositoryFormPage = ({ mode = "add" }) => {
     const { isAuthenticated } = useAuth();
     const { toast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
+    const { language } = useLanguage();
 
     const [formData, setFormData] = useState({
         category: "",
@@ -221,7 +229,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         Submit New Repository
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Share your climate repository with the community. All
+                        {getRepoDescriptionTransliteration(language)} All
                         submissions are reviewed before publishing.
                     </p>
                 </div>
@@ -258,9 +266,15 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                                 required
                             >
                                 <option value="">Select Category</option>
-                                <option value="CASE STUDY">CASE STUDY</option>
+                                <option value="CASE STUDY">
+                                    {getRepositoryCategoryCASESTUDYTransliteration(
+                                        language
+                                    )}
+                                </option>
                                 <option value="IMPACT REPORT">
-                                    IMPACT REPORT
+                                    {getRepositoryCategoryIMPACTTransliteration(
+                                        language
+                                    )}
                                 </option>
                                 <option value="FIELD NOTES">FIELD NOTES</option>
                             </select>
@@ -370,7 +384,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                         {actualMode === "public" && (
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Your Email{" "}
+                                    {getYourMailTransliteration(language)}{" "}
                                     <span className="text-red-500">*</span>
                                 </label>
                                 <input

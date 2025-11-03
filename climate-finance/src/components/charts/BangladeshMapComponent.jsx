@@ -115,7 +115,6 @@ const BangladeshMapComponent = memo(
                     zoom: 2.5,
                     maxZoom: 18,
                     minZoom: 5,
-
                     maxBoundsViscosity: 1.0,
                 });
 

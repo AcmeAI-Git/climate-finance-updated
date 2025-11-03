@@ -9,7 +9,7 @@ export const getClimateFinanceTransliteration = (language) => {
 
 export const getClimateFinanceTrackerTransliteration = (language) => {
     if (language === "bn") {
-        return "সবুজ জবাবদিহিতা মনিটর";
+        return "গ্রিন একাউন্টিবিলিটি মনিটর";
     }
     return "Green Accountability Monitor";
 };
@@ -26,4 +26,67 @@ export const getMitigationTransliteration = (language) => {
         return "মিটিগেশন";
     }
     return "Mitigation";
+};
+
+export const getYourMailTransliteration = (language) => {
+    if (language === "bn") {
+        return "আপনার ইমেইল";
+    }
+    return "Your Email";
+};
+
+export const getRepoDescriptionTransliteration = (language) => {
+    if (language === "bn") {
+        return "আপনার জলবায়ু রিপোজিটরি কমিউনিটিতে শেয়ার করুন।";
+    }
+    return "Share your climate repository with the community.";
+};
+
+export const getRepositoryTransliteration = (language) => {
+    if (language === "bn") {
+        return "রিপোজিটোরি";
+    }
+    return "Repository";
+};
+
+export const getDeshboardDescriptionTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ রিয়েল-টাইমে ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন। সহজ ও বিস্তারিত প্রতিবেদনের মাধ্যমে একটি সমগ্র ওভারভিউ পান।";
+    }
+    return "Track, analyze and visualize climate finance flows in Bangladesh with real-time overview and comprehensive reporting.";
+};
+
+export const getRepositoryCardDescriptionTransliteration = (language) => {
+    if (language === "bn") {
+        return "কোথায় পাবেন: সমস্ত উপলব্ধ গবেষণা ডকুমেন্টেশন ব্রাউজ এবং ডাউনলোড করতে ব্রাউজ ডকুমেন্টস বাটনে ক্লিক করুন অথবা ডকুমেন্টস রিপোজিটরি পৃষ্ঠায় নেভিগেট করুন।";
+    }
+    return "Where to find: Click the Browse Documents button or navigate to the Documents Repository page to browse and download all available research documentation.";
+};
+
+export const getInsightsTransliteration = (language) => {
+    if (language === "bn") {
+        return "বিস্তারিত প্রতিবেদন এবং এ্যানালাইসিস করুন";
+    }
+    return "Access detailed reports and analytics";
+};
+
+export const getRepositoryTitleTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাংলাদেশের জলবায়ু অর্থায়ন প্রকল্পগুলির বিস্তৃত গবেষণা প্রতিবেদন, কেস স্টাডি, ফিল্ড নোট এবং প্রযুক্তিগত ডকুমেন্টেশন অ্যাক্সেস করুন। সহজে আবিষ্কারের জন্য সমস্ত ডকুমেন্ট পর্যালোচনা এবং শ্রেণীবদ্ধ করা হয়েছে।";
+    }
+    return "Access comprehensive research reports, case studies, field notes, and technical documentation from climate finance projects across Bangladesh. All documents are reviewed and categorized for easy discovery.";
+};
+
+export const getRepositoryCategoryCASESTUDYTransliteration = (language) => {
+    if (language === "bn") {
+        return "কেস স্টাডি";
+    }
+    return "CASE STUDY";
+};
+
+export const getRepositoryCategoryIMPACTTransliteration = (language) => {
+    if (language === "bn") {
+        return "ইম্প্যাক্ট রিপোর্ট";
+    }
+    return "IMPACT REPORT";
 };
