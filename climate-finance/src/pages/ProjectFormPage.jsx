@@ -118,7 +118,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     approval_fy: projectData.approval_fy || "",
                     beneficiaries: projectData.beneficiaries || "",
                     objectives: projectData.objectives || "",
-                    // FIX: Extract IDs from nested objects or use direct array
                     agencies:
                         Array.isArray(projectData.agencies) &&
                         projectData.agencies.length > 0 &&
@@ -265,10 +264,13 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             : [e.target.value];
         setFormData((prev) => ({
             ...prev,
-            [field]: selectedValues,
+            [field]:
+                selectedValues && selectedValues.length > 0
+                    ? selectedValues
+                    : [],
         }));
-        // Clear error for this field
-        if (errors[field]) {
+
+        if (errors?.[field]) {
             setErrors((prev) => ({ ...prev, [field]: "" }));
         }
     };

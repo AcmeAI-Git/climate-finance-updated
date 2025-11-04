@@ -48,7 +48,6 @@ const ProjectFormSections = ({
             Array.isArray(formData.geographic_division) &&
             formData.geographic_division.length > 0
         ) {
-            // Collect districts from all selected divisions
             let filteredDistricts = [];
             formData.geographic_division.forEach((division) => {
                 if (districtsData[division]) {
@@ -65,39 +64,38 @@ const ProjectFormSections = ({
 
             setAvailableDistricts(uniqueDistricts);
 
-            // FIX: Only clear districts if they're actually invalid
-            // Don't trigger a change if districts are already valid
+            // Validate current districts against available ones
             const validDistrictNames = uniqueDistricts.map((d) => d.name);
-            const invalidDistricts = formData.districts.filter(
+            const invalidDistricts = (formData.districts || []).filter(
                 (districtName) => !validDistrictNames.includes(districtName)
             );
 
-            // Only call handleMultiSelectChange if there are actually invalid districts
+            // Only update if there are invalid districts to remove
             if (invalidDistricts.length > 0) {
-                const validSelectedDistricts = formData.districts.filter(
-                    (districtName) => validDistrictNames.includes(districtName)
+                const validSelectedDistricts = (
+                    formData.districts || []
+                ).filter((districtName) =>
+                    validDistrictNames.includes(districtName)
                 );
+                // Use handleMultiSelectChange instead of setFormData
                 handleMultiSelectChange(
                     { target: { value: validSelectedDistricts } },
                     "districts"
                 );
             }
         } else {
-            // If no division selected, show all districts
-            const allDistricts = Object.values(districtsData)
-                .flat()
-                .map((name, index) => ({
-                    id: index + 1,
-                    name: name,
-                }));
-            setAvailableDistricts(allDistricts);
+            // Show all districts if no division selected
+            if (Object.keys(districtsData).length > 0) {
+                const allDistricts = Object.values(districtsData)
+                    .flat()
+                    .map((name, index) => ({
+                        id: index + 1,
+                        name: name,
+                    }));
+                setAvailableDistricts(allDistricts);
+            }
         }
-    }, [
-        formData.geographic_division,
-        districtsData,
-        formData.districts,
-        handleMultiSelectChange,
-    ]);
+    }, [formData.geographic_division, districtsData, handleMultiSelectChange]);
 
     const handleWashSliderChange = (value) => {
         handleWashComponentChange((prev) => ({
@@ -134,7 +132,7 @@ const ProjectFormSections = ({
                 <CheckboxGroup
                     label="Select Agencies"
                     options={agencies}
-                    selectedValues={formData.agencies}
+                    selectedValues={formData.agencies || []}
                     onChange={(values) =>
                         handleMultiSelectChange(
                             { target: { value: values } },
@@ -157,7 +155,7 @@ const ProjectFormSections = ({
                 <CheckboxGroup
                     label="Select Funding Sources"
                     options={fundingSources}
-                    selectedValues={formData.funding_sources}
+                    selectedValues={formData.funding_sources || []}
                     onChange={(values) =>
                         handleMultiSelectChange(
                             { target: { value: values } },
@@ -244,7 +242,7 @@ const ProjectFormSections = ({
                         <input
                             type="text"
                             name="hotspot_vulnerability_type"
-                            value={formData.hotspot_vulnerability_type}
+                            value={formData.hotspot_vulnerability_type || ""}
                             onChange={handleInputChange}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                         />
@@ -266,7 +264,7 @@ const ProjectFormSections = ({
                             <input
                                 type="number"
                                 name="direct_beneficiaries"
-                                value={formData.direct_beneficiaries}
+                                value={formData.direct_beneficiaries || ""}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                                 min="0"
@@ -279,7 +277,7 @@ const ProjectFormSections = ({
                             <input
                                 type="number"
                                 name="indirect_beneficiaries"
-                                value={formData.indirect_beneficiaries}
+                                value={formData.indirect_beneficiaries || ""}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                                 min="0"
@@ -292,7 +290,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="beneficiary_description"
-                            value={formData.beneficiary_description}
+                            value={formData.beneficiary_description || ""}
                             onChange={handleInputChange}
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
@@ -313,7 +311,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="gender_inclusion"
-                            value={formData.gender_inclusion}
+                            value={formData.gender_inclusion || ""}
                             onChange={handleInputChange}
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
@@ -361,7 +359,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="equity_marker_description"
-                            value={formData.equity_marker_description}
+                            value={formData.equity_marker_description || ""}
                             onChange={handleInputChange}
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
@@ -384,7 +382,7 @@ const ProjectFormSections = ({
                         <CheckboxGroup
                             label="Select SDGs"
                             options={sdgList}
-                            selectedValues={formData.alignment_sdg}
+                            selectedValues={formData.alignment_sdg || []}
                             onChange={(values) =>
                                 handleMultiSelectChange(
                                     { target: { value: values } },
@@ -405,7 +403,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="alignment_nap"
-                            value={formData.alignment_nap}
+                            value={formData.alignment_nap || ""}
                             onChange={handleInputChange}
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
@@ -419,7 +417,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="alignment_cff"
-                            value={formData.alignment_cff}
+                            value={formData.alignment_cff || ""}
                             onChange={handleInputChange}
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
@@ -440,7 +438,7 @@ const ProjectFormSections = ({
                         </label>
                         <textarea
                             name="assessment"
-                            value={formData.assessment}
+                            value={formData.assessment || ""}
                             onChange={handleInputChange}
                             rows={4}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
