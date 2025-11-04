@@ -44,6 +44,11 @@ const ProjectFormSections = ({
 
     // Filter districts based on selected geographic divisions (multi)
     useEffect(() => {
+        // Don't run if districtsData hasn't loaded yet
+        if (Object.keys(districtsData).length === 0) {
+            return;
+        }
+
         if (
             Array.isArray(formData.geographic_division) &&
             formData.geographic_division.length > 0
@@ -65,35 +70,43 @@ const ProjectFormSections = ({
             setAvailableDistricts(uniqueDistricts);
 
             // Validate current districts against available ones
-            const validDistrictNames = uniqueDistricts.map((d) => d.name);
-            const invalidDistricts = (formData.districts || []).filter(
-                (districtName) => !validDistrictNames.includes(districtName)
-            );
+            // Only validate if we have existing districts to check
+            if (
+                Array.isArray(formData.districts) &&
+                formData.districts.length > 0
+            ) {
+                const validDistrictNames = uniqueDistricts.map((d) => d.name);
+                const invalidDistricts = formData.districts.filter(
+                    (districtName) => !validDistrictNames.includes(districtName)
+                );
 
-            // Only update if there are invalid districts to remove
-            if (invalidDistricts.length > 0) {
-                const validSelectedDistricts = (
-                    formData.districts || []
-                ).filter((districtName) =>
-                    validDistrictNames.includes(districtName)
-                );
-                // Use handleMultiSelectChange instead of setFormData
-                handleMultiSelectChange(
-                    { target: { value: validSelectedDistricts } },
-                    "districts"
-                );
+                // Only update if there are invalid districts to remove
+                if (invalidDistricts.length > 0) {
+                    const validSelectedDistricts = formData.districts.filter(
+                        (districtName) =>
+                            validDistrictNames.includes(districtName)
+                    );
+                    // Only update if the filtered result is different from current
+                    if (
+                        validSelectedDistricts.length !==
+                        formData.districts.length
+                    ) {
+                        handleMultiSelectChange(
+                            { target: { value: validSelectedDistricts } },
+                            "districts"
+                        );
+                    }
+                }
             }
         } else {
             // Show all districts if no division selected
-            if (Object.keys(districtsData).length > 0) {
-                const allDistricts = Object.values(districtsData)
-                    .flat()
-                    .map((name, index) => ({
-                        id: index + 1,
-                        name: name,
-                    }));
-                setAvailableDistricts(allDistricts);
-            }
+            const allDistricts = Object.values(districtsData)
+                .flat()
+                .map((name, index) => ({
+                    id: index + 1,
+                    name: name,
+                }));
+            setAvailableDistricts(allDistricts);
         }
     }, [formData.geographic_division, districtsData, handleMultiSelectChange]);
 
