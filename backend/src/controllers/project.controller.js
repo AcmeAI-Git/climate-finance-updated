@@ -151,6 +151,18 @@ exports.getProjectTrend = async (req, res) => {
     }
 };
 
+exports.getClimateFinanceTrend = async (req, res) => {
+    try {
+        const response = await Project.getClimateFinanceTrend();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
 exports.getFundingSourceOverview = async (req, res) => {
     try {
         const response = await Project.getFundingSourceOverviewStats();
@@ -216,6 +228,18 @@ exports.getOverViewStats = async (req, res) => {
 exports.getRegionalDistribution = async (req, res) => {
     try {
         const response = await Project.getRegionalDistribution();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getDistrictProjectDistribution = async (req, res) => {
+    try {
+        const response = await Project.getDistrictProjectDistribution();
         res.status(200).json({ status: true, data: response });
     } catch (e) {
         res.status(500).json({

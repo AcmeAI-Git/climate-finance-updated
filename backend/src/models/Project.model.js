@@ -573,6 +573,24 @@ Project.getProjectTrend = async () => {
     }));
 };
 
+Project.getClimateFinanceTrend = async () => {
+    const query = `
+        SELECT 
+            SUBSTRING(beginning, 1, 4) AS year,
+            SUM(total_cost_usd) AS total_cost_usd
+        FROM Project
+        WHERE beginning IS NOT NULL AND beginning <> ''
+        GROUP BY year
+        ORDER BY year;
+    `;
+
+    const { rows } = await pool.query(query);
+    return rows.map((row) => ({
+        year: row.year,
+        Total_Finance: parseFloat(row.total_cost_usd),
+    }));
+};
+
 Project.getRegionalDistribution = async () => {
     const query = `
         SELECT 
@@ -583,6 +601,32 @@ Project.getRegionalDistribution = async () => {
         FROM (
             SELECT 
                 unnest(p.geographic_division) AS region,
+                p.status
+            FROM Project p
+        ) AS sub
+        GROUP BY region
+        ORDER BY region;
+    `;
+
+    const { rows } = await pool.query(query);
+    return rows.map(row => ({
+        region: row.region,
+        total: parseInt(row.total) || 0,
+        active: parseInt(row.active) || 0,
+        completed: parseInt(row.completed) || 0,
+    }));
+};
+
+Project.getDistrictProjectDistribution = async () => {
+    const query = `
+        SELECT 
+            region,
+            COUNT(*) AS total,
+            COUNT(*) FILTER (WHERE status = 'Active') AS active,
+            COUNT(*) FILTER (WHERE status IN ('Implemented', 'Completed')) AS completed
+        FROM (
+            SELECT 
+                unnest(p.districts) AS region,
                 p.status
             FROM Project p
         ) AS sub
