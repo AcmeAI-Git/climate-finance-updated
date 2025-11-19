@@ -127,6 +127,18 @@ exports.getProjectByType = async (req, res) => {
     }
 };
 
+exports.getWASHStat = async (req, res) => {
+    try {
+        const response = await Project.getWashStat();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
 exports.getFundingSourceByType = async (req, res) => {
     try {
         const response = await Project.getFundingSourceByType();

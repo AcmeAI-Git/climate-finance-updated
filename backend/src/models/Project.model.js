@@ -573,6 +573,31 @@ Project.getProjectTrend = async () => {
     }));
 };
 
+Project.getWashStat = async () => {
+    const query = `
+        SELECT
+            COUNT(DISTINCT p.project_id) AS total_projects,
+            ROUND(SUM(p.total_cost_usd)::numeric, 2) AS total_budget_usd,
+
+            COUNT(DISTINCT CASE WHEN w.presence = TRUE THEN p.project_id END) AS wash_projects,
+            ROUND(
+                SUM(
+                    CASE 
+                        WHEN w.presence = TRUE 
+                        THEN p.total_cost_usd * (w.wash_percentage / 100.0)
+                    END
+                )::numeric, 
+                2
+            ) AS wash_budget_usd
+        FROM Project p
+        LEFT JOIN WASHComponent w ON p.project_id = w.project_id;
+    `;
+
+    const { rows } = await pool.query(query);
+    return rows;
+};
+
+
 Project.getClimateFinanceTrend = async () => {
     const query = `
         SELECT 

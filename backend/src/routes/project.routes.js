@@ -2,7 +2,8 @@ const express = require("express");
 const {addProject, getAllProjects, updateProject, deleteProject, getProjectById, getProjectsOverviewStats,
     getProjectByStatus, getProjectBySector, getProjectTrend, getProjectByType, getOverViewStats,
     getRegionalDistribution, getFundingSourceByType, getFundingSourceOverview, getFundingSourceTrend, 
-    getFundingSourceSectorAllocation, getFundingSource, getDistrictProjectDistribution, getClimateFinanceTrend
+    getFundingSourceSectorAllocation, getFundingSource, getDistrictProjectDistribution, getClimateFinanceTrend,
+    getWASHStat
 } = require("../controllers/project.controller");
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.get('/get-project-by-sector', getProjectBySector)
 router.get('/get-project-by-trend', getProjectTrend)
 router.get('/get-climate-finance-by-trend', getClimateFinanceTrend)
 router.get('/get-project-by-type', getProjectByType)
+router.get('/get-wash-stat', getWASHStat)
 //dashboard
 router.get('/get-overview-stat', getOverViewStats)
 router.get('/get-regional-distribution', getRegionalDistribution)
