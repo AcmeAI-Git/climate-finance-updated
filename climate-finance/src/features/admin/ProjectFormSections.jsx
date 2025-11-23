@@ -8,10 +8,10 @@ import { sdgList } from "../../constants/sdgList";
 const ProjectFormSections = ({
     formData,
     handleInputChange,
-    handleMultiSelectChange,
     handleWashComponentChange,
     agencies,
     fundingSources,
+    setFormData, // Added setFormData prop
 }) => {
     const navigate = useNavigate();
     const [districtsData, setDistrictsData] = useState({});
@@ -91,10 +91,10 @@ const ProjectFormSections = ({
                         validSelectedDistricts.length !==
                         formData.districts.length
                     ) {
-                        handleMultiSelectChange(
-                            { target: { value: validSelectedDistricts } },
-                            "districts"
-                        );
+                        setFormData((prev) => ({
+                            ...prev,
+                            districts: validSelectedDistricts,
+                        }));
                     }
                 }
             }
@@ -108,7 +108,7 @@ const ProjectFormSections = ({
                 }));
             setAvailableDistricts(allDistricts);
         }
-    }, [formData.geographic_division, districtsData, handleMultiSelectChange]);
+    }, [formData.geographic_division, formData.districts, districtsData, setFormData]);
 
     const handleWashSliderChange = (value) => {
         handleWashComponentChange((prev) => ({
@@ -147,10 +147,7 @@ const ProjectFormSections = ({
                     options={agencies}
                     selectedValues={formData.agencies || []}
                     onChange={(values) =>
-                        handleMultiSelectChange(
-                            { target: { value: values } },
-                            "agencies"
-                        )
+                        setFormData((prev) => ({ ...prev, agencies: values }))
                     }
                     getOptionId={(agency) => agency.agency_id}
                     getOptionLabel={(agency) => agency.name}
@@ -170,16 +167,11 @@ const ProjectFormSections = ({
                     options={fundingSources}
                     selectedValues={formData.funding_sources || []}
                     onChange={(values) =>
-                        handleMultiSelectChange(
-                            { target: { value: values } },
-                            "funding_sources"
-                        )
+                        setFormData((prev) => ({ ...prev, funding_sources: values }))
                     }
                     getOptionId={(source) => source.funding_source_id}
                     getOptionLabel={(source) => source.name}
-                    getOptionSubtext={(source) =>
-                        `Development Partner: ${source.dev_partner}`
-                    }
+                    getOptionSubtext={(source) => `Development Partner: ${source.dev_partner}`}
                     onAddNew={handleAddFundingSource}
                     addButtonText="Add Funding Source"
                 />
@@ -190,7 +182,7 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Geographic Location
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Division <span className="text-red-500">*</span>
@@ -200,10 +192,7 @@ const ProjectFormSections = ({
                             options={availableDivisions}
                             selectedValues={formData.geographic_division || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "geographic_division"
-                                )
+                                setFormData((prev) => ({ ...prev, geographic_division: values }))
                             }
                             getOptionId={(division) => division.name}
                             getOptionLabel={(division) => division.name}
@@ -219,14 +208,33 @@ const ProjectFormSections = ({
                             options={availableDistricts}
                             selectedValues={formData.districts || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "districts"
-                                )
+                                setFormData((prev) => ({ ...prev, districts: values }))
                             }
                             getOptionId={(district) => district.name}
                             getOptionLabel={(district) => district.name}
                         />
+                    </div>
+                </div>
+            </div>
+
+            {/* Rural/Urban Segregation */}
+            <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Rural/Urban Segregation
+                </h3>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                    <div>
+                        <select
+                            name="location_segregation"
+                            value={formData.location_segregation || ""}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        >
+                            <option value="">Select Location Segregation</option>
+                            <option value="Rural">Rural</option>
+                            <option value="Urban">Urban</option>
+                            <option value="Both">Both</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -247,11 +255,8 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Hotspot/Vulnerability Type
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hotspot/Vulnerability Type
-                        </label>
                         <input
                             type="text"
                             name="hotspot_vulnerability_type"
@@ -268,7 +273,7 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Beneficiaries
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -317,11 +322,8 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Gender & Inclusion
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Gender & Inclusion
-                        </label>
                         <textarea
                             name="gender_inclusion"
                             value={formData.gender_inclusion || ""}
@@ -338,7 +340,7 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Equity Marker
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-3">
                             Equity Marker Level
@@ -386,7 +388,7 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Alignment (SDG/NAP/CFF)
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
                     {/* SDG Selection */}
                     <div>
                         <h4 className="text-sm font-semibold text-gray-800 mb-3">
@@ -397,15 +399,10 @@ const ProjectFormSections = ({
                             options={sdgList}
                             selectedValues={formData.alignment_sdg || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "alignment_sdg"
-                                )
+                                setFormData((prev) => ({ ...prev, alignment_sdg: values }))
                             }
                             getOptionId={(sdg) => sdg.id}
-                            getOptionLabel={(sdg) =>
-                                `${sdg.number}: ${sdg.title}`
-                            }
+                            getOptionLabel={(sdg) => `${sdg.number}: ${sdg.title}`}
                         />
                     </div>
 
@@ -444,11 +441,8 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Assessment
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Assessment
-                        </label>
                         <textarea
                             name="assessment"
                             value={formData.assessment || ""}
