@@ -627,16 +627,13 @@ const Projects = () => {
                                                 </div>
                                             )}
 
-                                            {project.gef_grant && (
+                                            {parseFloat(project.gef_grant || 0) > 0 && (
                                                 <div className="flex items-center justify-between text-sm">
                                                     <span className="text-gray-600 font-medium">
                                                         Grant:
                                                     </span>
                                                     <span className="text-blue-600 font-semibold text-xs sm:text-sm">
-                                                        {formatCurrency(
-                                                            project.gef_grant
-                                                        )}{" "}
-                                                        M
+                                                        {formatCurrency(project.gef_grant)} M
                                                     </span>
                                                 </div>
                                             )}

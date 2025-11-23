@@ -158,16 +158,6 @@ const ProjectDetails = () => {
         return proj.timeline || "Not specified";
     };
 
-    const getLocation = (proj) => {
-        if (
-            Array.isArray(proj.projectLocations) &&
-            proj.projectLocations.length > 0
-        ) {
-            return proj.projectLocations.map((loc) => loc.name).join(", ");
-        }
-        return proj.location || "Not specified";
-    };
-
     const getTotalBudget = (proj) => {
         const val =
             proj.total_cost_usd || proj.totalFunding || proj.totalBudget || 0;
@@ -263,39 +253,39 @@ const ProjectDetails = () => {
                             </div>
                         </div>
 
-                        <div className="text-center">
-                            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                                Grant
+                        {/* Grant */}
+                        {parseFloat(project.gef_grant || 0) > 0 && (
+                            <div className="text-center">
+                                <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                                    Grant
+                                </div>
+                                <div className="text-base sm:text-lg font-bold text-success-600">
+                                    {formatCurrency(parseFloat(project.gef_grant))} M
+                                </div>
                             </div>
-                            <div className="text-base sm:text-lg font-bold text-success-600">
-                                {formatCurrency(
-                                    parseFloat(project.gef_grant || 0)
-                                )}{" "}
-                                M
+                        )}
+                        {/* Loan */}
+                        {parseFloat(project.loan_amount || 0) > 0 && (
+                            <div className="text-center">
+                                <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                                    Loan
+                                </div>
+                                <div className="text-base sm:text-lg font-bold text-success-600">
+                                    {formatCurrency(parseFloat(project.loan_amount))} M
+                                </div>
                             </div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                                Co-financing
+                        )}
+                        {/* Co-financing */}
+                        {parseFloat(project.cofinancing || 0) > 0 && (
+                            <div className="text-center">
+                                <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                                    Co-financing
+                                </div>
+                                <div className="text-base sm:text-lg font-bold text-success-600">
+                                    {formatCurrency(parseFloat(project.cofinancing))} M
+                                </div>
                             </div>
-                            <div className="text-base sm:text-lg font-bold text-success-600">
-                                {formatCurrency(
-                                    parseFloat(project.cofinancing || 0)
-                                )}{" "}
-                                M
-                            </div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                                Loan
-                            </div>
-                            <div className="text-base sm:text-lg font-bold text-success-600">
-                                {formatCurrency(
-                                    parseFloat(project.loan_amount || 0)
-                                )}{" "}
-                                M
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Timeline and Details */}
@@ -413,34 +403,28 @@ const ProjectDetails = () => {
                                                 </div>
                                             </div>
                                             <div className="mt-2 text-sm text-gray-600 flex gap-3">
-                                                <div>
-                                                    <div className="text-xs text-gray-500">
-                                                        Grant
+                                                {/* Grant */}
+                                                {parseFloat(source.grant_amount || 0) > 0 && (
+                                                    <div>
+                                                        <div className="text-xs text-gray-500">
+                                                            Grant
+                                                        </div>
+                                                        <div className="font-semibold">
+                                                            {formatCurrency(parseFloat(source.grant_amount))} M
+                                                        </div>
                                                     </div>
-                                                    <div className="font-semibold">
-                                                        {formatCurrency(
-                                                            parseFloat(
-                                                                source.grant_amount ||
-                                                                    0
-                                                            )
-                                                        )}{" "}
-                                                        M
+                                                )}
+                                                {/* Loan */}
+                                                {parseFloat(source.loan_amount || 0) > 0 && (
+                                                    <div>
+                                                        <div className="text-xs text-gray-500">
+                                                            Loan
+                                                        </div>
+                                                        <div className="font-semibold">
+                                                            {formatCurrency(parseFloat(source.loan_amount))} M
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-xs text-gray-500">
-                                                        Loan
-                                                    </div>
-                                                    <div className="font-semibold">
-                                                        {formatCurrency(
-                                                            parseFloat(
-                                                                source.loan_amount ||
-                                                                    0
-                                                            )
-                                                        )}{" "}
-                                                        M
-                                                    </div>
-                                                </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -530,28 +514,28 @@ const ProjectDetails = () => {
                                     {formatCurrency(getTotalBudget(project))} M
                                 </div>
                             </div>
-                            <div className="text-center p-4 bg-success-50 rounded-lg border border-success-100">
-                                <div className="text-sm text-gray-600 font-medium mb-2">
-                                    Grant
+                            {/* Grant */}
+                            {parseFloat(project.gef_grant || 0) > 0 && (
+                                <div className="text-center p-4 bg-success-50 rounded-lg border border-success-100">
+                                    <div className="text-sm text-gray-600 font-medium mb-2">
+                                        Grant
+                                    </div>
+                                    <div className="text-xl font-bold text-success-700">
+                                        {formatCurrency(parseFloat(project.gef_grant))} M
+                                    </div>
                                 </div>
-                                <div className="text-xl font-bold text-success-700">
-                                    {formatCurrency(
-                                        parseFloat(project.gef_grant || 0)
-                                    )}{" "}
-                                    M
+                            )}
+                            {/* Co-financing */}
+                            {parseFloat(project.cofinancing || 0) > 0 && (
+                                <div className="text-center p-4 bg-warning-50 rounded-lg border border-warning-100">
+                                    <div className="text-sm text-gray-600 font-medium mb-2">
+                                        Co-financing
+                                    </div>
+                                    <div className="text-xl font-bold text-warning-700">
+                                        {formatCurrency(parseFloat(project.cofinancing))} M
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="text-center p-4 bg-warning-50 rounded-lg border border-warning-100">
-                                <div className="text-sm text-gray-600 font-medium mb-2">
-                                    Co-financing
-                                </div>
-                                <div className="text-xl font-bold text-warning-700">
-                                    {formatCurrency(
-                                        parseFloat(project.cofinancing || 0)
-                                    )}{" "}
-                                    M
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </Card>
                 </div>
@@ -569,8 +553,8 @@ const ProjectDetails = () => {
                                     Direct Beneficiaries:
                                 </div>
                                 <div className="text-lg font-semibold text-gray-900">
-                                    {" " +
-                                        project.direct_beneficiaries.toLocaleString()}
+                                    {" "}
+                                    {project.direct_beneficiaries.toLocaleString()}
                                 </div>
                             </div>
 
