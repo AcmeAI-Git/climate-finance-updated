@@ -257,13 +257,25 @@ const ProjectFormSections = ({
                 </h3>
                 <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <input
-                            type="text"
+                        <select
                             name="hotspot_vulnerability_type"
                             value={formData.hotspot_vulnerability_type || ""}
                             onChange={handleInputChange}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        />
+                        >
+                            <option value="">Select Hotspot/Vulnerability Type</option>
+                            <option value="South-western coastal area and Sundarbans (SWM)">South-western coastal area and Sundarbans (SWM)</option>
+                            <option value="South-east and eastern coastal area (SEE)">South-east and eastern coastal area (SEE)</option>
+                            <option value="Chattogram Hill Tracts (CHT)">Chattogram Hill Tracts (CHT)</option>
+                            <option value="Rivers, floodplains, and erosion-prone areas (FPE)">Rivers, floodplains, and erosion-prone areas (FPE)</option>
+                            <option value="Haor and flash floods areas (HFF)">Haor and flash floods areas (HFF)</option>
+                            <option value="Drought-prone and Barind areas (DBA)">Drought-prone and Barind areas (DBA)</option>
+                            <option value="Northern, north-western region (NNW)">Northern, north-western region (NNW)</option>
+                            <option value="Chalan beel and low-lying area of the north-western region (CBL)">Chalan beel and low-lying area of the north-western region (CBL)</option>
+                            <option value="Char and Islands (CHI)">Char and Islands (CHI)</option>
+                            <option value="Bay of Bengal and Ocean (BoB)">Bay of Bengal and Ocean (BoB)</option>
+                            <option value="Urban areas (URB)">Urban areas (URB)</option>
+                        </select>
                     </div>
                 </div>
             </div>
