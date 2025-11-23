@@ -4,14 +4,15 @@ import CheckboxGroup from "../../components/ui/CheckboxGroup";
 import RadioWithSliders from "../../components/ui/RadioWithSliders";
 import SingleSlider from "../../components/ui/SingleSlider";
 import { sdgList } from "../../constants/sdgList";
+import { formFieldDescriptions } from "../../constants/formFieldDescriptions";
 
 const ProjectFormSections = ({
     formData,
     handleInputChange,
-    handleMultiSelectChange,
     handleWashComponentChange,
     agencies,
     fundingSources,
+    setFormData, // Added setFormData prop
 }) => {
     const navigate = useNavigate();
     const [districtsData, setDistrictsData] = useState({});
@@ -91,10 +92,10 @@ const ProjectFormSections = ({
                         validSelectedDistricts.length !==
                         formData.districts.length
                     ) {
-                        handleMultiSelectChange(
-                            { target: { value: validSelectedDistricts } },
-                            "districts"
-                        );
+                        setFormData((prev) => ({
+                            ...prev,
+                            districts: validSelectedDistricts,
+                        }));
                     }
                 }
             }
@@ -108,7 +109,7 @@ const ProjectFormSections = ({
                 }));
             setAvailableDistricts(allDistricts);
         }
-    }, [formData.geographic_division, districtsData, handleMultiSelectChange]);
+    }, [formData.geographic_division, formData.districts, districtsData, setFormData]);
 
     const handleWashSliderChange = (value) => {
         handleWashComponentChange((prev) => ({
@@ -142,15 +143,15 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Implementing & Executing Agencies
                 </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.agencies}
+                </p>
                 <CheckboxGroup
                     label="Select Agencies"
                     options={agencies}
                     selectedValues={formData.agencies || []}
                     onChange={(values) =>
-                        handleMultiSelectChange(
-                            { target: { value: values } },
-                            "agencies"
-                        )
+                        setFormData((prev) => ({ ...prev, agencies: values }))
                     }
                     getOptionId={(agency) => agency.agency_id}
                     getOptionLabel={(agency) => agency.name}
@@ -165,21 +166,19 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Funding Sources
                 </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.funding_sources}
+                </p>
                 <CheckboxGroup
                     label="Select Funding Sources"
                     options={fundingSources}
                     selectedValues={formData.funding_sources || []}
                     onChange={(values) =>
-                        handleMultiSelectChange(
-                            { target: { value: values } },
-                            "funding_sources"
-                        )
+                        setFormData((prev) => ({ ...prev, funding_sources: values }))
                     }
                     getOptionId={(source) => source.funding_source_id}
                     getOptionLabel={(source) => source.name}
-                    getOptionSubtext={(source) =>
-                        `Development Partner: ${source.dev_partner}`
-                    }
+                    getOptionSubtext={(source) => `Development Partner: ${source.dev_partner}`}
                     onAddNew={handleAddFundingSource}
                     addButtonText="Add Funding Source"
                 />
@@ -190,7 +189,10 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Geographic Location
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.geographic_division}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Division <span className="text-red-500">*</span>
@@ -200,10 +202,7 @@ const ProjectFormSections = ({
                             options={availableDivisions}
                             selectedValues={formData.geographic_division || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "geographic_division"
-                                )
+                                setFormData((prev) => ({ ...prev, geographic_division: values }))
                             }
                             getOptionId={(division) => division.name}
                             getOptionLabel={(division) => division.name}
@@ -214,15 +213,15 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Districts <span className="text-red-500">*</span>
                         </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            {formFieldDescriptions.districts}
+                        </p>
                         <CheckboxGroup
                             label="Select Districts"
                             options={availableDistricts}
                             selectedValues={formData.districts || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "districts"
-                                )
+                                setFormData((prev) => ({ ...prev, districts: values }))
                             }
                             getOptionId={(district) => district.name}
                             getOptionLabel={(district) => district.name}
@@ -231,8 +230,36 @@ const ProjectFormSections = ({
                 </div>
             </div>
 
+            {/* Rural/Urban Segregation */}
+            <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Rural/Urban Segregation
+                </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.location_segregation}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                    <div>
+                        <select
+                            name="location_segregation"
+                            value={formData.location_segregation || ""}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        >
+                            <option value="">Select Location Segregation</option>
+                            <option value="Rural">Rural</option>
+                            <option value="Urban">Urban</option>
+                            <option value="Both">Both</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             {/* WASH Component - Updated */}
             <div>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.wash_component}
+                </p>
                 <SingleSlider
                     label="WASH Component"
                     value={formData.wash_component?.wash_percentage || 0}
@@ -247,18 +274,30 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Hotspot/Vulnerability Type
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.hotspot_vulnerability_type}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hotspot/Vulnerability Type
-                        </label>
-                        <input
-                            type="text"
+                        <select
                             name="hotspot_vulnerability_type"
                             value={formData.hotspot_vulnerability_type || ""}
                             onChange={handleInputChange}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        />
+                        >
+                            <option value="">Select Hotspot/Vulnerability Type</option>
+                            <option value="South-western coastal area and Sundarbans (SWM)">South-western coastal area and Sundarbans (SWM)</option>
+                            <option value="South-east and eastern coastal area (SEE)">South-east and eastern coastal area (SEE)</option>
+                            <option value="Chattogram Hill Tracts (CHT)">Chattogram Hill Tracts (CHT)</option>
+                            <option value="Rivers, floodplains, and erosion-prone areas (FPE)">Rivers, floodplains, and erosion-prone areas (FPE)</option>
+                            <option value="Haor and flash floods areas (HFF)">Haor and flash floods areas (HFF)</option>
+                            <option value="Drought-prone and Barind areas (DBA)">Drought-prone and Barind areas (DBA)</option>
+                            <option value="Northern, north-western region (NNW)">Northern, north-western region (NNW)</option>
+                            <option value="Chalan beel and low-lying area of the north-western region (CBL)">Chalan beel and low-lying area of the north-western region (CBL)</option>
+                            <option value="Char and Islands (CHI)">Char and Islands (CHI)</option>
+                            <option value="Bay of Bengal and Ocean (BoB)">Bay of Bengal and Ocean (BoB)</option>
+                            <option value="Urban areas (URB)">Urban areas (URB)</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -268,7 +307,10 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Beneficiaries
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.direct_beneficiaries}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -301,6 +343,9 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Beneficiary Description
                         </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            {formFieldDescriptions.beneficiary_description}
+                        </p>
                         <textarea
                             name="beneficiary_description"
                             value={formData.beneficiary_description || ""}
@@ -317,11 +362,11 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Gender & Inclusion
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.gender_inclusion}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Gender & Inclusion
-                        </label>
                         <textarea
                             name="gender_inclusion"
                             value={formData.gender_inclusion || ""}
@@ -338,13 +383,16 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Equity Marker
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.equity_marker}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-3">
                             Equity Marker Level
                         </label>
                         <div className="flex space-x-6">
-                            {["Strong", "Partial", "Weak"].map((level) => (
+                            {['Strong', 'Partial', 'Weak'].map((level) => (
                                 <label
                                     key={level}
                                     className="flex items-center"
@@ -353,9 +401,7 @@ const ProjectFormSections = ({
                                         type="radio"
                                         name="equity_marker"
                                         value={level}
-                                        checked={
-                                            formData.equity_marker === level
-                                        }
+                                        checked={formData.equity_marker === level}
                                         onChange={handleInputChange}
                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                     />
@@ -370,6 +416,9 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Equity Marker Description
                         </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            {formFieldDescriptions.equity_marker_description}
+                        </p>
                         <textarea
                             name="equity_marker_description"
                             value={formData.equity_marker_description || ""}
@@ -386,7 +435,10 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Alignment (SDG/NAP/CFF)
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.alignment_sdg}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
                     {/* SDG Selection */}
                     <div>
                         <h4 className="text-sm font-semibold text-gray-800 mb-3">
@@ -397,15 +449,10 @@ const ProjectFormSections = ({
                             options={sdgList}
                             selectedValues={formData.alignment_sdg || []}
                             onChange={(values) =>
-                                handleMultiSelectChange(
-                                    { target: { value: values } },
-                                    "alignment_sdg"
-                                )
+                                setFormData((prev) => ({ ...prev, alignment_sdg: values }))
                             }
                             getOptionId={(sdg) => sdg.id}
-                            getOptionLabel={(sdg) =>
-                                `${sdg.number}: ${sdg.title}`
-                            }
+                            getOptionLabel={(sdg) => `${sdg.number}: ${sdg.title}`}
                         />
                     </div>
 
@@ -414,6 +461,9 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             National Adaptation Plans (NAP)
                         </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            {formFieldDescriptions.alignment_nap}
+                        </p>
                         <textarea
                             name="alignment_nap"
                             value={formData.alignment_nap || ""}
@@ -428,6 +478,9 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Climate Fiscal Frameworks (CFF)
                         </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            {formFieldDescriptions.alignment_cff}
+                        </p>
                         <textarea
                             name="alignment_cff"
                             value={formData.alignment_cff || ""}
@@ -444,11 +497,11 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Assessment
                 </h3>
-                <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.assessment}
+                </p>
+                <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Assessment
-                        </label>
                         <textarea
                             name="assessment"
                             value={formData.assessment || ""}

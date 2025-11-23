@@ -23,6 +23,7 @@ import {
 import MultiSelect from "../components/ui/MultiSelect";
 import { useLanguage } from "../context/LanguageContext";
 import { translateChartData, getChartTitle } from "../utils/chartTranslations";
+import { chartDescriptions } from "../constants/chartDescriptions";
 
 const Transliteration = (type, language) => {
     if (language === "bn") {
@@ -232,73 +233,54 @@ const Projects = () => {
             new Set(projectsList.map((p) => p.equity_marker).filter(Boolean))
         ).sort();
 
-        const filters = [
-            {
-                key: "status",
-                label: "Status",
+        const filters = [];
+        filters.push({
+            key: "status",
+            label: "Status",
+            options: [
+                { value: "All", label: "All Status" },
+                ...statuses.map((status) => ({ value: status, label: status })),
+            ],
+        });
+        if (divisions.length > 0) {
+            filters.push({
+                key: "geographic_division",
+                label: "Geographic Division",
                 options: [
-                    { value: "All", label: "All Status" },
-                    ...statuses.map((status) => ({
-                        value: status,
-                        label: status,
+                    { value: "All", label: "All Divisions" },
+                    ...divisions.map((division) => ({ value: division, label: division })),
+                ],
+            });
+        }
+        filters.push({
+            key: "agency_id",
+            label: "Agency",
+            options: [
+                { value: "All", label: "All Agencies" },
+                ...agencies.map((a) => ({ value: a.agency_id, label: a.name })),
+            ],
+        });
+        filters.push({
+            key: "funding_source_id",
+            label: "Funding Source",
+            options: [
+                { value: "All", label: "All Funding Sources" },
+                ...fundingSources.map((f) => ({ value: f.funding_source_id, label: f.name })),
+            ],
+        });
+        if (equityMarkers.length > 0) {
+            filters.push({
+                key: "equity_marker",
+                label: "Equity Marker",
+                options: [
+                    { value: "All", label: "All Equity Markers" },
+                    ...equityMarkers.map((marker) => ({
+                        value: marker,
+                        label: marker.charAt(0).toUpperCase() + marker.slice(1),
                     })),
                 ],
-            },
-            ...(divisions.length > 0
-                ? [
-                      {
-                          key: "geographic_division",
-                          label: "Geographic Division",
-                          options: [
-                              { value: "All", label: "All Divisions" },
-                              ...divisions.map((division) => ({
-                                  value: division,
-                                  label: division,
-                              })),
-                          ],
-                      },
-                  ]
-                : []),
-            {
-                key: "agency_id",
-                label: "Agency",
-                options: [
-                    { value: "All", label: "All Agencies" },
-                    ...agencies.map((a) => ({
-                        value: a.agency_id,
-                        label: a.name,
-                    })),
-                ],
-            },
-            {
-                key: "funding_source_id",
-                label: "Funding Source",
-                options: [
-                    { value: "All", label: "All Funding Sources" },
-                    ...fundingSources.map((f) => ({
-                        value: f.funding_source_id,
-                        label: f.name,
-                    })),
-                ],
-            },
-            ...(equityMarkers.length > 0
-                ? [
-                      {
-                          key: "equity_marker",
-                          label: "Equity Marker",
-                          options: [
-                              { value: "All", label: "All Equity Markers" },
-                              ...equityMarkers.map((marker) => ({
-                                  value: marker,
-                                  label:
-                                      marker.charAt(0).toUpperCase() +
-                                      marker.slice(1),
-                              })),
-                          ],
-                      },
-                  ]
-                : []),
-        ];
+            });
+        }
 
         return {
             searchFields: [
@@ -454,23 +436,28 @@ const Projects = () => {
             />
 
             {statsData.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {statsData.map((stat, index) => (
-                        <div
-                            key={index}
-                            className="animate-fade-in-up h-full"
-                            style={{ animationDelay: `${index * 100}ms` }}
-                        >
-                            <StatCard
-                                title={stat.title}
-                                value={stat.value}
-                                change={stat.change}
-                                color={stat.color}
-                                icon={stat.icon}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {statsData.map((stat, index) => (
+                            <div
+                                key={index}
+                                className="animate-fade-in-up h-full"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                <StatCard
+                                    title={stat.title}
+                                    value={stat.value}
+                                    change={stat.change}
+                                    color={stat.color}
+                                    icon={stat.icon}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-sm text-gray-500 mb-8 text-center italic">
+                        {chartDescriptions.projectsStats}
+                    </p>
+                </>
             ) : (
                 <div className="mb-8">
                     <Card padding={true}>
@@ -487,11 +474,8 @@ const Projects = () => {
                 </div>
             )}
 
-            {/* Projects by Status - Full Width */}
-            <div
-                className="animate-fade-in-up mb-6"
-                style={{ animationDelay: "400ms" }}
-            >
+            {/* Status Pie Chart */}
+            <div className="animate-fade-in-up mb-6" style={{ animationDelay: "400ms" }}>
                 <Card hover padding={true}>
                     {projectsByStatus.length > 0 ? (
                         <PieChartComponent
@@ -516,12 +500,9 @@ const Projects = () => {
                 </Card>
             </div>
 
-            {/* Project Trend */}
+            {/* Project Trend Line Chart */}
             {projectTrend.length > 0 && (
-                <div
-                    className="animate-fade-in-up  mb-6"
-                    style={{ animationDelay: "600ms" }}
-                >
+                <div className="animate-fade-in-up  mb-6" style={{ animationDelay: "600ms" }}>
                     <Card hover padding={true}>
                         <LineChartComponent
                             title={Transliteration(
@@ -537,6 +518,9 @@ const Projects = () => {
                             )}
                             formatYAxis={false}
                         />
+                        <p className="text-sm text-gray-500 mt-4 text-center italic">
+                            {chartDescriptions.projectTrend}
+                        </p>
                     </Card>
                 </div>
             )}
@@ -606,7 +590,7 @@ const Projects = () => {
                                         handleViewDetails(e, project.project_id)
                                     }
                                 >
-                                    <div className="p-4 sm:p-6 flex flex-col h-full min-h-[320px]">
+                                    <div className="p-4 sm:p-6 flex flex-col h-full min-h-80">
                                         <div className="mb-4 min-h-[100px] flex flex-col justify-start">
                                             <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors mb-2 line-clamp-2 text-base sm:text-lg leading-tight">
                                                 {project.title}
@@ -618,7 +602,7 @@ const Projects = () => {
                                             </p>
                                         </div>
 
-                                        <div className="flex flex-wrap gap-2 mb-4 min-h-[32px] items-start">
+                                        <div className="flex flex-wrap gap-2 mb-4 min-h-8 items-start">
                                             <span
                                                 className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
                                                     project.status
@@ -643,16 +627,13 @@ const Projects = () => {
                                                 </div>
                                             )}
 
-                                            {project.gef_grant && (
+                                            {parseFloat(project.gef_grant || 0) > 0 && (
                                                 <div className="flex items-center justify-between text-sm">
                                                     <span className="text-gray-600 font-medium">
                                                         Grant:
                                                     </span>
                                                     <span className="text-blue-600 font-semibold text-xs sm:text-sm">
-                                                        {formatCurrency(
-                                                            project.gef_grant
-                                                        )}{" "}
-                                                        M
+                                                        {formatCurrency(project.gef_grant)} M
                                                     </span>
                                                 </div>
                                             )}
@@ -739,7 +720,7 @@ const Projects = () => {
                                                             project.project_id
                                                         )
                                                     }
-                                                    className="text-purple-600 border-purple-600 hover:bg-purple-50 flex-shrink-0 text-xs px-2 py-1"
+                                                    className="text-purple-600 border-purple-600 hover:bg-purple-50 shrink-0 text-xs px-2 py-1"
                                                 >
                                                     View Details
                                                 </Button>
