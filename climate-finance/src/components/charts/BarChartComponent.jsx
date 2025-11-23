@@ -32,6 +32,7 @@ const BarChartComponent = ({
     xAxisKey,
     bars, // [{ dataKey, name?, fill, totalKey? }]
     formatYAxis = false,
+    description,
 }) => {
     const { language } = useLanguage();
     const displayTitle = Transliteration(title, language);
@@ -152,6 +153,11 @@ const BarChartComponent = ({
                         ))}
                     </VictoryChart>
                 </div>
+                {description && (
+                    <p className="text-sm text-gray-500 mt-2 text-center italic">
+                        {description}
+                    </p>
+                )}
             </div>
         </div>
     );

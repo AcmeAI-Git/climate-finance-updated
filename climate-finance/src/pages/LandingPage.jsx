@@ -33,6 +33,7 @@ import {
 } from "../utils/transliteration";
 import ResearchDocsCard from "../components/ui/ResearchDocsCard";
 import { useAuth } from "../context/AuthContext";
+import { chartDescriptions } from "../constants/chartDescriptions";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -400,23 +401,25 @@ const LandingPage = () => {
 
             {/* Stats Grid */}
             {statsData.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {statsData.map((stat, index) => (
-                        <div
-                            key={index}
-                            className="animate-fade-in-up h-full"
-                            style={{ animationDelay: `${index * 100}ms` }}
-                        >
-                            <StatCard
-                                title={stat.title}
-                                value={stat.value}
-                                change={stat.change}
-                                color={stat.color}
-                                icon={stat.icon}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {statsData.map((stat, index) => (
+                            <div
+                                key={index}
+                                className="animate-fade-in-up h-full"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                <StatCard
+                                    title={stat.title}
+                                    value={stat.value}
+                                    change={stat.change}
+                                    color={stat.color}
+                                    icon={stat.icon}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </>
             ) : (
                 <div className="mb-8">
                     <Card padding={true}>
@@ -438,6 +441,9 @@ const LandingPage = () => {
                     {regionalData.length > 0 && (
                         <BangladeshMapComponent data={regionalData} />
                     )}
+                    <p className="text-sm text-gray-500 mt-4 text-center italic">
+                        {chartDescriptions.regionalDistribution}
+                    </p>
                 </div>
             </div>
 
@@ -460,6 +466,9 @@ const LandingPage = () => {
                             </div>
                         </Card>
                     )}
+                    <p className="text-sm text-gray-500 mt-4 text-center italic">
+                        {chartDescriptions.projectsByStatus}
+                    </p>
                 </div>
                 <div
                     className="animate-fade-in-up"
@@ -479,6 +488,9 @@ const LandingPage = () => {
                             </div>
                         </Card>
                     )}
+                    <p className="text-sm text-gray-500 mt-4 text-center italic">
+                        {chartDescriptions.washDistribution}
+                    </p>
                 </div>
             </div>
 
@@ -506,6 +518,7 @@ const LandingPage = () => {
                                             fill: "#A78BFA",
                                         },
                                     ]}
+                                    description={chartDescriptions.districtDistribution}
                                 />
                             </div>
                         </div>
@@ -522,21 +535,23 @@ const LandingPage = () => {
             </div>
             {/* Yearly Climate Finance Trend */}
             <div className="w-full overflow-hidden">
-                <div
-                    className="animate-fade-in-up"
-                    style={{ animationDelay: "750ms" }}
-                >
+                <div className="animate-fade-in-up" style={{ animationDelay: "750ms" }}>
                     {climateFinanceTrend.length > 0 ? (
-                        <BarChartComponent
-                            title="Yearly Climate Finance Trend"
-                            data={climateFinanceTrend}
-                            xAxisKey="year"
-                            bars={[{
-                                dataKey: "Total_Finance",
-                                name: "Total Climate Finance (USD M)",
-                                fill: "#8B5CF6", // Match regional distribution bar color
-                            }]}
-                        />
+                        <div className="w-full">
+                            <div className="w-full">
+                                <BarChartComponent
+                                    title="Yearly Climate Finance Trend"
+                                    data={climateFinanceTrend}
+                                    xAxisKey="year"
+                                    bars={[{
+                                        dataKey: "Total_Finance",
+                                        name: "Total Climate Finance (USD M)",
+                                        fill: "#8B5CF6",
+                                    }]}
+                                    description={chartDescriptions.climateFinanceTrend}
+                                />
+                            </div>
+                        </div>
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
