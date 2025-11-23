@@ -105,6 +105,8 @@ export const projectApi = {
         apiRequest("/project/projectsOverviewStats"),
     getRegionalDistribution: () =>
         apiRequest("/project/get-regional-distribution"),
+    getDistrictProjectDistribution: () =>
+        apiRequest("/project/get-district-project-distribution"),
     getClimateFinanceByTrend: () => apiRequest("/project/get-climate-finance-by-trend"),
 
     // Dashboard Data

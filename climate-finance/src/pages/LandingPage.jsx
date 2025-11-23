@@ -47,6 +47,7 @@ const LandingPage = () => {
     const [overviewStats, setOverviewStats] = useState([]);
     const [projectsByStatus, setProjectsByStatus] = useState([]);
     const [regionalData, setRegionalData] = useState([]);
+    const [districtData, setDistrictData] = useState([]);
     const [washDistribution, setWashDistribution] = useState([]);
     const [projects, setProjects] = useState([]);
     const [climateFinanceTrend, setClimateFinanceTrend] = useState([]);
@@ -66,12 +67,14 @@ const LandingPage = () => {
                 overviewResponse,
                 statusResponse,
                 regionalResponse,
+                districtResponse,
                 projectsResponse,
                 climateFinanceTrendResponse,
             ] = await Promise.all([
                 projectApi.getOverviewStats(),
                 projectApi.getByStatus(),
                 projectApi.getRegionalDistribution(),
+                projectApi.getDistrictProjectDistribution(),
                 projectApi.getAll(),
                 projectApi.getClimateFinanceByTrend(),
             ]);
@@ -207,6 +210,19 @@ const LandingPage = () => {
                 setRegionalData(regionalResponse.data);
             }
 
+            // Set district data for bar chart
+            if (districtResponse.status && Array.isArray(districtResponse.data)) {
+                const districtDataProcessed = districtResponse.data.map((item) => ({
+                    region: item.region,
+                    active: Number(item.active) || 0,
+                    completed: Number(item.completed) || 0,
+                    total: Number(item.total) || 0,
+                }));
+                setDistrictData(districtDataProcessed);
+            } else {
+                setDistrictData([]);
+            }
+
             // Calculate WASH vs Climate Finance distribution
             if (
                 projectsResponse.status &&
@@ -230,8 +246,8 @@ const LandingPage = () => {
                 });
 
                 setWashDistribution([
-                    { name: "WASH Projects", value: washProjects },
-                    { name: "Climate Finance Only", value: climateFinanceOnly },
+                    { name: "With WASH", value: washProjects },
+                    { name: "Without WASH", value: climateFinanceOnly },
                 ]);
             } else {
                 setWashDistribution([]);
@@ -252,6 +268,7 @@ const LandingPage = () => {
             setProjectsByStatus([]);
             setWashDistribution([]);
             setClimateFinanceTrend([]);
+            setDistrictData([]);
         } finally {
             setLoading(false);
         }
@@ -278,6 +295,7 @@ const LandingPage = () => {
             overview: overviewStats,
             projectsByStatus,
             regionalData,
+            districtData,
             washDistribution,
             projects: projects || [],
         };
@@ -449,7 +467,7 @@ const LandingPage = () => {
                 >
                     {washDistribution.length > 0 ? (
                         <PieChartComponent
-                            title={getChartTitle(language, "washvsnonwash")}
+                            title="Projects by WASH Inclusion"
                             data={washDistribution}
                         />
                     ) : (
@@ -469,12 +487,12 @@ const LandingPage = () => {
                     className="animate-fade-in-up"
                     style={{ animationDelay: "700ms" }}
                 >
-                    {regionalData.length > 0 ? (
+                    {districtData.length > 0 ? (
                         <div className="w-full">
                             <div className="w-full">
                                 <BarChartComponent
-                                    title="Regional Distribution"
-                                    data={regionalData}
+                                    title="District Distribution"
+                                    data={districtData}
                                     xAxisKey="region"
                                     bars={[
                                         {
@@ -495,7 +513,7 @@ const LandingPage = () => {
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
                                 <p className="text-gray-500">
-                                    No regional data available
+                                    No district data available
                                 </p>
                             </div>
                         </Card>
