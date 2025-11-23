@@ -9,6 +9,7 @@ import {
     Activity,
     CheckCircle,
     FolderTree,
+    Plus,
 } from "lucide-react";
 import PageLayout from "../components/layouts/PageLayout";
 import Card from "../components/ui/Card";
@@ -31,6 +32,7 @@ import {
     getInsightsTransliteration,
 } from "../utils/transliteration";
 import ResearchDocsCard from "../components/ui/ResearchDocsCard";
+import { useAuth } from "../context/AuthContext";
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -39,6 +41,7 @@ const LandingPage = () => {
     const [error, setError] = useState(null);
     const { toast } = useToast();
     const { language } = useLanguage();
+    const { isAuthenticated } = useAuth();
 
     // API data states
     const [overviewStats, setOverviewStats] = useState([]);
@@ -46,6 +49,7 @@ const LandingPage = () => {
     const [regionalData, setRegionalData] = useState([]);
     const [washDistribution, setWashDistribution] = useState([]);
     const [projects, setProjects] = useState([]);
+    const [climateFinanceTrend, setClimateFinanceTrend] = useState([]);
 
     // Fetch all dashboard data
     useEffect(() => {
@@ -63,11 +67,13 @@ const LandingPage = () => {
                 statusResponse,
                 regionalResponse,
                 projectsResponse,
+                climateFinanceTrendResponse,
             ] = await Promise.all([
                 projectApi.getOverviewStats(),
                 projectApi.getByStatus(),
                 projectApi.getRegionalDistribution(),
                 projectApi.getAll(),
+                projectApi.getClimateFinanceByTrend(),
             ]);
 
             setProjects(projectsResponse.status ? projectsResponse.data : []);
@@ -75,37 +81,6 @@ const LandingPage = () => {
             // Set overview stats
             if (overviewResponse.status && overviewResponse.data) {
                 const data = overviewResponse.data;
-
-                // Calculate stats from projects if backend values are 0 or missing
-                let calculatedStats = {};
-                if (
-                    projectsResponse.status &&
-                    Array.isArray(projectsResponse.data)
-                ) {
-                    const projects = projectsResponse.data;
-
-                    calculatedStats = {
-                        total_projects: projects.length,
-                        active_projects: projects.filter(
-                            (p) =>
-                                p.status === "Active" ||
-                                p.status === "Ongoing" ||
-                                p.status === "active" ||
-                                p.status === "ongoing"
-                        ).length,
-                        completed_projects: projects.filter(
-                            (p) =>
-                                p.status === "Completed" ||
-                                p.status === "Implemented" ||
-                                p.status === "completed" ||
-                                p.status === "implemented"
-                        ).length,
-                        total_climate_finance: projects.reduce(
-                            (sum, p) => sum + Number(p.total_cost_usd || 0),
-                            0
-                        ),
-                    };
-                }
 
                 setOverviewStats([
                     {
@@ -163,7 +138,7 @@ const LandingPage = () => {
                     total: Number(item.total) || 0,
                 }));
 
-                // Calculate from projects if backend has 0 values
+                // Calculate stats from projects if backend values are 0 or missing
                 let calculatedRegional = [];
                 if (
                     projectsResponse.status &&
@@ -261,6 +236,13 @@ const LandingPage = () => {
             } else {
                 setWashDistribution([]);
             }
+
+            // Set climate finance trend data
+            if (climateFinanceTrendResponse.status && Array.isArray(climateFinanceTrendResponse.data)) {
+                setClimateFinanceTrend(climateFinanceTrendResponse.data);
+            } else {
+                setClimateFinanceTrend([]);
+            }
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
             setError("Failed to load dashboard data. Please try again.");
@@ -269,6 +251,7 @@ const LandingPage = () => {
             setOverviewStats([]);
             setProjectsByStatus([]);
             setWashDistribution([]);
+            setClimateFinanceTrend([]);
         } finally {
             setLoading(false);
         }
@@ -322,6 +305,22 @@ const LandingPage = () => {
         language,
         "status"
     );
+
+    const getAddProjectPath = () => {
+        if (isAuthenticated) {
+            return "/admin/projects/new";
+        } else {
+            return "/projects/new?mode=public";
+        }
+    };
+
+    const getAddRepositoryPath = () => {
+        if (isAuthenticated) {
+            return "/admin/repository/new";
+        } else {
+            return "/repository/new?mode=public";
+        }
+    };
 
     if (loading) {
         return (
@@ -503,12 +502,75 @@ const LandingPage = () => {
                     )}
                 </div>
             </div>
+            {/* Yearly Climate Finance Trend */}
+            <div className="w-full overflow-hidden">
+                <div
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: "750ms" }}
+                >
+                    {climateFinanceTrend.length > 0 ? (
+                        <BarChartComponent
+                            title="Yearly Climate Finance Trend"
+                            data={climateFinanceTrend}
+                            xAxisKey="year"
+                            bars={[{
+                                dataKey: "Total_Finance",
+                                name: "Total Climate Finance (USD M)",
+                                fill: "#8B5CF6", // Match regional distribution bar color
+                            }]}
+                        />
+                    ) : (
+                        <Card hover padding={true}>
+                            <div className="h-[300px] flex items-center justify-center">
+                                <p className="text-gray-500">
+                                    No climate finance trend data available
+                                </p>
+                            </div>
+                        </Card>
+                    )}
+                </div>
+            </div>
 
             <ResearchDocsCard />
 
+            {/* Contribution Note */}
+            <div
+                className="p-6 bg-linear-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up mb-8"
+                style={{ animationDelay: "850ms" }}
+            >
+                <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        Contribute to the Tracker
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                        Help keep the climate finance tracker updated by adding new projects or research documents.
+                    </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button
+                        variant="primary"
+                        onClick={() => navigate(getAddProjectPath())}
+                        leftIcon={<Plus size={16} />}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                        Add Project
+                    </Button>
+
+                    <Button
+                        variant="outline"
+                        onClick={() => navigate(getAddRepositoryPath())}
+                        leftIcon={<Plus size={16} />}
+                        className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                    >
+                        Add Repository
+                    </Button>
+                </div>
+            </div>
+
             {/* Quick Actions */}
             <div
-                className="p-6 bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up"
+                className="p-6 bg-linear-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up"
                 style={{ animationDelay: "900ms" }}
             >
                 <div className="text-center mb-6">

@@ -124,7 +124,6 @@ const BarChartComponent = ({
                                 style={{ data: { fill: bar.fill } }}
                                 labels={({ datum }) => {
                                     const barVal = datum[bar.dataKey];
-                                    const total = datum.total;
                                     const barName = Transliteration(
                                         bar.name ?? bar.dataKey,
                                         language
@@ -132,11 +131,8 @@ const BarChartComponent = ({
                                     const formattedBar = formatYAxis
                                         ? formatCurrency(barVal)
                                         : barVal;
-                                    const formattedTotal = formatYAxis
-                                        ? formatCurrency(total)
-                                        : total;
-
-                                    return `${barName}: ${formattedBar}\nTotal projects: ${formattedTotal}`;
+                                    // Only show the finance value for trend chart
+                                    return `${barName}: ${formattedBar}`;
                                 }}
                                 labelComponent={
                                     <VictoryTooltip
