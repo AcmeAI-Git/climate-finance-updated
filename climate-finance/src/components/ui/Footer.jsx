@@ -19,11 +19,18 @@ const Footer = () => {
 
     const partners = [
         {
+            src: "/wateraid.png",
+            alt: "WaterAid",
+            href: "https://www.wateraid.org/bd/",
+            width: 90,
+            height: 90,
+        },
+        {
             src: "/acme.svg",
             alt: "Acme AI",
             href: "https://www.acmeai.tech/",
-            width: 40,
-            height: 40,
+            width: 50,
+            height: 50,
         },
         {
             src: "/cprd.jpg",
@@ -38,13 +45,6 @@ const Footer = () => {
             href: "https://www.wri.org/",
             width: 70,
             height: 70,
-        },
-        {
-            src: "/wateraid.png",
-            alt: "WaterAid",
-            href: "https://www.wateraid.org/bd/",
-            width: 60,
-            height: 60,
         },
     ];
 
@@ -109,18 +109,18 @@ const Footer = () => {
                             <div className="text-sm text-gray-500 justify-center items-center md:justify-start flex flex-row gap-x-4">
                                 <p>Developed by</p>
                                 <a
-                                    key={partners[0].alt}
-                                    href={partners[0].href}
+                                    key={partners[1].alt}
+                                    href={partners[1].href}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex-shrink-0"
                                 >
                                     <div className={"flex gap-x-2 justify-center items-center"}>
                                         <img
-                                            src={partners[0].src}
-                                            alt={partners[0].alt}
-                                            width={partners[0].width}
-                                            height={partners[0].height}
+                                            src={partners[1].src}
+                                            alt={partners[1].alt}
+                                            width={partners[1].width}
+                                            height={partners[1].height}
                                             className="object-contain"
                                         />
                                         <p className={"text-blue-500"}>www.acmeai.tech</p>

@@ -296,7 +296,8 @@ const FundingSourceDetails = () => {
                                 Funding Information
                             </h3>
                             <div className="space-y-2">
-                                {
+                                {/* Grant Amount */}
+                                {parseFloat(source.total_grant || 0) > 0 && (
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Grant Amount
@@ -305,19 +306,18 @@ const FundingSourceDetails = () => {
                                             {formatCurrency(source.total_grant)}
                                         </span>
                                     </div>
-                                }
-                                {
+                                )}
+                                {/* Loan Amount */}
+                                {parseFloat(source.total_loan || 0) > 0 && (
                                     <div className="flex justify-between items-center py-2 border-b border-gray-100">
                                         <span className="text-sm text-gray-600">
                                             Loan Amount
                                         </span>
                                         <span className="text-sm font-semibold text-blue-600">
-                                            {formatCurrency(
-                                                source.total_loan ?? "0"
-                                            )}
+                                            {formatCurrency(source.total_loan)}
                                         </span>
                                     </div>
-                                }
+                                )}
                             </div>
                         </div>
 

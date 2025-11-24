@@ -6,7 +6,6 @@ import {
     fundingSourceApi,
     projectApi,
     pendingProjectApi,
-    locationApi,
 } from "../services/api";
 import Button from "../components/ui/Button";
 import Loading from "../components/ui/Loading";
@@ -15,11 +14,14 @@ import PageLayout from "../components/layouts/PageLayout";
 import ProjectFormSections from "../features/admin/ProjectFormSections";
 import { ArrowLeft, FolderTree, CheckCircle } from "lucide-react";
 import { useToast } from "../components/ui/Toast";
+import CheckboxGroup from "../components/ui/CheckboxGroup";
 
 const defaultFormData = {
     project_id: "",
     title: "",
     status: "",
+    sector: "",
+    type: [],
     total_cost_usd: "",
     gef_grant: "",
     cofinancing: "",
@@ -109,6 +111,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     project_id: projectData.project_id || "",
                     title: projectData.title || "",
                     status: projectData.status || "",
+                    sector: projectData.sector || "",
+                    type: Array.isArray(projectData.type) ? projectData.type : [],
                     total_cost_usd: projectData.total_cost_usd || "",
                     gef_grant: projectData.gef_grant || "",
                     cofinancing: projectData.cofinancing || "",
@@ -258,23 +262,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
         }
     };
 
-    const handleMultiSelectChange = (e, field) => {
-        const selectedValues = Array.isArray(e.target.value)
-            ? e.target.value
-            : [e.target.value];
-        setFormData((prev) => ({
-            ...prev,
-            [field]:
-                selectedValues && selectedValues.length > 0
-                    ? selectedValues
-                    : [],
-        }));
-
-        if (errors?.[field]) {
-            setErrors((prev) => ({ ...prev, [field]: "" }));
-        }
-    };
-
     const handleWashComponentChange = (washData) => {
         setFormData((prev) => ({
             ...prev,
@@ -408,22 +395,14 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const cofinancing = parseFloat(formData.cofinancing) || 0;
             const loanAmount = parseFloat(formData.loan_amount) || 0;
 
-            // Calculate WASH finance based on WASH component presence and total cost
-            const washFinance = formData.wash_component.presence
-                ? (totalCost * (formData.wash_component.wash_percentage || 0)) /
-                  100
-                : 0;
-
-            // Calculate WASH finance percentage
-            const washFinancePercent =
-                totalCost > 0 ? (washFinance / totalCost) * 100 : 0;
-
             // Create FormData for file upload support
             const formDataToSend = new FormData();
 
             // Append all project fields as per user sample
             formDataToSend.append("title", formData.title);
             formDataToSend.append("status", formData.status);
+            formDataToSend.append("sector", formData.sector);
+            formDataToSend.append("type", formData.type.join(","));
             formDataToSend.append("total_cost_usd", totalCost.toString());
             formDataToSend.append("gef_grant", gefGrant.toString());
             formDataToSend.append("cofinancing", cofinancing.toString());
@@ -841,12 +820,52 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Sector row */}
+                        <div className="grid grid-cols-1 gap-6 mt-6">
+                            {/* Sector as text input spanning full row */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Sector
+                                </label>
+                                <input
+                                    type="text"
+                                    name="sector"
+                                    value={formData.sector}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="Enter sector (e.g. Agriculture, Water, etc.)"
+                                />
+                            </div>
+
+                            {/* Type as standardized CheckboxGroup */}
+                            <div>
+                                <CheckboxGroup
+                                    label="Type"
+                                    options={[
+                                        { id: "Adaptation", name: "Adaptation" },
+                                        { id: "Mitigation", name: "Mitigation" },
+                                        { id: "Loss and Damage", name: "Loss and Damage" },
+                                        { id: "Cross Cutting Finance", name: "Cross Cutting Finance" }
+                                    ]}
+                                    selectedValues={formData.type || []}
+                                    onChange={(values) =>
+                                        setFormData((prev) => ({ ...prev, type: values }))
+                                    }
+                                    getOptionId={(option) => option.id}
+                                    getOptionLabel={(option) => option.name}
+                                />
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Select all that apply
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <ProjectFormSections
                         formData={formData}
+                        setFormData={setFormData}
                         handleInputChange={handleInputChange}
-                        handleMultiSelectChange={handleMultiSelectChange}
                         handleWashComponentChange={handleWashComponentChange}
                         agencies={agencies}
                         fundingSources={fundingSources}
@@ -1016,12 +1035,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         </h3>
                         <div className="grid grid-cols-1 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Objectives{" "}
-                                    {actualMode === "public" && (
-                                        <span className="text-red-500">*</span>
-                                    )}
-                                </label>
                                 <textarea
                                     name="objectives"
                                     value={formData.objectives}
@@ -1040,38 +1053,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                     </p>
                                 )}
                             </div>
-
-                            {/* Email field for public mode */}
-                            {actualMode === "public" && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Your Email Address{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="submitter_email"
-                                        value={formData.submitter_email}
-                                        onChange={handleInputChange}
-                                        className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                                            errors.submitter_email
-                                                ? "border-red-300"
-                                                : "border-gray-300"
-                                        }`}
-                                        placeholder="Enter your email address"
-                                        required
-                                    />
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        We'll notify you when your project is
-                                        reviewed
-                                    </p>
-                                    {errors.submitter_email && (
-                                        <p className="mt-1 text-sm text-red-600">
-                                            {errors.submitter_email}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </div>
 
@@ -1153,7 +1134,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         <h3 className="text-lg font-medium text-gray-900 mb-4">
                             Supporting Documents
                         </h3>
-                        <div className="bg-gradient-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                        <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Project Document
@@ -1178,7 +1159,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                     <div className="border border-purple-200 bg-purple-50 rounded-xl p-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-3">
-                                                <div className="flex-shrink-0">
+                                                <div className="shrink-0">
                                                     <svg
                                                         className="h-8 w-8 text-purple-600"
                                                         fill="none"
@@ -1210,7 +1191,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveFile}
-                                                className="flex-shrink-0 ml-4 p-1 rounded-full hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
+                                                className="shrink-0 ml-4 p-1 rounded-full hover:bg-red-100 text-red-600 hover:text-red-700 transition-colors duration-200"
                                             >
                                                 <svg
                                                     className="h-5 w-5"
