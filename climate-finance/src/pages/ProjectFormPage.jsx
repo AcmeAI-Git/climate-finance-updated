@@ -821,8 +821,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             </div>
                         </div>
 
-                        {/* Sector and Type row */}
-                        <div className="grid grid-cols-1 gap-6">
+                        {/* Sector row */}
+                        <div className="grid grid-cols-1 gap-6 mt-6">
                             {/* Sector as text input spanning full row */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">

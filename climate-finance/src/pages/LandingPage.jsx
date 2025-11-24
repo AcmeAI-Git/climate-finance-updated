@@ -534,7 +534,7 @@ const LandingPage = () => {
                 </div>
             </div>
             {/* Yearly Climate Finance Trend */}
-            <div className="w-full overflow-hidden">
+            <div className="mt-6 w-full overflow-hidden">
                 <div className="animate-fade-in-up" style={{ animationDelay: "750ms" }}>
                     {climateFinanceTrend.length > 0 ? (
                         <div className="w-full">
@@ -568,7 +568,7 @@ const LandingPage = () => {
 
             {/* Contribution Note */}
             <div
-                className="p-6 bg-linear-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up mb-8"
+                className="p-6 bg-linear-to-r from-primary-50 to-primary-100 rounded-2xl border border-primary-200 animate-fade-in-up mb-8 mt-8"
                 style={{ animationDelay: "850ms" }}
             >
                 <div className="text-center mb-6">
