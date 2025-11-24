@@ -56,6 +56,7 @@ const LandingPage = () => {
     // Fetch all dashboard data
     useEffect(() => {
         fetchDashboardData();
+        fetchWashBudgetData();
     }, []);
 
     const fetchDashboardData = async () => {
@@ -224,36 +225,6 @@ const LandingPage = () => {
                 setDistrictData([]);
             }
 
-            // Calculate WASH vs Climate Finance distribution
-            if (
-                projectsResponse.status &&
-                Array.isArray(projectsResponse.data)
-            ) {
-                const projects = projectsResponse.data;
-                let washProjects = 0;
-                let climateFinanceOnly = 0;
-
-                projects.forEach((project) => {
-                    const washComponent = project.wash_component;
-                    if (
-                        washComponent &&
-                        (washComponent.wash_percentage > 0 ||
-                            washComponent.presence)
-                    ) {
-                        washProjects++;
-                    } else {
-                        climateFinanceOnly++;
-                    }
-                });
-
-                setWashDistribution([
-                    { name: "With WASH", value: washProjects },
-                    { name: "Without WASH", value: climateFinanceOnly },
-                ]);
-            } else {
-                setWashDistribution([]);
-            }
-
             // Set climate finance trend data
             if (climateFinanceTrendResponse.status && Array.isArray(climateFinanceTrendResponse.data)) {
                 setClimateFinanceTrend(climateFinanceTrendResponse.data);
@@ -272,6 +243,27 @@ const LandingPage = () => {
             setDistrictData([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Fetch WASH budget stats for pie chart
+    const fetchWashBudgetData = async () => {
+        try {
+            const response = await projectApi.getWashStat();
+            if (response.status && Array.isArray(response.data) && response.data.length > 0) {
+                const stat = response.data[0];
+                const washBudget = Number(stat.wash_budget_usd || 0);
+                const totalBudget = Number(stat.total_budget_usd || 0);
+                const nonWashBudget = totalBudget - washBudget;
+                setWashDistribution([
+                    { name: "WASH Budget (USD)", value: washBudget },
+                    { name: "Non-WASH Budget (USD)", value: nonWashBudget }
+                ]);
+            } else {
+                setWashDistribution([]);
+            }
+        } catch (e) {
+            setWashDistribution([]);
         }
     };
 
@@ -476,20 +468,20 @@ const LandingPage = () => {
                 >
                     {washDistribution.length > 0 ? (
                         <PieChartComponent
-                            title="Projects by WASH Inclusion"
+                            title="WASH vs Non-WASH Budget (USD)"
                             data={washDistribution}
                         />
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
                                 <p className="text-gray-500">
-                                    No WASH data available
+                                    No WASH budget data available
                                 </p>
                             </div>
                         </Card>
                     )}
                     <p className="text-sm text-gray-500 mt-4 text-center italic">
-                        {chartDescriptions.washDistribution}
+                        Distribution of WASH vs Non-WASH Budget (USD)
                     </p>
                 </div>
             </div>
