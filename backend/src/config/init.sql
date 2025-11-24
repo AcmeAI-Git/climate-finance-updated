@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS Project (
     project_id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
+    sector TEXT,
+    type TEXT,
+    location_segregation TEXT,
+    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -50,6 +54,10 @@ CREATE TABLE IF NOT EXISTS PendingProject (
                                               pending_id SERIAL PRIMARY KEY,
                                               title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
+    sector TEXT,
+    type TEXT,
+    location_segregation TEXT,
+    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -210,3 +218,4 @@ COMMENT ON TABLE ProjectAgency IS 'Junction table for Project-Agency many-to-man
 COMMENT ON TABLE ProjectFundingSource IS 'Junction table for Project-FundingSource many-to-many relationship';
 COMMENT ON TABLE ProjectLocation IS 'Junction table for Project-Location many-to-many relationship';
 COMMENT ON TABLE ProjectSDG IS 'Junction table for Project-SDG many-to-many relationship';
+

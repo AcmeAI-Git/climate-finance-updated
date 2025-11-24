@@ -59,6 +59,10 @@ PendingProject.addPendingProject = async (data) => {
                 sdg_ids = [],
                 districts = [],
                 wash_component,
+                sector,
+                type,
+                location_segregation,
+                activities,
             } = data;
 
             // ✅ Parse array-like fields
@@ -78,11 +82,13 @@ PendingProject.addPendingProject = async (data) => {
                     climate_relevance_category, climate_relevance_justification,
                     hotspot_vulnerability_type, wash_component_description,
                     submitter_email, agency_ids, funding_source_ids, sdg_ids, districts,
-                    wash_component, supporting_document
+                    wash_component, supporting_document, sector,
+                    type, location_segregation,
+                    activities,
                 )
                 VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31, $32
+                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31, $32, $33, $34, $35, $36
                 )
                 RETURNING *;
             `;
@@ -120,6 +126,10 @@ PendingProject.addPendingProject = async (data) => {
                 parsedDistricts,
                 wash_component ? JSON.stringify(wash_component) : null,
                 supporting_document,
+                sector,
+                type,
+                location_segregation,
+                activities,
             ];
 
             const result = await client.query(insertQuery, values);
