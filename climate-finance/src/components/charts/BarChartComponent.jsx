@@ -87,6 +87,26 @@ const BarChartComponent = ({
                         padding={{ left: 60, top: 20, right: 60, bottom: 80 }}
                         domain={{ y: [0, maxY] }}
                     >
+                        {/* Legend */}
+                        {bars.length > 1 && (
+                            <VictoryLegend
+                                x={chartWidth / 2 - 100}
+                                y={10}
+                                orientation="horizontal"
+                                gutter={20}
+                                style={{
+                                    labels: { fontSize: 11, fill: "#6B7280" },
+                                }}
+                                data={bars.map((bar) => ({
+                                    name: Transliteration(
+                                        bar.name ?? bar.dataKey,
+                                        language
+                                    ),
+                                    symbol: { fill: bar.fill, type: "square" },
+                                }))}
+                            />
+                        )}
+
                         {/* Y Axis */}
                         <VictoryAxis
                             dependentAxis
@@ -95,7 +115,7 @@ const BarChartComponent = ({
                             }
                             style={{
                                 axis: { stroke: "#E5E7EB" },
-                                grid: { stroke: "#F3F4F6" },
+                                grid: { stroke: "none" },
                                 tickLabels: { fontSize: 11, fill: "#6B7280" },
                             }}
                         />
