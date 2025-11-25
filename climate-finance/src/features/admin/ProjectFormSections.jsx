@@ -292,7 +292,7 @@ const ProjectFormSections = ({
                             onChange={handleInputChange}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                         >
-                            <option value="">Select Hotspot/Vulnerability Type</option>
+                            <option value="">Select</option>
                             <option value="South-western coastal area and Sundarbans (SWM)">South-western coastal area and Sundarbans (SWM)</option>
                             <option value="South-east and eastern coastal area (SEE)">South-east and eastern coastal area (SEE)</option>
                             <option value="Chattogram Hill Tracts (CHT)">Chattogram Hill Tracts (CHT)</option>
