@@ -429,7 +429,7 @@ const Projects = () => {
                         title="Climate Finance Projects"
                         subtitle="Comprehensive list of climate projects in Bangladesh"
                         variant="export"
-                        exportFormats={["pdf", "json", "csv"]}
+                        exportFormats={["json", "csv"]}
                         className="w-full sm:w-auto"
                     />
                 }

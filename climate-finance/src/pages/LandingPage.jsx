@@ -370,7 +370,7 @@ const LandingPage = () => {
                             title="Bangladesh Climate Finance Dashboard"
                             subtitle="Overview of climate finance data and project statistics"
                             variant="export"
-                            exportFormats={["pdf", "json", "csv"]}
+                            exportFormats={["json"]}
                             className="w-full sm:w-auto"
                         />
                     </>

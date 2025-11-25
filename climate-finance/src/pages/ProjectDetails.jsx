@@ -223,7 +223,7 @@ const ProjectDetails = () => {
                             variant="primary"
                             size="sm"
                             className="bg-primary-600 hover:bg-primary-700 text-white"
-                            exportFormats={["pdf", "json", "csv"]}
+                            exportFormats={["json", "csv"]}
                         />
                     </div>
 

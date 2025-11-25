@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
     ArrowLeft,
@@ -44,9 +44,9 @@ const FundingSourceDetails = () => {
             setError("No funding source ID provided");
             setLoading(false);
         }
-    }, [sourceId]);
+    }, [sourceId, fetchFundingSource]);
 
-    const fetchFundingSource = async () => {
+    const fetchFundingSource = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -64,7 +64,7 @@ const FundingSourceDetails = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [sourceId]);
 
     const handleRetry = () => {
         setRetryCount((prev) => prev + 1);
@@ -216,7 +216,7 @@ const FundingSourceDetails = () => {
                             variant="primary"
                             size="sm"
                             className="bg-primary-600 hover:bg-primary-700 text-white"
-                            exportFormats={["pdf", "json", "csv"]}
+                            exportFormats={["json", "csv"]}
                         />
                     </div>
 
@@ -229,7 +229,7 @@ const FundingSourceDetails = () => {
                                 64
                             )}
                             alt={source.name}
-                            className="w-16 h-16 rounded-xl border border-gray-200 shadow-sm flex-shrink-0"
+                            className="w-16 h-16 rounded-xl border border-gray-200 shadow-sm shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                             <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">
