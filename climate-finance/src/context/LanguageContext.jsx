@@ -14,30 +14,35 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    // Get language from Google Translate cookie on page load
-    const getCookieValue = (name) => {
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        const [key, value] = cookie.split('=').map(c => c.trim());
-        if (key === name) return value;
-      }
-      return null;
-    };
-    
-    // Check googtrans cookie format: /en/bn or /en/en
-    const googtransCookie = getCookieValue('googtrans');
-    if (googtransCookie) {
-      const parts = googtransCookie.split('/');
-      const targetLang = parts[parts.length - 1]; // Get last part (bn or en)
-      if (targetLang === 'bn') {
-        setLanguage('bn');
-      } else {
-        setLanguage('en');
-      }
+    // Priority: localStorage > googtrans cookie > default to English
+    let detectedLang = "en";
+
+    // Check localStorage first (our custom preference)
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang === 'bn' || savedLang === 'en') {
+      detectedLang = savedLang;
     } else {
-      // No cookie found, default to English
-      setLanguage('en');
+      // Fall back to Google Translate cookie
+      const getCookieValue = (name) => {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          const [key, value] = cookie.split('=').map(c => c.trim());
+          if (key === name) return value;
+        }
+        return null;
+      };
+      
+      const googtransCookie = getCookieValue('googtrans');
+      if (googtransCookie) {
+        const parts = googtransCookie.split('/');
+        const targetLang = parts[parts.length - 1];
+        if (targetLang === 'bn') {
+          detectedLang = 'bn';
+        }
+      }
     }
+
+    setLanguage(detectedLang);
   }, []);
 
   useEffect(() => {
@@ -51,6 +56,7 @@ export const LanguageProvider = ({ children }) => {
 
   const updateLanguage = (newLang) => {
     setLanguage(newLang);
+    localStorage.setItem('preferredLanguage', newLang);
   };
 
   const value = {

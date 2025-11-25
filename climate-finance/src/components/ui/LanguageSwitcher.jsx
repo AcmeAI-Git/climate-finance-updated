@@ -44,30 +44,54 @@ const LanguageSwitcher = () => {
     const toggleLanguage = () => {
         const newLang = language === "en" ? "bn" : "en";
 
-        // Single, reliable cookie setting approach for all environments
-        const expireDate = new Date();
-        expireDate.setTime(expireDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
-        const expireDateString = expireDate.toUTCString();
+        // Store preference in localStorage
+        localStorage.setItem('preferredLanguage', newLang);
 
-        if (newLang === "en") {
-            // Clear the translation cookie to return to English
-            // Use multiple formats to ensure it works everywhere
-            document.cookie = `googtrans=; path=/; expires=${expireDateString}; SameSite=Lax`;
-            document.cookie = `googtrans=; path=/; expires=${expireDateString}`;
-        } else {
-            // Set translation cookie for Bangla
-            // Format: /en/bn (from English to Bangla)
-            document.cookie = `googtrans=/en/${newLang}; path=/; expires=${expireDateString}; SameSite=Lax`;
-            document.cookie = `googtrans=/en/${newLang}; path=/; expires=${expireDateString}`;
+        // Clear ALL translation-related cookies aggressively
+        const cookieNames = ['googtrans', 'google_translate_element', '_GOOGLE_TRANSLATE_ELEMENT_', 'OGPC'];
+        
+        cookieNames.forEach(name => {
+            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure`;
+        });
+
+        // If switching to Bangla, set the googtrans cookie
+        if (newLang === "bn") {
+            const expireDate = new Date();
+            expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
+            const expireDateString = expireDate.toUTCString();
+            
+            document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
+            document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}`;
         }
 
         // Update React state
         updateLanguage(newLang);
 
-        // Force Google Translate to re-process the page by reloading
-        // This is necessary because Google Translate modifies the DOM directly
+        // Aggressive cache busting - multiple approaches to force reload without cache
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(7);
+        
+        // Clear service worker cache if exists
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    caches.delete(cacheName);
+                });
+            });
+        }
+
+        // Build URL with multiple cache-busting parameters
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('_t', timestamp);
+        currentUrl.searchParams.set('_lang', newLang);
+        currentUrl.searchParams.set('_id', randomId);
+
+        // Force hard reload with cache bypass
         setTimeout(() => {
-            window.location.reload();
+            // Use replace to avoid back button issues
+            window.location.replace(currentUrl.toString());
         }, 150);
     };
 
