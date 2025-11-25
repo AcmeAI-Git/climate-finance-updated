@@ -47,52 +47,47 @@ const LanguageSwitcher = () => {
         // Store preference in localStorage
         localStorage.setItem('preferredLanguage', newLang);
 
-        // Clear ALL translation-related cookies aggressively
-        const cookieNames = ['googtrans', 'google_translate_element', '_GOOGLE_TRANSLATE_ELEMENT_', 'OGPC'];
-        
-        cookieNames.forEach(name => {
-            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
-            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=None; Secure`;
-        });
-
-        // If switching to Bangla, set the googtrans cookie
-        if (newLang === "bn") {
+        // For Vercel: Clear the googtrans cookie
+        if (newLang === "en") {
+            // Clear translation cookie
+            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+            document.cookie = `googtrans=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+        } else {
+            // Set translation cookie for Bangla
             const expireDate = new Date();
             expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
             const expireDateString = expireDate.toUTCString();
             
-            document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}`;
         }
 
-        // Update React state
+        // Update React state first
         updateLanguage(newLang);
 
-        // Aggressive cache busting - multiple approaches to force reload without cache
-        const timestamp = Date.now();
-        const randomId = Math.random().toString(36).substring(7);
-        
-        // Clear service worker cache if exists
-        if ('caches' in window) {
-            caches.keys().then(cacheNames => {
-                cacheNames.forEach(cacheName => {
-                    caches.delete(cacheName);
-                });
-            });
-        }
+        // For Vercel, use a full hard refresh with no-cache headers
+        // Add multiple cache-busting strategies
+        const noCacheUrl = new URL(window.location);
+        noCacheUrl.searchParams.set('_t', Date.now());
+        noCacheUrl.searchParams.set('_lang_switch', 'true');
 
-        // Build URL with multiple cache-busting parameters
-        const currentUrl = new URL(window.location);
-        currentUrl.searchParams.set('_t', timestamp);
-        currentUrl.searchParams.set('_lang', newLang);
-        currentUrl.searchParams.set('_id', randomId);
-
-        // Force hard reload with cache bypass
+        // Use a small delay to ensure cookies are set
         setTimeout(() => {
-            // Use replace to avoid back button issues
-            window.location.replace(currentUrl.toString());
-        }, 150);
+            // Force a complete page reload bypassing cache
+            fetch(noCacheUrl.toString(), { 
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            }).then(() => {
+                // Reload after fetch to ensure Vercel serves fresh content
+                window.location.href = noCacheUrl.toString();
+            }).catch(() => {
+                // Fallback if fetch fails
+                window.location.href = noCacheUrl.toString();
+            });
+        }, 100);
     };
 
     return (
