@@ -65,9 +65,6 @@ Project.addProjectWithRelations = async (data) => {
         const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
         const parsedDistricts = parseArrayField(districts, 'districts');
         const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
-        const parsedType = parseArrayField(type, 'type');
-        const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
-        const parsedActivities = parseArrayField(activities, 'activities');
 
         if (!title || !status || !approval_fy) {
             throw new Error("Missing required fields: title, status, approval_fy");
@@ -123,9 +120,9 @@ Project.addProjectWithRelations = async (data) => {
             supporting_document,
             parsedDistricts,
             sector,
-            parsedType,
-            parsedLocationSegregation,
-            parsedActivities,
+            type,
+            location_segregation,
+            activities,
         ];
 
         await client.query(insertProjectQuery, values);
