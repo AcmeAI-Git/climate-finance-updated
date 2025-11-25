@@ -49,8 +49,10 @@ export const LanguageProvider = ({ children }) => {
     // Update body class based on language for styling
     if (language === "bn") {
       document.body.classList.add('lang-bn');
+      document.documentElement.lang = 'bn'; // Set lang attribute for proper text rendering
     } else {
       document.body.classList.remove('lang-bn');
+      document.documentElement.lang = 'en'; // Always reset to English
     }
   }, [language]);
 
