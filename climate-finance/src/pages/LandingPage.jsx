@@ -492,34 +492,30 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            <div className="w-full overflow-hidden">
+            <div className="w-full">
                 <div
                     className="animate-fade-in-up"
                     style={{ animationDelay: "700ms" }}
                 >
                     {districtData.length > 0 ? (
-                        <div className="w-full">
-                            <div className="w-full">
-                                <BarChartComponent
-                                    title="District Distribution"
-                                    data={districtData}
-                                    xAxisKey="region"
-                                    bars={[
-                                        {
-                                            dataKey: "active",
-                                            name: "Active Projects",
-                                            fill: "#8B5CF6",
-                                        },
-                                        {
-                                            dataKey: "completed",
-                                            name: "Completed Projects",
-                                            fill: "#A78BFA",
-                                        },
-                                    ]}
-                                    description={chartDescriptions.districtDistribution}
-                                />
-                            </div>
-                        </div>
+                        <BarChartComponent
+                            title="District Distribution"
+                            data={districtData}
+                            xAxisKey="region"
+                            bars={[
+                                {
+                                    dataKey: "active",
+                                    name: "Active Projects",
+                                    fill: "#8B5CF6",
+                                },
+                                {
+                                    dataKey: "completed",
+                                    name: "Completed Projects",
+                                    fill: "#A78BFA",
+                                },
+                            ]}
+                            description={chartDescriptions.districtDistribution}
+                        />
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">
