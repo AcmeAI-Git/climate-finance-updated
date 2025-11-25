@@ -29,7 +29,6 @@ const defaultFormData = {
     beginning: "",
     closing: "",
     approval_fy: "",
-    beneficiaries: "",
     objectives: "",
     agencies: [],
     funding_sources: [],
@@ -399,6 +398,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const formDataToSend = new FormData();
 
             // Append all project fields as per user sample
+            formDataToSend.append("project_id", formData.project_id || "");
             formDataToSend.append("title", formData.title);
             formDataToSend.append("status", formData.status);
             formDataToSend.append("sector", formData.sector);
@@ -411,8 +411,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
                 "approval_fy",
-                formData.approval_fy &&
-                    parseInt(formData.approval_fy).toString()
+                formData.approval_fy ? parseInt(formData.approval_fy, 10).toString() : ""
             );
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
@@ -466,9 +465,13 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 "alignment_cff",
                 formData.alignment_cff || ""
             );
+            // Safely handle climate relevance score to prevent NaN
+            const climateScore = formData.climate_relevance_score 
+                ? parseFloat(formData.climate_relevance_score) 
+                : 0;
             formDataToSend.append(
                 "climate_relevance_score",
-                (parseFloat(formData.climate_relevance_score) || 0).toString()
+                isNaN(climateScore) ? "0" : climateScore.toString()
             );
             formDataToSend.append(
                 "climate_relevance_category",
