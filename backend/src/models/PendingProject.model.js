@@ -84,7 +84,7 @@ PendingProject.addPendingProject = async (data) => {
                     submitter_email, agency_ids, funding_source_ids, sdg_ids, districts,
                     wash_component, supporting_document, sector,
                     type, location_segregation,
-                    activities,
+                    activities
                 )
                 VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,

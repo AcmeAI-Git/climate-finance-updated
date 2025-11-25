@@ -28,17 +28,17 @@ Project.addProjectWithRelations = async (data) => {
             assessment,
             alignment_nap,
             alignment_cff,
-            geographic_division = [],
+            geographic_division,
             climate_relevance_score,
             climate_relevance_category,
             climate_relevance_justification,
             hotspot_vulnerability_type,
             wash_component_description,
             supporting_document,
-            agency_ids = [],
-            funding_source_ids = [],
-            sdg_ids = [],
-            districts = [],
+            agency_ids,
+            funding_source_ids,
+            sdg_ids,
+            districts,
             wash_component,
             sector,
             type,
@@ -46,7 +46,7 @@ Project.addProjectWithRelations = async (data) => {
             activities,
         } = data;
 
-        // Helper function to parse arrays
+        // Helper: parse array fields safely
         const parseArrayField = (field, fieldName) => {
             if (!field) return [];
             if (Array.isArray(field)) return field;
@@ -54,10 +54,10 @@ Project.addProjectWithRelations = async (data) => {
                 try {
                     return JSON.parse(field);
                 } catch (err) {
-                    throw new Error(`Invalid JSON format for ${fieldName}: ${err.message}`);
+                    throw new Error(`Invalid JSON for ${fieldName}: ${err.message}`);
                 }
             }
-            throw new Error(`${fieldName} must be an array or JSON array string`);
+            throw new Error(`${fieldName} must be array or JSON string`);
         };
 
         const parsedAgencyIds = parseArrayField(agency_ids, 'agency_ids');
@@ -67,7 +67,7 @@ Project.addProjectWithRelations = async (data) => {
         const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
 
         if (!title || !status || !approval_fy) {
-            throw new Error('Missing required fields: title, status, or approval_fy');
+            throw new Error("Missing required fields: title, status, approval_fy");
         }
 
         const project_id = uuidv4();
@@ -79,15 +79,14 @@ Project.addProjectWithRelations = async (data) => {
                 direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
                 gender_inclusion, equity_marker, equity_marker_description,
                 assessment, alignment_nap, alignment_cff, geographic_division,
-                climate_relevance_score, climate_relevance_category, 
+                climate_relevance_score, climate_relevance_category,
                 climate_relevance_justification, hotspot_vulnerability_type,
-                wash_component_description, supporting_document, districts, sector,
-                type, location_segregation,
-                activities,
+                wash_component_description, supporting_document, districts,
+                sector, type, location_segregation, activities
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
-                $21,$22,$23,$24,$25,$26,$27, $28, $29, $30, $31, $32
+                $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32
             ) RETURNING *
         `;
 
@@ -103,8 +102,8 @@ Project.addProjectWithRelations = async (data) => {
             parseFloat(cofinancing) || 0,
             parseFloat(loan_amount) || 0,
             objectives,
-            parseInt(direct_beneficiaries, 10) || 0,
-            parseInt(indirect_beneficiaries, 10) || 0,
+            parseInt(direct_beneficiaries) || 0,
+            parseInt(indirect_beneficiaries) || 0,
             beneficiary_description,
             gender_inclusion,
             equity_marker,
@@ -128,26 +127,22 @@ Project.addProjectWithRelations = async (data) => {
 
         await client.query(insertProjectQuery, values);
 
-        // WASH component
-        if (wash_component && typeof wash_component === 'string') {
+        // --- WASH COMPONENT ---
+        if (typeof wash_component === 'string') {
             wash_component = JSON.parse(wash_component);
         }
 
         if (wash_component && wash_component.presence) {
             const { presence, wash_percentage, description } = wash_component;
-            const insertWASH = `
-                INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
-                VALUES ($1, $2, $3, $4)
-            `;
-            await client.query(insertWASH, [
-                project_id,
-                presence,
-                parseFloat(wash_percentage) || 0,
-                description,
-            ]);
+
+            await client.query(
+                `INSERT INTO WASHComponent (project_id, presence, wash_percentage, description)
+                 VALUES ($1, $2, $3, $4)`,
+                [project_id, presence, parseFloat(wash_percentage) || 0, description]
+            );
         }
 
-        // Insert relationships
+        // --- RELATIONSHIP TABLES ---
         for (const agency_id of parsedAgencyIds) {
             await client.query(
                 "INSERT INTO ProjectAgency (project_id, agency_id) VALUES ($1, $2)",
@@ -170,6 +165,7 @@ Project.addProjectWithRelations = async (data) => {
         }
 
         await client.query("COMMIT");
+
         return { project_id, status: true, message: "Project added successfully" };
 
     } catch (err) {
