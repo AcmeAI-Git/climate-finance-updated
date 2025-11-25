@@ -60,63 +60,50 @@ const LanguageSwitcher = () => {
         // Update React state first
         updateLanguage(newLang);
 
-        // Set the googtrans cookie BEFORE attempting translation
-        if (newLang === "en") {
-            // Clear googtrans cookie to return to English
-            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
-            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
-            console.log('Cleared googtrans cookie');
-        } else {
-            // Set googtrans cookie for Bangla
+        // NUCLEAR OPTION: Clear ALL Google Translate related storage
+        // Clear all cookies
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+            if (name.includes('goog') || name.includes('translate')) {
+                document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+                document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
+            }
+        }
+        console.log('Cleared all Google Translate cookies');
+
+        // Set the new googtrans cookie
+        if (newLang === "bn") {
             const expireDate = new Date();
             expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
             const expireDateString = expireDate.toUTCString();
             
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
-            document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}`;
             console.log('Set googtrans cookie to /en/bn');
+        } else {
+            console.log('Not setting googtrans (returning to English)');
         }
 
-        console.log('Current cookies:', document.cookie);
+        console.log('Final cookies:', document.cookie);
 
-        // Try to use Google Translate's API to force translation
-        if (window.google && window.google.translate && window.google.translate.TranslateService) {
-            try {
-                console.log('Attempting to use TranslateService...');
-                
-                // Get the language code from the select element
-                const selectElement = document.querySelector('select.goog-te-combo');
-                if (selectElement) {
-                    console.log('Found language selector');
-                    selectElement.value = newLang;
-                    selectElement.dispatchEvent(new Event('change'));
-                    console.log('Dispatched change event on selector');
-                    return;
-                } else {
-                    console.log('Language selector not found');
-                }
-            } catch (err) {
-                console.log('TranslateService error:', err);
-            }
-        }
-
-        // Fallback: Full page reload with cache busting
-        console.log('Using fallback: page reload with cache busting');
-        
-        const reloadUrl = new URL(window.location);
-        // Remove old params
-        reloadUrl.searchParams.delete('_t');
-        reloadUrl.searchParams.delete('_lang');
-        // Add new params
-        reloadUrl.searchParams.set('_t', Date.now());
-        reloadUrl.searchParams.set('_lang', newLang);
-
-        console.log('Reload URL:', reloadUrl.toString());
-
+        // Force a HARD reload that bypasses all caches
+        // This is the most aggressive reload possible in JavaScript
         setTimeout(() => {
-            console.log('Executing page reload...');
-            window.location.href = reloadUrl.toString();
-        }, 200);
+            console.log('Forcing hard reload...');
+            
+            // Method 1: Use location.reload(true) - deprecated but still works
+            try {
+                window.location.reload(true);
+            } catch {
+                console.log('Method 1 failed, trying method 2');
+                
+                // Method 2: Use replace with cache-busting
+                const url = new URL(window.location);
+                url.searchParams.set('nocache', Date.now());
+                window.location.replace(url.toString());
+            }
+        }, 150);
     };
 
     return (
