@@ -10,17 +10,17 @@ const Footer = () => {
     const socialLinks = [
         {
             icon: <Facebook size={16} />,
-            href: "https://www.facebook.com/AcmeAILtd",
-            label: "Twitter",
+            href: "https://www.facebook.com/BDWaterAid/",
+            label: "Facebook",
         },
         {
             icon: <Linkedin size={16} />,
-            href: "https://www.linkedin.com/company/acme-ai/",
+            href: "https://www.linkedin.com/company/wateraidbd/",
             label: "Linkedin",
         },
         {
             icon: <Mail size={16} />,
-            href: "mailto:info@acmeai.tech",
+            href: "mailto:wateraidbangladesh@wateraid.org",
             label: "Email",
         },
     ];
@@ -94,6 +94,8 @@ const Footer = () => {
                                     <a
                                         key={social.label}
                                         href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="text-gray-400 hover:text-purple-600 transition-colors duration-200"
                                         aria-label={social.label}
                                     >
