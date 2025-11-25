@@ -57,11 +57,37 @@ const LanguageSwitcher = () => {
         console.log('Current language:', language);
         console.log('Switching to:', newLang);
 
-        // Update React state first
+        // CRITICAL FIX: Remove ALL Google Translate DOM elements
+        // This prevents the stuck loading spinner issue
+        const elementsToRemove = [
+            document.querySelector('.skiptranslate'),
+            document.querySelector('.goog-te-banner-frame'),
+            document.querySelector('.goog-te-spinner-pos'),
+            document.querySelector('.VIpgJd-ZVi9od-aZ2wEe-wOHMyf'), // Loading spinner
+            document.getElementById('google_translate_element'),
+            document.getElementById('google-translate-script'),
+            ...document.querySelectorAll('iframe[src*="translate.google"]'),
+            ...document.querySelectorAll('iframe[src*="translate.googleapis"]'),
+        ];
+
+        elementsToRemove.forEach(el => {
+            if (el) {
+                console.log('Removing element:', el.className || el.id);
+                el.remove();
+            }
+        });
+
+        // Remove Google Translate global objects
+        if (window.google && window.google.translate) {
+            delete window.google.translate;
+            console.log('Removed window.google.translate');
+        }
+        delete window.googleTranslateElementInit;
+
+        // Update React state
         updateLanguage(newLang);
 
-        // NUCLEAR OPTION: Clear ALL Google Translate related storage
-        // Clear all cookies
+        // Clear ALL Google Translate cookies
         const cookies = document.cookie.split(";");
         for (let cookie of cookies) {
             const eqPos = cookie.indexOf("=");
@@ -73,7 +99,7 @@ const LanguageSwitcher = () => {
         }
         console.log('Cleared all Google Translate cookies');
 
-        // Set the new googtrans cookie
+        // Set the new googtrans cookie for target language
         if (newLang === "bn") {
             const expireDate = new Date();
             expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
@@ -87,23 +113,22 @@ const LanguageSwitcher = () => {
 
         console.log('Final cookies:', document.cookie);
 
-        // Force a HARD reload that bypasses all caches
-        // This is the most aggressive reload possible in JavaScript
+        // Force hard reload with multiple fallbacks
         setTimeout(() => {
             console.log('Forcing hard reload...');
             
-            // Method 1: Use location.reload(true) - deprecated but still works
-            try {
-                window.location.reload(true);
-            } catch {
-                console.log('Method 1 failed, trying method 2');
-                
-                // Method 2: Use replace with cache-busting
-                const url = new URL(window.location);
-                url.searchParams.set('nocache', Date.now());
-                window.location.replace(url.toString());
-            }
-        }, 150);
+            // Use window.location.replace with no-cache headers
+            const url = new URL(window.location);
+            url.searchParams.set('_reload', Date.now());
+            
+            // Force clear browser cache with meta tag injection
+            const meta = document.createElement('meta');
+            meta.httpEquiv = 'Cache-Control';
+            meta.content = 'no-cache, no-store, must-revalidate';
+            document.head.appendChild(meta);
+            
+            window.location.replace(url.toString());
+        }, 100);
     };
 
     return (
@@ -148,6 +173,14 @@ const LanguageSwitcher = () => {
 
         .goog-logo-link {
           display: none !important;
+        }
+
+        /* Hide the stuck loading spinner */
+        .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+        .goog-te-spinner-pos,
+        .VIpgJd-ZVi9od-aZ2wEe-OiiCO {
+          display: none !important;
+          visibility: hidden !important;
         }
       `}</style>
         </div>
