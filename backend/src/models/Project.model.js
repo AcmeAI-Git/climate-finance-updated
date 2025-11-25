@@ -40,6 +40,10 @@ Project.addProjectWithRelations = async (data) => {
             sdg_ids = [],
             districts = [],
             wash_component,
+            sector,
+            type,
+            location_segregation,
+            activities,
         } = data;
 
         // Helper function to parse arrays
@@ -77,11 +81,13 @@ Project.addProjectWithRelations = async (data) => {
                 assessment, alignment_nap, alignment_cff, geographic_division,
                 climate_relevance_score, climate_relevance_category, 
                 climate_relevance_justification, hotspot_vulnerability_type,
-                wash_component_description, supporting_document, districts
+                wash_component_description, supporting_document, districts, sector,
+                type, location_segregation,
+                activities,
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
-                $21,$22,$23,$24,$25,$26,$27, $28
+                $21,$22,$23,$24,$25,$26,$27, $28, $29, $30, $31, $32
             ) RETURNING *
         `;
 
@@ -114,6 +120,10 @@ Project.addProjectWithRelations = async (data) => {
             wash_component_description,
             supporting_document,
             parsedDistricts,
+            sector,
+            type,
+            location_segregation,
+            activities,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -300,6 +310,10 @@ Project.updateProject = async (id, data) => {
             sdg_ids = [],
             districts = [],
             wash_component,
+            sector,
+            type,
+            location_segregation,
+            activities,
         } = data;
 
         const parseArrayField = (field, fieldName) => {
@@ -331,9 +345,11 @@ Project.updateProject = async (id, data) => {
                 alignment_cff = $18, geographic_division = $19, climate_relevance_score = $20,
                 climate_relevance_category = $21, climate_relevance_justification = $22,
                 hotspot_vulnerability_type = $23, wash_component_description = $24,
-                supporting_document = $25, districts = $26, loan_amount = $27,
+                supporting_document = $25, districts = $26, loan_amount = $27, sector = $28,
+                type = $29, location_segregation = $30,
+                activities = $31,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE project_id = $28
+            WHERE project_id = $32
             RETURNING *
         `;
 
@@ -365,6 +381,10 @@ Project.updateProject = async (id, data) => {
             supporting_document,
             parsedDistricts,
             parseFloat(loan_amount) || 0,
+            sector,
+            type,
+            location_segregation,
+            activities,
             id,
         ];
 

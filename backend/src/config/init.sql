@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS Project (
     project_id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
+    sector TEXT,
+    type TEXT,
+    location_segregation TEXT,
+    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -50,6 +54,10 @@ CREATE TABLE IF NOT EXISTS PendingProject (
                                               pending_id SERIAL PRIMARY KEY,
                                               title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
+    sector TEXT,
+    type TEXT,
+    location_segregation TEXT,
+    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -190,6 +198,17 @@ CREATE TABLE IF NOT EXISTS PendingDocumentRepository (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+CREATE TABLE IF NOT EXISTS feedbacks (
+    id SERIAL PRIMARY KEY,
+    issue_type VARCHAR(50) NOT NULL,
+    priority VARCHAR(20) NOT NULL DEFAULT 'Medium' CHECK (priority IN ('Low', 'Medium', 'High', 'Critical')),
+    issue_title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    user_name VARCHAR(100),
+    email VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_project_title ON Project(title);
@@ -210,3 +229,4 @@ COMMENT ON TABLE ProjectAgency IS 'Junction table for Project-Agency many-to-man
 COMMENT ON TABLE ProjectFundingSource IS 'Junction table for Project-FundingSource many-to-many relationship';
 COMMENT ON TABLE ProjectLocation IS 'Junction table for Project-Location many-to-many relationship';
 COMMENT ON TABLE ProjectSDG IS 'Junction table for Project-SDG many-to-many relationship';
+

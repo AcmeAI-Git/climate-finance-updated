@@ -10,6 +10,7 @@ const pendingProjectRoutes = require("./pendingProject.routes");
 const sdgRoutes = require("./sdg.routes");
 const documentRepositoryRoutes = require("./documentRepository.routes");
 const pendingDocumentRepositoryRoutes = require("./pendingDocumentRepository.routes");
+const feedbackRoutes = require("./feedback.routes");
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use("/pending-project", pendingProjectRoutes);
 router.use("/sdg", sdgRoutes);
 router.use("/document-repository", documentRepositoryRoutes);
 router.use("/pending-document-repository", pendingDocumentRepositoryRoutes);
+router.use("/feedback", feedbackRoutes);
 
 module.exports = router;
