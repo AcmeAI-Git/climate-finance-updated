@@ -65,6 +65,9 @@ Project.addProjectWithRelations = async (data) => {
         const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
         const parsedDistricts = parseArrayField(districts, 'districts');
         const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
+        const parsedType = parseArrayField(type, 'type');
+        const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
+        const parsedActivities = parseArrayField(activities, 'activities');
 
         if (!title || !status || !approval_fy) {
             throw new Error('Missing required fields: title, status, or approval_fy');
@@ -83,7 +86,7 @@ Project.addProjectWithRelations = async (data) => {
                 climate_relevance_justification, hotspot_vulnerability_type,
                 wash_component_description, supporting_document, districts, sector,
                 type, location_segregation,
-                activities,
+                activities
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
@@ -121,9 +124,9 @@ Project.addProjectWithRelations = async (data) => {
             supporting_document,
             parsedDistricts,
             sector,
-            type,
-            location_segregation,
-            activities,
+            parsedType,
+            parsedLocationSegregation,
+            parsedActivities,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -334,6 +337,9 @@ Project.updateProject = async (id, data) => {
         const parsedSdgIds = parseArrayField(sdg_ids, 'sdg_ids');
         const parsedDistricts = parseArrayField(districts, 'districts');
         const parsedGeographicDivision = parseArrayField(geographic_division, 'geographic_division');
+        const parsedType = parseArrayField(type, 'type');
+        const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
+        const parsedActivities = parseArrayField(activities, 'activities');
 
         const updateProjectQuery = `
             UPDATE Project SET 
@@ -382,9 +388,9 @@ Project.updateProject = async (id, data) => {
             parsedDistricts,
             parseFloat(loan_amount) || 0,
             sector,
-            type,
-            location_segregation,
-            activities,
+            parsedType,
+            parsedLocationSegregation,
+            parsedActivities,
             id,
         ];
 
