@@ -14,21 +14,34 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    // Get language from cookie with improved parsing
+    // Get language from Google Translate cookie on page load
     const getCookieValue = (name) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        const [key, value] = cookie.split('=').map(c => c.trim());
+        if (key === name) return value;
+      }
       return null;
     };
     
+    // Check googtrans cookie format: /en/bn or /en/en
     const googtransCookie = getCookieValue('googtrans');
-    const currentLang = googtransCookie ? googtransCookie.split('/')[2] || "en" : "en";
-    setLanguage(currentLang);
+    if (googtransCookie) {
+      const parts = googtransCookie.split('/');
+      const targetLang = parts[parts.length - 1]; // Get last part (bn or en)
+      if (targetLang === 'bn') {
+        setLanguage('bn');
+      } else {
+        setLanguage('en');
+      }
+    } else {
+      // No cookie found, default to English
+      setLanguage('en');
+    }
   }, []);
 
   useEffect(() => {
-    // Update body class based on language
+    // Update body class based on language for styling
     if (language === "bn") {
       document.body.classList.add('lang-bn');
     } else {
