@@ -37,8 +37,8 @@ const Footer = () => {
             src: "/acme.svg",
             alt: "Acme AI",
             href: "https://www.acmeai.tech/",
-            width: 50,
-            height: 50,
+            width: 45,
+            height: 45,
         },
         {
             src: "/cprd.jpg",

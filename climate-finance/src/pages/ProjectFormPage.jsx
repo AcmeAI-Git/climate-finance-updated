@@ -57,6 +57,7 @@ const defaultFormData = {
     climate_relevance_score: "",
     climate_relevance_category: "",
     climate_relevance_justification: "",
+    location_segregation: "",
 };
 
 const formatDateForInput = (dateStr) => {
@@ -111,7 +112,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     title: projectData.title || "",
                     status: projectData.status || "",
                     sector: projectData.sector || "",
-                    type: Array.isArray(projectData.type) ? projectData.type : [],
+                    type: Array.isArray(projectData.type)
+                        ? projectData.type
+                        : [],
                     total_cost_usd: projectData.total_cost_usd || "",
                     gef_grant: projectData.gef_grant || "",
                     cofinancing: projectData.cofinancing || "",
@@ -190,6 +193,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         projectData.climate_relevance_category || "",
                     climate_relevance_justification:
                         projectData.climate_relevance_justification || "",
+                    location_segregation:
+                        projectData.location_segregation || "",
                 });
             } else {
                 throw new Error("Project not found");
@@ -411,7 +416,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
                 "approval_fy",
-                formData.approval_fy ? parseInt(formData.approval_fy, 10).toString() : ""
+                formData.approval_fy
+                    ? parseInt(formData.approval_fy, 10).toString()
+                    : 2025
             );
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
@@ -466,8 +473,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 formData.alignment_cff || ""
             );
             // Safely handle climate relevance score to prevent NaN
-            const climateScore = formData.climate_relevance_score 
-                ? parseFloat(formData.climate_relevance_score) 
+            const climateScore = formData.climate_relevance_score
+                ? parseFloat(formData.climate_relevance_score)
                 : 0;
             formDataToSend.append(
                 "climate_relevance_score",
@@ -516,6 +523,11 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         formData.wash_component.wash_percentage || 0,
                     description: formData.wash_component.description || "",
                 })
+            );
+
+            formDataToSend.append(
+                "location_segregation",
+                formData.location_segregation || ""
             );
 
             if (actualMode === "public") {
@@ -828,7 +840,11 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             )}
 
                             {/* Title field - spans full width */}
-                            <div className={actualMode === "edit" ? "" : "md:col-span-2"}>
+                            <div
+                                className={
+                                    actualMode === "edit" ? "" : "md:col-span-2"
+                                }
+                            >
                                 <label className="block text-sm font-medium text-gray-700">
                                     Title{" "}
                                     <span className="text-red-500">*</span>
@@ -875,14 +891,29 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 <CheckboxGroup
                                     label="Type"
                                     options={[
-                                        { id: "Adaptation", name: "Adaptation" },
-                                        { id: "Mitigation", name: "Mitigation" },
-                                        { id: "Loss and Damage", name: "Loss and Damage" },
-                                        { id: "Cross Cutting Finance", name: "Cross Cutting Finance" }
+                                        {
+                                            id: "Adaptation",
+                                            name: "Adaptation",
+                                        },
+                                        {
+                                            id: "Mitigation",
+                                            name: "Mitigation",
+                                        },
+                                        {
+                                            id: "Loss and Damage",
+                                            name: "Loss and Damage",
+                                        },
+                                        {
+                                            id: "Cross Cutting Finance",
+                                            name: "Cross Cutting Finance",
+                                        },
                                     ]}
                                     selectedValues={formData.type || []}
                                     onChange={(values) =>
-                                        setFormData((prev) => ({ ...prev, type: values }))
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            type: values,
+                                        }))
                                     }
                                     getOptionId={(option) => option.id}
                                     getOptionLabel={(option) => option.name}
