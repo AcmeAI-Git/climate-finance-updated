@@ -502,6 +502,7 @@ const LandingPage = () => {
                             title="District Distribution"
                             data={districtData}
                             xAxisKey="region"
+                            scrollable={true}
                             bars={[
                                 {
                                     dataKey: "active",
@@ -537,6 +538,7 @@ const LandingPage = () => {
                                     title="Yearly Climate Finance Trend"
                                     data={climateFinanceTrend}
                                     xAxisKey="year"
+                                    scrollable={true}
                                     bars={[{
                                         dataKey: "Total_Finance",
                                         name: "Total Climate Finance (USD M)",

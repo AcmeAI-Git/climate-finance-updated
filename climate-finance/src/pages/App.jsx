@@ -18,8 +18,8 @@ function App() {
             <ErrorBoundary>
               <DynamicTitle />
               <Navbar />
-              <div className="min-h-screen flex flex-col bg-gray-50">
-                <main className="flex-grow">
+              <div className="min-h-screen flex flex-col bg-gray-50 w-full">
+                <main className="flex-grow w-full">
                   <Routing />
                 </main>
                 <Footer />

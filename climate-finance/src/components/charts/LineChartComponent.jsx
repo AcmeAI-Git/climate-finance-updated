@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
     LineChart,
     Line,
@@ -21,7 +21,23 @@ const LineChartComponent = ({
     lineName = "Value",
     xAxisLabel = "Year",
     yAxisLabel = "Number of Projects",
+    scrollable = false, // Enable horizontal scrolling for charts with many data points
 }) => {
+    const containerRef = useRef(null);
+    const [chartWidth, setChartWidth] = useState("100%");
+
+    useEffect(() => {
+        if (scrollable && containerRef.current) {
+            const containerWidth = containerRef.current.offsetWidth - 40;
+            // For line charts, estimate ~60px per data point
+            const minPointWidth = 60;
+            const requiredWidth = Math.max(data.length * minPointWidth, 600);
+            setChartWidth(Math.max(containerWidth, requiredWidth));
+        } else {
+            setChartWidth("100%");
+        }
+    }, [data, scrollable]);
+
     const formatYAxisMillion = (value) => {
         if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
         if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
@@ -65,61 +81,119 @@ const LineChartComponent = ({
     };
 
     return (
-        <div className="w-full overflow-hidden select-none">
+        <div ref={containerRef} className="w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 {title}
             </h3>
-            <ResponsiveContainer width="100%" height={320}>
-                <LineChart
-                    data={data}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 40 }} // ✅ extra space for x-axis label
-                >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            {scrollable ? (
+                <div style={{ overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+                    <div style={{ width: typeof chartWidth === "number" ? chartWidth : "100%", minHeight: "320px", display: "inline-block" }}>
+                        <ResponsiveContainer width="100%" height={320}>
+                            <LineChart
+                                data={data}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
-                    <XAxis dataKey={xAxisKey} fontSize={12} interval={0}>
-                        <Label
-                            value={xAxisLabel}
-                            offset={-10}
-                            position="insideBottom"
-                            style={{
-                                textAnchor: "middle",
-                                fill: "#666",
-                                fontSize: 12,
-                            }}
-                        />
-                    </XAxis>
+                                <XAxis dataKey={xAxisKey} fontSize={12} interval={0}>
+                                    <Label
+                                        value={xAxisLabel}
+                                        offset={-10}
+                                        position="insideBottom"
+                                        style={{
+                                            textAnchor: "middle",
+                                            fill: "#666",
+                                            fontSize: 12,
+                                        }}
+                                    />
+                                </XAxis>
 
-                    <YAxis
-                        tickFormatter={
-                            formatYAxis ? formatYAxisMillion : (value) => value
-                        }
-                        width={100}
+                                <YAxis
+                                    tickFormatter={
+                                        formatYAxis ? formatYAxisMillion : (value) => value
+                                    }
+                                    width={100}
+                                >
+                                    <Label
+                                        value={yAxisLabel}
+                                        angle={-90}
+                                        position="insideLeft"
+                                        style={{
+                                            textAnchor: "middle",
+                                            fill: "#666",
+                                            fontSize: 12,
+                                        }}
+                                    />
+                                </YAxis>
+
+                                <Tooltip content={<CustomTooltip />} />
+
+                                <Line
+                                    type="monotone"
+                                    dataKey={yAxisKey}
+                                    stroke={lineColor}
+                                    strokeWidth={2}
+                                    dot={{ fill: lineColor }}
+                                    activeDot={{ r: 6 }}
+                                    name={lineName}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            ) : (
+                <ResponsiveContainer width="100%" height={320}>
+                    <LineChart
+                        data={data}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
                     >
-                        <Label
-                            value={yAxisLabel}
-                            angle={-90}
-                            position="insideLeft"
-                            style={{
-                                textAnchor: "middle",
-                                fill: "#666",
-                                fontSize: 12,
-                            }}
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+
+                        <XAxis dataKey={xAxisKey} fontSize={12} interval={0}>
+                            <Label
+                                value={xAxisLabel}
+                                offset={-10}
+                                position="insideBottom"
+                                style={{
+                                    textAnchor: "middle",
+                                    fill: "#666",
+                                    fontSize: 12,
+                                }}
+                            />
+                        </XAxis>
+
+                        <YAxis
+                            tickFormatter={
+                                formatYAxis ? formatYAxisMillion : (value) => value
+                            }
+                            width={100}
+                        >
+                            <Label
+                                value={yAxisLabel}
+                                angle={-90}
+                                position="insideLeft"
+                                style={{
+                                    textAnchor: "middle",
+                                    fill: "#666",
+                                    fontSize: 12,
+                                }}
+                            />
+                        </YAxis>
+
+                        <Tooltip content={<CustomTooltip />} />
+
+                        <Line
+                            type="monotone"
+                            dataKey={yAxisKey}
+                            stroke={lineColor}
+                            strokeWidth={2}
+                            dot={{ fill: lineColor }}
+                            activeDot={{ r: 6 }}
+                            name={lineName}
                         />
-                    </YAxis>
-
-                    <Tooltip content={<CustomTooltip />} />
-
-                    <Line
-                        type="monotone"
-                        dataKey={yAxisKey}
-                        stroke={lineColor}
-                        strokeWidth={2}
-                        dot={{ fill: lineColor }}
-                        activeDot={{ r: 6 }}
-                        name={lineName}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+                    </LineChart>
+                </ResponsiveContainer>
+            )}
         </div>
     );
 };

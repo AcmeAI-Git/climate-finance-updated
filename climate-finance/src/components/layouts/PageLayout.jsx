@@ -19,9 +19,9 @@ const PageLayout = ({
                 className={`min-h-screen ${bgColor} text-gray-800 flex flex-col`}
             >
                 <main
-                    className={`flex-grow py-4 sm:py-6 lg:py-8 ${maxWidth} px-4 sm:px-6 lg:px-8`}
+                    className={`flex-grow py-4 sm:py-6 lg:py-8 ${maxWidth} px-4 sm:px-6 lg:px-8 w-full`}
                 >
-                    <div className="animate-fade-in-up">{children}</div>
+                    <div className="animate-fade-in-up w-full">{children}</div>
                 </main>
             </div>
         </ErrorBoundary>

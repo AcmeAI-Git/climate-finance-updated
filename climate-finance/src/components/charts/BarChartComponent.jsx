@@ -33,6 +33,7 @@ const BarChartComponent = ({
     bars, // [{ dataKey, name?, fill, totalKey? }]
     formatYAxis = false,
     description,
+    scrollable = false, // Enable horizontal scrolling for charts with many data points
 }) => {
     const { language } = useLanguage();
     const displayTitle = Transliteration(title, language);
@@ -45,15 +46,44 @@ const BarChartComponent = ({
         const handleResize = () => {
             if (containerRef.current) {
                 const containerWidth = containerRef.current.offsetWidth - 40;
-                // For many data points (like 64 districts), use a larger fixed width for scrolling
-                const minWidthForScroll = Math.max(800, data.length * 25);
-                setChartWidth(Math.max(containerWidth, minWidthForScroll));
+                // Calculate minimum viable width for chart to be readable
+                // Each bar group needs ~25-30px minimum
+                const minBarWidth = 25;
+                const requiredWidth = data.length * minBarWidth + 200; // 200 for axes/labels
+                
+                // If scrollable is enabled, always allow the chart to be wider if needed
+                if (scrollable) {
+                    // Scrollable mode: always use required width or container width, whichever is larger
+                    setChartWidth(Math.max(containerWidth, requiredWidth));
+                } else {
+                    // Default responsive mode
+                    if (containerWidth < 500) {
+                        // Mobile: Use container width
+                        setChartWidth(containerWidth);
+                    } else {
+                        // Desktop: Use max of container or required, but be smart about it
+                        setChartWidth(Math.max(containerWidth, requiredWidth));
+                    }
+                }
             }
         };
+        
+        // Call on mount
         handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [data]);
+        
+        // Debounce resize events
+        let timeout;
+        const debouncedResize = () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(handleResize, 150);
+        };
+        
+        window.addEventListener("resize", debouncedResize);
+        return () => {
+            window.removeEventListener("resize", debouncedResize);
+            clearTimeout(timeout);
+        };
+    }, [data, scrollable]);
 
     // ---------- prepare data for Victory ----------
     const chartData = data.map((item) => {
@@ -74,15 +104,23 @@ const BarChartComponent = ({
     return (
         <div ref={containerRef} className="w-full">
             <div
-                className="relative w-full bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none overflow-x-auto"
-                style={{ minHeight: "440px" }} // extra room for legend
+                className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none"
+                style={{ minHeight: "440px" }}
             >
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 text-start">
                     {displayTitle}
                 </h3>
 
-                {/* Chart - wrapped in div with set width for horizontal scroll */}
-                <div style={{ height: "340px", width: chartWidth }}>
+                {/* Chart wrapper - scrollable only when needed */}
+                <div 
+                    style={{ 
+                        height: "340px", 
+                        overflowX: scrollable ? "auto" : "visible",
+                        overflowY: "hidden",
+                        WebkitOverflowScrolling: "touch"
+                    }}
+                >
+                    <div style={{ width: chartWidth, height: "100%", display: scrollable ? "inline-block" : "block" }}>
                     <VictoryChart
                         theme={VictoryTheme.material}
                         width={chartWidth}
@@ -175,6 +213,7 @@ const BarChartComponent = ({
                             />
                         ))}
                     </VictoryChart>
+                    </div>
                 </div>
                 {description && (
                     <p className="text-sm text-gray-500 mt-2 text-center italic">

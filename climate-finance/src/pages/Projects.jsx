@@ -512,6 +512,7 @@ const Projects = () => {
                             data={projectTrend}
                             xAxisKey="year"
                             yAxisKey="projects"
+                            scrollable={true}
                             lineName={Transliteration(
                                 getChartTitle(language, "projectYear"),
                                 language
