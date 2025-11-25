@@ -32,6 +32,7 @@ const LanguageSwitcher = () => {
                     },
                     "google_translate_element"
                 );
+                console.log('Google Translate initialized');
             } catch (err) {
                 console.log('Google Translate init error:', err);
             }
@@ -44,6 +45,7 @@ const LanguageSwitcher = () => {
             script.src =
                 "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
             script.async = true;
+            script.onerror = () => console.log('Google Translate script failed to load');
             document.body.appendChild(script);
         }
     }, []);
@@ -55,53 +57,66 @@ const LanguageSwitcher = () => {
         console.log('Current language:', language);
         console.log('Switching to:', newLang);
 
-        // Store preference in localStorage
-        localStorage.setItem('preferredLanguage', newLang);
-        console.log('localStorage preferredLanguage set to:', newLang);
+        // Update React state first
+        updateLanguage(newLang);
 
-        // Always reset lang attribute to English first (prevents transliteration)
-        document.documentElement.lang = 'en';
-        console.log('HTML lang attribute set to: en');
-
-        // Clear the googtrans cookie completely first
-        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
-        document.cookie = `googtrans=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
-        console.log('Cleared googtrans cookies');
-
-        // If switching to Bangla, set the translation cookie
-        if (newLang === "bn") {
+        // Set the googtrans cookie BEFORE attempting translation
+        if (newLang === "en") {
+            // Clear googtrans cookie to return to English
+            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
+            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+            console.log('Cleared googtrans cookie');
+        } else {
+            // Set googtrans cookie for Bangla
             const expireDate = new Date();
             expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
             const expireDateString = expireDate.toUTCString();
             
-            // Use the proper format for Google Translate
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}`;
-            console.log('Set googtrans cookie to: /en/bn');
+            console.log('Set googtrans cookie to /en/bn');
         }
 
-        console.log('All cookies after toggle:', document.cookie);
+        console.log('Current cookies:', document.cookie);
 
-        // Update React state
-        updateLanguage(newLang);
+        // Try to use Google Translate's API to force translation
+        if (window.google && window.google.translate && window.google.translate.TranslateService) {
+            try {
+                console.log('Attempting to use TranslateService...');
+                
+                // Get the language code from the select element
+                const selectElement = document.querySelector('select.goog-te-combo');
+                if (selectElement) {
+                    console.log('Found language selector');
+                    selectElement.value = newLang;
+                    selectElement.dispatchEvent(new Event('change'));
+                    console.log('Dispatched change event on selector');
+                    return;
+                } else {
+                    console.log('Language selector not found');
+                }
+            } catch (err) {
+                console.log('TranslateService error:', err);
+            }
+        }
 
-        // For Vercel: Force a complete page reload to get fresh translation
-        const noCacheUrl = new URL(window.location);
-        // Remove any existing cache-busting params
-        noCacheUrl.searchParams.delete('_t');
-        noCacheUrl.searchParams.delete('_lang_switch');
-        // Add fresh cache-busting params
-        noCacheUrl.searchParams.set('_t', Date.now());
-        noCacheUrl.searchParams.set('_lang_switch', newLang);
+        // Fallback: Full page reload with cache busting
+        console.log('Using fallback: page reload with cache busting');
+        
+        const reloadUrl = new URL(window.location);
+        // Remove old params
+        reloadUrl.searchParams.delete('_t');
+        reloadUrl.searchParams.delete('_lang');
+        // Add new params
+        reloadUrl.searchParams.set('_t', Date.now());
+        reloadUrl.searchParams.set('_lang', newLang);
 
-        console.log('Reloading with URL:', noCacheUrl.toString());
+        console.log('Reload URL:', reloadUrl.toString());
 
-        // Use a small delay to ensure cookies are set before reload
         setTimeout(() => {
-            // Hard refresh - Ctrl+R behavior
-            console.log('Executing window.location.href redirect');
-            window.location.href = noCacheUrl.toString();
-        }, 100);
+            console.log('Executing page reload...');
+            window.location.href = reloadUrl.toString();
+        }, 200);
     };
 
     return (
