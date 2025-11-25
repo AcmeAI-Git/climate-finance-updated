@@ -103,14 +103,6 @@ const CheckboxGroup = ({
         </div>
       )}
       
-      {/* Selection counter */}
-      {options.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-300">
-          <p className="text-xs text-gray-500">
-            {selectedValues.length} of {options.length} selected
-          </p>
-        </div>
-      )}
     </div>
   );
 };
