@@ -3,6 +3,7 @@ import { AlertTriangle, Send } from "lucide-react";
 import Modal from "./Modal";
 import Button from "./Button";
 import FormField from "./FormField";
+import { feedbackApi } from "../../services/api";
 
 const ReportIssueModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -51,16 +52,21 @@ const ReportIssueModal = ({ isOpen, onClose }) => {
         setIsSubmitting(true);
 
         try {
-            // Here you would typically send to your API
-            // For now, we'll simulate the submission
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const submissionData = {
+                issue_type: formData.issueType,
+                priority: formData.priority.charAt(0).toUpperCase() + formData.priority.slice(1),
+                issue_title: formData.title,
+                description: formData.description,
+                user_name: formData.name || null,
+                email: formData.email || null,
+            };
 
-            // In real app, send to backend
-            // Issue data: { ...formData, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, url: window.location.href }
+            await feedbackApi.submitFeedback(submissionData);
 
             alert("Issue reported successfully. Thank you for your feedback!");
             handleClose();
-        } catch {
+        } catch (error) {
+            console.error("Error submitting issue:", error);
             alert("Failed to submit issue. Please try again.");
         } finally {
             setIsSubmitting(false);
@@ -154,7 +160,7 @@ const ReportIssueModal = ({ isOpen, onClose }) => {
                     <div className="flex items-start gap-2">
                         <AlertTriangle
                             size={16}
-                            className="text-blue-600 mt-0.5 flex-shrink-0"
+                            className="text-blue-600 mt-0.5 shrink-0"
                         />
                         <div className="text-sm text-blue-800">
                             <p className="font-medium mb-1">
