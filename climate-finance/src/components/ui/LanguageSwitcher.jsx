@@ -51,15 +51,22 @@ const LanguageSwitcher = () => {
     const toggleLanguage = () => {
         const newLang = language === "en" ? "bn" : "en";
 
+        console.log('=== Language Toggle Debug ===');
+        console.log('Current language:', language);
+        console.log('Switching to:', newLang);
+
         // Store preference in localStorage
         localStorage.setItem('preferredLanguage', newLang);
+        console.log('localStorage preferredLanguage set to:', newLang);
 
         // Always reset lang attribute to English first (prevents transliteration)
         document.documentElement.lang = 'en';
+        console.log('HTML lang attribute set to: en');
 
         // Clear the googtrans cookie completely first
         document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
         document.cookie = `googtrans=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+        console.log('Cleared googtrans cookies');
 
         // If switching to Bangla, set the translation cookie
         if (newLang === "bn") {
@@ -70,7 +77,10 @@ const LanguageSwitcher = () => {
             // Use the proper format for Google Translate
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
             document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}`;
+            console.log('Set googtrans cookie to: /en/bn');
         }
+
+        console.log('All cookies after toggle:', document.cookie);
 
         // Update React state
         updateLanguage(newLang);
@@ -84,9 +94,12 @@ const LanguageSwitcher = () => {
         noCacheUrl.searchParams.set('_t', Date.now());
         noCacheUrl.searchParams.set('_lang_switch', newLang);
 
+        console.log('Reloading with URL:', noCacheUrl.toString());
+
         // Use a small delay to ensure cookies are set before reload
         setTimeout(() => {
             // Hard refresh - Ctrl+R behavior
+            console.log('Executing window.location.href redirect');
             window.location.href = noCacheUrl.toString();
         }, 100);
     };
