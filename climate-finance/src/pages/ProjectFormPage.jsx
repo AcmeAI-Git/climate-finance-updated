@@ -29,7 +29,6 @@ const defaultFormData = {
     beginning: "",
     closing: "",
     approval_fy: "",
-    beneficiaries: "",
     objectives: "",
     agencies: [],
     funding_sources: [],
@@ -399,6 +398,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             const formDataToSend = new FormData();
 
             // Append all project fields as per user sample
+            formDataToSend.append("project_id", formData.project_id || "");
             formDataToSend.append("title", formData.title);
             formDataToSend.append("status", formData.status);
             formDataToSend.append("sector", formData.sector);
@@ -411,8 +411,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
                 "approval_fy",
-                formData.approval_fy &&
-                    parseInt(formData.approval_fy).toString()
+                formData.approval_fy ? parseInt(formData.approval_fy, 10).toString() : ""
             );
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
@@ -466,9 +465,13 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 "alignment_cff",
                 formData.alignment_cff || ""
             );
+            // Safely handle climate relevance score to prevent NaN
+            const climateScore = formData.climate_relevance_score 
+                ? parseFloat(formData.climate_relevance_score) 
+                : 0;
             formDataToSend.append(
                 "climate_relevance_score",
-                (parseFloat(formData.climate_relevance_score) || 0).toString()
+                isNaN(climateScore) ? "0" : climateScore.toString()
             );
             formDataToSend.append(
                 "climate_relevance_category",
@@ -746,51 +749,35 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             Basic Information
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Title field - one column */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Title{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                                        errors.title
-                                            ? "border-red-300"
-                                            : "border-gray-300"
-                                    }`}
-                                    required
-                                />
-                                {errors.title && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {errors.title}
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Project ID: Only show in edit mode */}
-                            {actualMode === "edit" && (
+                            {/* Email field - only for public mode */}
+                            {actualMode === "public" && (
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
-                                        Project ID
+                                        Email{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        type="text"
-                                        name="project_id"
-                                        value={formData.project_id}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                        disabled
-                                        readOnly
+                                        type="email"
+                                        name="submitter_email"
+                                        value={formData.submitter_email || ""}
+                                        onChange={handleInputChange}
+                                        className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                            errors.submitter_email
+                                                ? "border-red-300"
+                                                : "border-gray-300"
+                                        }`}
+                                        placeholder="your.email@example.com"
+                                        required
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Project ID cannot be changed
-                                    </p>
+                                    {errors.submitter_email && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            {errors.submitter_email}
+                                        </p>
+                                    )}
                                 </div>
                             )}
 
+                            {/* Status field */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
                                     Status{" "}
@@ -816,6 +803,51 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 {errors.status && (
                                     <p className="mt-1 text-sm text-red-600">
                                         {errors.status}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Project ID: Only show in edit mode */}
+                            {actualMode === "edit" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Project ID
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="project_id"
+                                        value={formData.project_id}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                        disabled
+                                        readOnly
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Project ID cannot be changed
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Title field - spans full width */}
+                            <div className={actualMode === "edit" ? "" : "md:col-span-2"}>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Title{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                        errors.title
+                                            ? "border-red-300"
+                                            : "border-gray-300"
+                                    }`}
+                                    required
+                                />
+                                {errors.title && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.title}
                                     </p>
                                 )}
                             </div>

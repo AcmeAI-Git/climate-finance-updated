@@ -44,13 +44,16 @@ const BarChartComponent = ({
     useEffect(() => {
         const handleResize = () => {
             if (containerRef.current) {
-                setChartWidth(containerRef.current.offsetWidth - 40); // 40px padding
+                const containerWidth = containerRef.current.offsetWidth - 40;
+                // For many data points (like 64 districts), use a larger fixed width for scrolling
+                const minWidthForScroll = Math.max(800, data.length * 25);
+                setChartWidth(Math.max(containerWidth, minWidthForScroll));
             }
         };
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    }, [data]);
 
     // ---------- prepare data for Victory ----------
     const chartData = data.map((item) => {
@@ -69,17 +72,17 @@ const BarChartComponent = ({
         1;
 
     return (
-        <div ref={containerRef} className="w-full overflow-hidden">
+        <div ref={containerRef} className="w-full">
             <div
-                className="relative w-full bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none"
+                className="relative w-full bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none overflow-x-auto"
                 style={{ minHeight: "440px" }} // extra room for legend
             >
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 text-start">
                     {displayTitle}
                 </h3>
 
-                {/* Chart */}
-                <div style={{ height: "340px", width: "100%" }}>
+                {/* Chart - wrapped in div with set width for horizontal scroll */}
+                <div style={{ height: "340px", width: chartWidth }}>
                     <VictoryChart
                         theme={VictoryTheme.material}
                         width={chartWidth}

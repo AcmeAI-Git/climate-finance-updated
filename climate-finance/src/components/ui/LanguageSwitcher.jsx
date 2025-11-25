@@ -1,37 +1,41 @@
 "use client"; // Add this if using Next.js App Router
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Button from "./Button";
 import { useLanguage } from "../../context/LanguageContext";
 
 const LanguageSwitcher = () => {
     const { language, updateLanguage } = useLanguage();
-    const [isGoogleTranslateLoaded, setIsGoogleTranslateLoaded] =
-        useState(false);
 
     useEffect(() => {
         // Language is now managed by LanguageContext
         // This effect only handles Google Translate setup
 
+        // Ensure the HTML lang attribute is always set to English
+        document.documentElement.lang = 'en';
+
         // Check if Google Translate is already loaded
         if (window.google && window.google.translate) {
-            setIsGoogleTranslateLoaded(true);
             return;
         }
 
         // Define the global init function BEFORE loading the script
         window.googleTranslateElementInit = () => {
-            new window.google.translate.TranslateElement(
-                {
-                    pageLanguage: "en",
-                    includedLanguages: "bn,en",
-                    layout: window.google.translate.TranslateElement
-                        .InlineLayout.SIMPLE,
-                    autoDisplay: false,
-                },
-                "google_translate_element"
-            );
-            setIsGoogleTranslateLoaded(true);
+            try {
+                new window.google.translate.TranslateElement(
+                    {
+                        pageLanguage: "en",
+                        includedLanguages: "bn,en",
+                        layout: window.google.translate.TranslateElement
+                            .InlineLayout.SIMPLE,
+                        autoDisplay: false,
+                    },
+                    "google_translate_element"
+                );
+                console.log('Google Translate initialized');
+            } catch (err) {
+                console.log('Google Translate init error:', err);
+            }
         };
 
         // Load script dynamically with HTTPS for production
@@ -41,6 +45,7 @@ const LanguageSwitcher = () => {
             script.src =
                 "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
             script.async = true;
+            script.onerror = () => console.log('Google Translate script failed to load');
             document.body.appendChild(script);
         }
     }, []);
@@ -48,83 +53,68 @@ const LanguageSwitcher = () => {
     const toggleLanguage = () => {
         const newLang = language === "en" ? "bn" : "en";
 
-        // Fix domain logic for Vercel and other deployments
-        const hostname = window.location.hostname;
-        const isLocalhost =
-            hostname === "localhost" || hostname === "127.0.0.1";
+        console.log('=== Language Toggle Debug ===');
+        console.log('Current language:', language);
+        console.log('Switching to:', newLang);
 
-        // Get appropriate domain for cookie - simplified for Vercel
-        const getCookieDomain = () => {
-            if (isLocalhost) return null; // No domain for localhost
-
-            // For Vercel deployments, don't set domain at all to avoid cross-domain issues
-            if (hostname.includes(".vercel.app")) {
-                return null; // Let browser handle domain automatically
-            }
-
-            // For custom domains
-            const parts = hostname.split(".");
-            if (parts.length <= 2) {
-                return null; // Let browser handle simple domains
-            } else {
-                return "." + parts.slice(-2).join(".");
-            }
-        };
-
-        const cookieDomain = getCookieDomain();
-
-        // Set or clear translation cookie with proper format
-        if (newLang === "en") {
-            // Clear cookie - try multiple approaches for Vercel
-            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-            if (cookieDomain) {
-                document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${cookieDomain}`;
-            }
-            // Also try to clear with SameSite for Vercel
-            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
-        } else {
-            // Set cookie - try multiple approaches for Vercel
-            document.cookie = `googtrans=/en/${newLang}; path=/`;
-            if (cookieDomain) {
-                document.cookie = `googtrans=/en/${newLang}; path=/; domain=${cookieDomain}`;
-            }
-            // Also try to set with SameSite for Vercel
-            document.cookie = `googtrans=/en/${newLang}; path=/; SameSite=Lax`;
-        }
-
+        // Update React state first
         updateLanguage(newLang);
 
-        // Try to trigger translation programmatically if Google Translate is loaded
-        if (
-            isGoogleTranslateLoaded &&
-            window.google &&
-            window.google.translate
-        ) {
-            const translateElement = window.google.translate.TranslateElement;
-            if (translateElement) {
-                // Trigger immediate translation if possible
-                setTimeout(() => {
-                    window.location.reload();
-                }, 50);
-                return;
+        // NUCLEAR OPTION: Clear ALL Google Translate related storage
+        // Clear all cookies
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+            if (name.includes('goog') || name.includes('translate')) {
+                document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+                document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
             }
         }
+        console.log('Cleared all Google Translate cookies');
 
-        // Fallback: reload page with small delay to ensure cookie setting
+        // Set the new googtrans cookie
+        if (newLang === "bn") {
+            const expireDate = new Date();
+            expireDate.setTime(expireDate.getTime() + (365 * 24 * 60 * 60 * 1000));
+            const expireDateString = expireDate.toUTCString();
+            
+            document.cookie = `googtrans=/en/bn; path=/; expires=${expireDateString}; SameSite=Lax`;
+            console.log('Set googtrans cookie to /en/bn');
+        } else {
+            console.log('Not setting googtrans (returning to English)');
+        }
+
+        console.log('Final cookies:', document.cookie);
+
+        // Force a HARD reload that bypasses all caches
+        // This is the most aggressive reload possible in JavaScript
         setTimeout(() => {
-            window.location.reload();
-        }, 100);
+            console.log('Forcing hard reload...');
+            
+            // Method 1: Use location.reload(true) - deprecated but still works
+            try {
+                window.location.reload(true);
+            } catch {
+                console.log('Method 1 failed, trying method 2');
+                
+                // Method 2: Use replace with cache-busting
+                const url = new URL(window.location);
+                url.searchParams.set('nocache', Date.now());
+                window.location.replace(url.toString());
+            }
+        }, 150);
     };
 
     return (
         <div
-            className={`relative z-[1000] min-w-[100px] flex items-center ${
+            className={`relative z-1000 min-w-[100px] flex items-center ${
                 language === "bn" ? "noto-sans-bengali" : ""
             }`}
         >
             <button
                 onClick={toggleLanguage}
-                className="inline-flex items-center px-2 py-2.5 bg-gradient-to-r from-violet-600 to-violet-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
+                className="inline-flex items-center px-2 py-2.5 bg-linear-to-r from-violet-600 to-violet-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-200 hover:from-violet-700 hover:to-violet-700 transition-all duration-300 group"
             >
                 {language === "en" ? "⇆  English" : "⇆  বাংলা"}
             </button>

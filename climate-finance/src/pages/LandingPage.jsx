@@ -262,7 +262,7 @@ const LandingPage = () => {
             } else {
                 setWashDistribution([]);
             }
-        } catch (e) {
+        } catch {
             setWashDistribution([]);
         }
     };
@@ -315,6 +315,12 @@ const LandingPage = () => {
         projectsByStatus,
         language,
         "status"
+    );
+
+    const translatedWashDistribution = translateChartData(
+        washDistribution,
+        language,
+        "washBudget"
     );
 
     const getAddProjectPath = () => {
@@ -370,7 +376,7 @@ const LandingPage = () => {
                             title="Bangladesh Climate Finance Dashboard"
                             subtitle="Overview of climate finance data and project statistics"
                             variant="export"
-                            exportFormats={["pdf", "json", "csv"]}
+                            exportFormats={["json"]}
                             className="w-full sm:w-auto"
                         />
                     </>
@@ -468,8 +474,8 @@ const LandingPage = () => {
                 >
                     {washDistribution.length > 0 ? (
                         <PieChartComponent
-                            title="WASH vs Non-WASH Budget (USD)"
-                            data={washDistribution}
+                            title={getChartTitle(language, "washvsnonwash")}
+                            data={translatedWashDistribution}
                         />
                     ) : (
                         <Card hover padding={true}>
@@ -486,34 +492,30 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            <div className="w-full overflow-hidden">
+            <div className="w-full">
                 <div
                     className="animate-fade-in-up"
                     style={{ animationDelay: "700ms" }}
                 >
                     {districtData.length > 0 ? (
-                        <div className="w-full">
-                            <div className="w-full">
-                                <BarChartComponent
-                                    title="District Distribution"
-                                    data={districtData}
-                                    xAxisKey="region"
-                                    bars={[
-                                        {
-                                            dataKey: "active",
-                                            name: "Active Projects",
-                                            fill: "#8B5CF6",
-                                        },
-                                        {
-                                            dataKey: "completed",
-                                            name: "Completed Projects",
-                                            fill: "#A78BFA",
-                                        },
-                                    ]}
-                                    description={chartDescriptions.districtDistribution}
-                                />
-                            </div>
-                        </div>
+                        <BarChartComponent
+                            title="District Distribution"
+                            data={districtData}
+                            xAxisKey="region"
+                            bars={[
+                                {
+                                    dataKey: "active",
+                                    name: "Active Projects",
+                                    fill: "#8B5CF6",
+                                },
+                                {
+                                    dataKey: "completed",
+                                    name: "Completed Projects",
+                                    fill: "#A78BFA",
+                                },
+                            ]}
+                            description={chartDescriptions.districtDistribution}
+                        />
                     ) : (
                         <Card hover padding={true}>
                             <div className="h-[300px] flex items-center justify-center">

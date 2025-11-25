@@ -444,4 +444,39 @@ export const authApi = {
     },
 };
 
+// Feedback API endpoints
+export const feedbackApi = {
+    // Submit feedback/issue report
+    submitFeedback: (feedbackData) => {
+        if (!feedbackData) throw new Error("Feedback data is required");
+        return apiRequest("/feedback", {
+            method: "POST",
+            body: JSON.stringify(feedbackData),
+        });
+    },
+    // Get all feedbacks (admin only)
+    getAll: () => apiRequest("/feedback"),
+    // Get feedback by ID
+    getById: (id) => {
+        if (!id) throw new Error("Feedback ID is required");
+        return apiRequest(`/feedback/${id}`);
+    },
+    // Update feedback (admin only)
+    update: (id, feedbackData) => {
+        if (!id) throw new Error("Feedback ID is required");
+        if (!feedbackData) throw new Error("Feedback data is required");
+        return apiRequest(`/feedback/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(feedbackData),
+        });
+    },
+    // Delete feedback (admin only)
+    delete: (id) => {
+        if (!id) throw new Error("Feedback ID is required");
+        return apiRequest(`/feedback/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
 export default apiRequest;

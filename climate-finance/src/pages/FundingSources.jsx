@@ -24,8 +24,7 @@ import { formatCurrency } from "../utils/formatters";
 // Chart colors removed from this file (pie chart removed)
 import { generateOrganizationLogo } from "../utils/svgPlaceholder";
 import { fundingSourceApi } from "../services/api";
-import { useLanguage } from "../context/LanguageContext";
-// Chart translation helpers removed (pie chart removed)
+// Language context - commented out as not used
 
 const FundingSources = () => {
     // State management
@@ -47,9 +46,6 @@ const FundingSources = () => {
     const [fundingTrend, setFundingTrend] = useState([]);
     const [topFundingSources, setTopFundingSources] = useState([]);
     const [fundingOverview, setFundingOverview] = useState(null);
-
-    // Language context
-    const { language } = useLanguage();
 
     // Fetch all funding source data
     useEffect(() => {
@@ -215,7 +211,7 @@ const FundingSources = () => {
                 (source.dev_partner?.toLowerCase() || "").includes(
                     searchTerm.toLowerCase()
                 ) ||
-                (source.funding_source_id?.toLowerCase() || "").includes(
+                (String(source.funding_source_id || "").toLowerCase()).includes(
                     searchTerm.toLowerCase()
                 );
 
@@ -314,7 +310,7 @@ const FundingSources = () => {
                         title="Climate Finance Funding Sources"
                         subtitle="Comprehensive data on funding sources and contributions"
                         variant="export"
-                        exportFormats={["pdf", "json", "csv"]}
+                        exportFormats={["json", "csv"]}
                         className="w-full sm:w-auto"
                     />
                 }
@@ -486,7 +482,7 @@ const FundingSources = () => {
                                 >
                                     {/* Logo and Basic Info */}
                                     <div className="flex items-start space-x-4 flex-1">
-                                        <div className="flex-shrink-0">
+                                        <div className="shrink-0">
                                             <img
                                                 src={generateOrganizationLogo(
                                                     source.name || "Unknown",
@@ -497,7 +493,7 @@ const FundingSources = () => {
                                                     source.name ||
                                                     "Unknown Source"
                                                 }
-                                                className="w-16 h-16 rounded-xl border border-gray-100 shadow-sm flex-shrink-0 group-hover:border-purple-200 transition-colors"
+                                                className="w-16 h-16 rounded-xl border border-gray-100 shadow-sm shrink-0 group-hover:border-purple-200 transition-colors"
                                             />
                                         </div>
 
@@ -520,7 +516,7 @@ const FundingSources = () => {
                                                 <div className="flex items-center text-sm text-gray-600 mb-3">
                                                     <Globe
                                                         size={14}
-                                                        className="mr-2 flex-shrink-0"
+                                                        className="mr-2 shrink-0"
                                                     />
                                                     <span>
                                                         Development Partner:{" "}
@@ -539,7 +535,7 @@ const FundingSources = () => {
                                     </div>
 
                                     {/* Action Button */}
-                                    <div className="mt-6 lg:mt-0 lg:ml-6 flex-shrink-0">
+                                    <div className="mt-6 lg:mt-0 lg:ml-6 shrink-0">
                                         <Button
                                             size="sm"
                                             variant="outline"
