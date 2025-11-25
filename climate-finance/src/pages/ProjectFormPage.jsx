@@ -15,6 +15,7 @@ import ProjectFormSections from "../features/admin/ProjectFormSections";
 import { ArrowLeft, FolderTree, CheckCircle } from "lucide-react";
 import { useToast } from "../components/ui/Toast";
 import CheckboxGroup from "../components/ui/CheckboxGroup";
+import { useLanguage } from "../context/LanguageContext";
 
 const defaultFormData = {
     project_id: "",
@@ -83,6 +84,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const { language } = useLanguage();
 
     // Determine mode based on params, authentication, and URL query
     const urlParams = new URLSearchParams(location.search);
@@ -916,7 +918,16 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                         }))
                                     }
                                     getOptionId={(option) => option.id}
-                                    getOptionLabel={(option) => option.name}
+                                    getOptionLabel={(option) => {
+                                        const bangla = {
+                                            Adaptation: "অ্যাডাপটেশন",
+                                            Mitigation: "মিটিগেশন",
+                                            "Loss and Damage": "ক্ষয় ও ক্ষতি",
+                                            "Cross Cutting Finance": "সমন্বয়মূলক অর্থায়ন",
+                                        };
+                                        return language === 'bn' ? (bangla[option.id] || option.name) : option.name;
+                                    }}
+                                    preventTranslate={true}
                                 />
                                 <p className="mt-1 text-xs text-gray-500">
                                     Select all that apply

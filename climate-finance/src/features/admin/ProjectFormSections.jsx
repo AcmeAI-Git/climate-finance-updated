@@ -240,7 +240,12 @@ const ProjectFormSections = ({
             {/* Rural/Urban Segregation */}
             <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Rural/Urban Segregation
+                    <span
+                        translate={language === 'bn' ? 'no' : undefined}
+                        className={language === 'bn' ? 'notranslate' : undefined}
+                    >
+                        {language === 'bn' ? 'গ্রামীণ/শহুরে বিভাজন' : 'Rural/Urban Segregation'}
+                    </span>
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
                     {formFieldDescriptions.location_segregation}
@@ -253,10 +258,22 @@ const ProjectFormSections = ({
                             onChange={handleInputChange}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                         >
-                            <option value="">Select Location Segregation</option>
-                            <option value="Rural">Rural</option>
-                            <option value="Urban">Urban</option>
-                            <option value="Both">Both</option>
+                            <option
+                                value=""
+                                translate={language === 'bn' ? 'no' : undefined}
+                                className={language === 'bn' ? 'notranslate' : undefined}
+                            >
+                                {language === 'bn' ? 'বিভাজন নির্বাচন করুন' : 'Select Location Segregation'}
+                            </option>
+                            <option value="Rural" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                {language === 'bn' ? 'গ্রামীণ' : 'Rural'}
+                            </option>
+                            <option value="Urban" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                {language === 'bn' ? 'শহুরে' : 'Urban'}
+                            </option>
+                            <option value="Both" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                {language === 'bn' ? 'উভয়' : 'Both'}
+                            </option>
                         </select>
                     </div>
                 </div>

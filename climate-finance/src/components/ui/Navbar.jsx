@@ -84,7 +84,7 @@ const Navbar = () => {
                                 </h1>
                             </div>
                             <p className="text-xs text-gray-500 font-medium tracking-wide">
-                                Climate-resilient WASH finance tracker
+                                {language === 'bn' ? 'জলবায়ু-সহনশীল WASH ফাইন্যান্স ট্র্যাকার' : 'Climate-resilient WASH finance tracker'}
                             </p>
                         </button>
                     </div>
