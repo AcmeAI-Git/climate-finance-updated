@@ -262,7 +262,7 @@ const LandingPage = () => {
             } else {
                 setWashDistribution([]);
             }
-        } catch (e) {
+        } catch {
             setWashDistribution([]);
         }
     };
@@ -315,6 +315,12 @@ const LandingPage = () => {
         projectsByStatus,
         language,
         "status"
+    );
+
+    const translatedWashDistribution = translateChartData(
+        washDistribution,
+        language,
+        "washBudget"
     );
 
     const getAddProjectPath = () => {
@@ -468,8 +474,8 @@ const LandingPage = () => {
                 >
                     {washDistribution.length > 0 ? (
                         <PieChartComponent
-                            title="WASH vs Non-WASH Budget (USD)"
-                            data={washDistribution}
+                            title={getChartTitle(language, "washvsnonwash")}
+                            data={translatedWashDistribution}
                         />
                     ) : (
                         <Card hover padding={true}>

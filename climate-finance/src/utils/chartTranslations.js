@@ -16,7 +16,7 @@ export const chartTranslations = {
         projectYear: "Number of Projects",
         projectByYear: "Projects By Year",
         regionalDistributionMap: "Regional Distribution Map",
-        washvsnonwash: "WASH vs Climate Finance",
+        washvsnonwash: "WASH vs Non-WASH Budget (USD)",
 
         // Status translations
         status: {
@@ -93,6 +93,11 @@ export const chartTranslations = {
             "Bangladesh Climate Change Trust Fund":
                 "Bangladesh Climate Change Trust Fund",
         },
+        // WASH Budget Category
+        washBudget: {
+            "WASH Budget (USD)": "WASH Budget (USD)",
+            "Non-WASH Budget (USD)": "Non-WASH Budget (USD)",
+        },
         // WASH Component
         washComponent: {
             "Water Supply": "Water Supply",
@@ -140,7 +145,7 @@ export const chartTranslations = {
         projectYear: "প্রকল্প গতি",
         projectByYear: "বছর অনুযায়ী প্রকল্প",
         regionalDistributionMap: "আঞ্চলিক বণ্টন চিত্র",
-        washvsnonwash: "ওয়াশ বনাম ক্লাইমেট ফাইন্যান্স",
+        washvsnonwash: "ওয়াশ বনাম নন-ওয়াশ",
 
         // Status translations
         status: {
@@ -216,6 +221,11 @@ export const chartTranslations = {
             "Green Climate Fund": "গ্রীন ক্লাইমেট ফাউন্ডেশন",
             "Bangladesh Climate Change Trust Fund":
                 "বাংলাদেশ ক্লাইমেট চ্যান্স ফাউন্ডেশন",
+        },
+        // WASH Budget Category
+        washBudget: {
+            "WASH Budget (USD)": "ওয়াশ বাজেট (ইউএসডি)",
+            "Non-WASH Budget (USD)": "নন-ওয়াশ বাজেট (ইউএসডি)",
         },
         // WASH Component
         washComponent: {
