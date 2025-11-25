@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {Mail, AlertTriangle, Linkedin, Facebook} from "lucide-react";
+import { Mail, AlertTriangle, Linkedin, Facebook } from "lucide-react";
 import Button from "./Button";
 import ReportIssueModal from "./ReportIssueModal";
 
@@ -8,8 +8,16 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     const socialLinks = [
-        { icon: <Facebook size={16} />, href: "https://www.facebook.com/AcmeAILtd", label: "Twitter" },
-        { icon: <Linkedin size={16} />, href: "https://www.linkedin.com/company/acme-ai/", label: "Linkedin" },
+        {
+            icon: <Facebook size={16} />,
+            href: "https://www.facebook.com/AcmeAILtd",
+            label: "Twitter",
+        },
+        {
+            icon: <Linkedin size={16} />,
+            href: "https://www.linkedin.com/company/acme-ai/",
+            label: "Linkedin",
+        },
         {
             icon: <Mail size={16} />,
             href: "mailto:info@acmeai.tech",
@@ -43,8 +51,8 @@ const Footer = () => {
             src: "/wri.png",
             alt: "WRI",
             href: "https://www.wri.org/",
-            width: 70,
-            height: 70,
+            width: 80,
+            height: 80,
         },
     ];
 
@@ -56,11 +64,9 @@ const Footer = () => {
                         <div className="flex flex-col gap-y-2">
                             {/* Copyright */}
                             <p className="text-sm text-gray-500 text-center md:text-left">
-                                © {currentYear} Bangladesh Climate Finance
-                                Tracker. All rights reserved.
+                                Copyright © WaterAid Bangladesh/{currentYear}.
                             </p>
-                            <div
-                                className="text-sm text-gray-500 justify-center items-center md:justify-start flex flex-row gap-x-4">
+                            <div className="text-sm text-gray-500 justify-center items-center md:justify-start flex flex-row gap-x-4">
                                 {partners.map((partner) => (
                                     <a
                                         key={partner.alt}
@@ -100,7 +106,7 @@ const Footer = () => {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setIsReportModalOpen(true)}
-                                    leftIcon={<AlertTriangle size={14}/>}
+                                    leftIcon={<AlertTriangle size={14} />}
                                     className="text-gray-500 hover:text-orange-600 hover:bg-orange-50 ml-2"
                                 >
                                     Report Issue
@@ -115,7 +121,11 @@ const Footer = () => {
                                     rel="noopener noreferrer"
                                     className="flex-shrink-0"
                                 >
-                                    <div className={"flex gap-x-2 justify-center items-center"}>
+                                    <div
+                                        className={
+                                            "flex gap-x-2 justify-center items-center"
+                                        }
+                                    >
                                         <img
                                             src={partners[1].src}
                                             alt={partners[1].alt}
@@ -123,10 +133,11 @@ const Footer = () => {
                                             height={partners[1].height}
                                             className="object-contain"
                                         />
-                                        <p className={"text-blue-500"}>www.acmeai.tech</p>
+                                        <p className={"text-blue-500"}>
+                                            www.acmeai.tech
+                                        </p>
                                     </div>
                                 </a>
-
                             </div>
                         </div>
                     </div>
