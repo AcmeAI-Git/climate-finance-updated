@@ -5,6 +5,7 @@ import RadioWithSliders from "../../components/ui/RadioWithSliders";
 import SingleSlider from "../../components/ui/SingleSlider";
 import { sdgList } from "../../constants/sdgList";
 import { formFieldDescriptions } from "../../constants/formFieldDescriptions";
+import { useLanguage } from "../../context/LanguageContext";
 
 const ProjectFormSections = ({
     formData,
@@ -15,6 +16,12 @@ const ProjectFormSections = ({
     setFormData, // Added setFormData prop
 }) => {
     const navigate = useNavigate();
+    const { language } = useLanguage();
+    // helper to convert western digits to Bengali numerals
+    const toBengaliNumeral = (num) => {
+        const beng = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        return String(num).split('').map(ch => (ch >= '0' && ch <= '9') ? beng[Number(ch)] : ch).join('');
+    };
     const [districtsData, setDistrictsData] = useState({});
     const [availableDistricts, setAvailableDistricts] = useState([]);
     const [availableDivisions, setAvailableDivisions] = useState([]);
@@ -435,15 +442,15 @@ const ProjectFormSections = ({
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Alignment (SDG/NAP/CFF)
                 </h3>
-                <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                    {formFieldDescriptions.alignment_sdg}
-                </p>
                 <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
                     {/* SDG Selection */}
                     <div>
                         <h4 className="text-sm font-semibold text-gray-800 mb-3">
                             Sustainable Development Goals (SDGs)
                         </h4>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                        {formFieldDescriptions.alignment_sdg}
+                        </p>
                         <CheckboxGroup
                             label="Select SDGs"
                             options={sdgList}
@@ -452,7 +459,11 @@ const ProjectFormSections = ({
                                 setFormData((prev) => ({ ...prev, alignment_sdg: values }))
                             }
                             getOptionId={(sdg) => sdg.id}
-                            getOptionLabel={(sdg) => `${sdg.number}: ${sdg.title}`}
+                            getOptionLabel={(sdg) =>
+                                language === 'bn'
+                                    ? `${toBengaliNumeral(sdg.id)}: ${sdg.banglaTitle || sdg.title}`
+                                    : `${sdg.id}: ${sdg.title}`
+                            }
                         />
                     </div>
 

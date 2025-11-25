@@ -65,13 +65,13 @@ const CheckboxGroup = ({
                   className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-400 rounded transition-colors duration-200"
                 />
                 <div className="flex-1 min-w-0">
-                  <span className={`text-sm font-medium block transition-colors duration-200 ${
+                  <span className={`text-sm font-medium block transition-colors duration-200 leading-relaxed wrap-break-word whitespace-normal ${
                     isSelected ? 'text-purple-800' : 'text-gray-900 group-hover:text-purple-700'
                   }`}>
                     {getOptionLabel(option)}
                   </span>
                   {subtext && (
-                    <span className={`text-xs block mt-1 transition-colors duration-200 ${
+                    <span className={`text-xs block mt-1 transition-colors duration-200 leading-snug wrap-break-word whitespace-normal ${
                       isSelected ? 'text-purple-600' : 'text-gray-500 group-hover:text-purple-500'
                     }`}>
                       {subtext}

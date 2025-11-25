@@ -12,7 +12,7 @@ export const formFieldDescriptions = {
     gender_inclusion: "Describe how the project addresses gender and social inclusion, including specific actions or targets.",
     equity_marker: "Select the level of equity marker that best describes the project's approach to equity (Strong, Partial, Weak).",
     equity_marker_description: "Provide details on how the project promotes equity and addresses disparities.",
-    alignment_sdg: "Select the Sustainable Development Goals (SDGs) that the project aligns with.",
+    alignment_sdg: "Select the SDGs that the project aligns with.",
     alignment_nap: "Describe how the project aligns with National Adaptation Plans (NAP).",
     alignment_cff: "Describe how the project aligns with Climate Fiscal Frameworks (CFF).",
     assessment: "Provide an assessment of the project's expected impact, risks, and monitoring plans."

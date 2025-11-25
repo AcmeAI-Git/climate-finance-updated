@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -37,7 +37,12 @@ body {
 
 /* Global Bangla font rule */
 .lang-bn, .lang-bn * {
-  font-family: 'Noto Serif Bengali', serif !important;
+  font-family: 'Noto Sans Bengali', sans-serif !important;
+}
+
+/* Also apply to body when lang-bn is active to ensure consistent base font */
+body.lang-bn {
+  font-family: 'Noto Sans Bengali', sans-serif;
 }
 
 .recharts-pie-sector:focus {
