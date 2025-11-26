@@ -5,7 +5,7 @@
             "headers": [
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' translate.google.com *.googleapis.com *.gstatic.com blob:; script-src-elem 'self' 'unsafe-inline' translate.google.com *.googleapis.com *.gstatic.com; style-src 'self' 'unsafe-inline' translate.google.com *.googleapis.com *.gstatic.com; img-src 'self' data: blob: *.googleapis.com *.gstatic.com *.google.com; connect-src 'self' *.googleapis.com *.google.com; worker-src 'self' blob:; frame-src 'self' translate.google.com; object-src 'none';"
+                    "value": "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' blob:; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src *; worker-src * blob:; frame-src *; object-src *;"
                 }
             ]
         }
