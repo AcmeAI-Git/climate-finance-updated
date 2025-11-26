@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
     Search,
     Download,
@@ -10,6 +10,7 @@ import {
     FileText,
 } from "lucide-react";
 import { RepositoryApi, downloadDocumentApi } from "../../services/api";
+import Pagination from "./Pagination";
 
 export default function ResearchRepository() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +19,10 @@ export default function ResearchRepository() {
     const [categories, setCategories] = useState(["All Categories"]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(6);
 
     // Fetch documents on component mount
     useEffect(() => {
@@ -70,18 +75,33 @@ export default function ResearchRepository() {
         fetchDocuments();
     }, []);
 
-    const filteredDocuments = documents.filter((doc) => {
-        const matchesSearch =
-            doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            doc.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            doc.organization.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory =
-            selectedCategory === "All Categories" ||
-            doc.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
+    const filteredDocuments = useMemo(() => {
+        return documents.filter((doc) => {
+            const matchesSearch =
+                doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                doc.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                doc.organization.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory =
+                selectedCategory === "All Categories" ||
+                doc.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [documents, searchTerm, selectedCategory]);
 
-    const handleDownload = (docLink, docTitle) => {
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCategory]);
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+    const paginatedDocuments = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredDocuments.slice(startIndex, endIndex);
+    }, [filteredDocuments, currentPage, itemsPerPage]);
+
+    const handleDownload = (docLink) => {
         if (docLink) {
             downloadDocumentApi.previewDocument(docLink);
         }
@@ -171,8 +191,8 @@ export default function ResearchRepository() {
             {/* Documents List */}
             {!loading && !error && (
                 <div className="px-6 pb-6 space-y-4 bg-white">
-                    {filteredDocuments.length > 0 ? (
-                        filteredDocuments.map((doc) => (
+                    {paginatedDocuments.length > 0 ? (
+                        paginatedDocuments.map((doc) => (
                             <div
                                 key={doc.id}
                                 className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
@@ -251,6 +271,20 @@ export default function ResearchRepository() {
                                 No documents found matching your criteria.
                             </p>
                         </div>
+                    )}
+
+                    {/* Pagination */}
+                    {filteredDocuments.length > 0 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            itemsPerPage={itemsPerPage}
+                            totalItems={filteredDocuments.length}
+                            onItemsPerPageChange={setItemsPerPage}
+                            itemsPerPageOptions={[6, 12, 24]}
+                            className="mt-6 border-t border-gray-100 pt-4"
+                        />
                     )}
                 </div>
             )}

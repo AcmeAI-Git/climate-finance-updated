@@ -12,6 +12,7 @@ import PageHeader from "../components/layouts/PageHeader";
 import SearchFilter from "../components/ui/SearchFilter";
 import Loading from "../components/ui/Loading";
 import ExportButton from "../components/ui/ExportButton";
+import Pagination from "../components/ui/Pagination";
 import {
     FolderOpen,
     Activity,
@@ -55,6 +56,10 @@ const Projects = () => {
 
     // Add filtered projects state
     const [filteredProjects, setFilteredProjects] = useState([]);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(9);
 
     const [agencies, setAgencies] = useState([]);
     const [fundingSources, setFundingSources] = useState([]);
@@ -199,6 +204,19 @@ const Projects = () => {
             setFilteredProjects(projectsList);
         }
     }, [projectsList]);
+
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filteredProjects]);
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+    const paginatedProjects = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredProjects.slice(startIndex, endIndex);
+    }, [filteredProjects, currentPage, itemsPerPage]);
 
     const getProjectsConfig = useMemo(() => {
         if (!projectsList || projectsList.length === 0) {
@@ -577,7 +595,7 @@ const Projects = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        {filteredProjects.map((project, index) => (
+                        {paginatedProjects.map((project, index) => (
                             <div
                                 key={project.project_id || `project-${index}`}
                                 className="animate-fade-in-up"
@@ -732,6 +750,20 @@ const Projects = () => {
                             </div>
                         ))}
                     </div>
+                )}
+
+                {/* Pagination */}
+                {filteredProjects.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        itemsPerPage={itemsPerPage}
+                        totalItems={filteredProjects.length}
+                        onItemsPerPageChange={setItemsPerPage}
+                        itemsPerPageOptions={[6, 9, 12, 24]}
+                        className="mt-6 border-t border-gray-100 pt-4"
+                    />
                 )}
 
                 {filteredProjects.length === 0 && projectsList.length > 0 && (
