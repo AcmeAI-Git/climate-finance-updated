@@ -30,6 +30,7 @@
         "react-leaflet": "^5.0.0",
         "react-router-dom": "^7.6.0",
         "recharts": "^2.15.3",
+        "vercel": "^48.10.14",
         "victory": "^37.3.6"
     },
     "devDependencies": {
