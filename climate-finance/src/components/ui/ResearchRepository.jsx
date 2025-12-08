@@ -15,8 +15,12 @@ import Pagination from "./Pagination";
 export default function ResearchRepository() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
+    const [selectedOrganization, setSelectedOrganization] = useState("All Organizations");
+    const [selectedYear, setSelectedYear] = useState("All Years");
     const [documents, setDocuments] = useState([]);
     const [categories, setCategories] = useState(["All Categories"]);
+    const [organizations, setOrganizations] = useState(["All Organizations"]);
+    const [years, setYears] = useState(["All Years"]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -48,6 +52,7 @@ export default function ResearchRepository() {
                                 day: "numeric",
                             }
                         ),
+                        year: new Date(doc.created_at).getFullYear(),
                         size: `${doc.document_size} MB`,
                         documentLink: doc.document_link,
                         color: "bg-purple-100",
@@ -61,6 +66,20 @@ export default function ResearchRepository() {
                         ...new Set(transformedDocs.map((doc) => doc.category)),
                     ];
                     setCategories(uniqueCategories);
+
+                    // Extract unique organizations
+                    const uniqueOrganizations = [
+                        "All Organizations",
+                        ...new Set(transformedDocs.map((doc) => doc.organization).filter(Boolean)),
+                    ];
+                    setOrganizations(uniqueOrganizations);
+
+                    // Extract unique years
+                    const uniqueYears = [
+                        "All Years",
+                        ...new Set(transformedDocs.map((doc) => doc.year).sort((a, b) => b - a)),
+                    ];
+                    setYears(uniqueYears);
                 } else {
                     setError("Invalid response format from server");
                 }
@@ -84,14 +103,20 @@ export default function ResearchRepository() {
             const matchesCategory =
                 selectedCategory === "All Categories" ||
                 doc.category === selectedCategory;
-            return matchesSearch && matchesCategory;
+            const matchesOrganization =
+                selectedOrganization === "All Organizations" ||
+                doc.organization === selectedOrganization;
+            const matchesYear =
+                selectedYear === "All Years" ||
+                doc.year === selectedYear;
+            return matchesSearch && matchesCategory && matchesOrganization && matchesYear;
         });
-    }, [documents, searchTerm, selectedCategory]);
+    }, [documents, searchTerm, selectedCategory, selectedOrganization, selectedYear]);
 
     // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, selectedCategory]);
+    }, [searchTerm, selectedCategory, selectedOrganization, selectedYear]);
 
     // Pagination calculations
     const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
@@ -138,25 +163,83 @@ export default function ResearchRepository() {
                         />
                     </div>
 
-                    {/* Category Filter */}
-                    <div className="relative w-full sm:w-48">
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) =>
-                                setSelectedCategory(e.target.value)
-                            }
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white"
+                    {/* Filter Dropdowns */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Category Filter */}
+                        <div className="relative">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) =>
+                                    setSelectedCategory(e.target.value)
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white"
+                            >
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown
+                                className="absolute right-3 top-2.5 text-gray-400 pointer-events-none"
+                                size={18}
+                            />
+                        </div>
+
+                        {/* Organization Filter */}
+                        <div className="relative">
+                            <select
+                                value={selectedOrganization}
+                                onChange={(e) =>
+                                    setSelectedOrganization(e.target.value)
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white"
+                            >
+                                {organizations.map((org) => (
+                                    <option key={org} value={org}>
+                                        {org}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown
+                                className="absolute right-3 top-2.5 text-gray-400 pointer-events-none"
+                                size={18}
+                            />
+                        </div>
+
+                        {/* Year Filter */}
+                        <div className="relative">
+                            <select
+                                value={selectedYear}
+                                onChange={(e) =>
+                                    setSelectedYear(e.target.value === "All Years" ? "All Years" : parseInt(e.target.value))
+                                }
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white"
+                            >
+                                {years.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown
+                                className="absolute right-3 top-2.5 text-gray-400 pointer-events-none"
+                                size={18}
+                            />
+                        </div>
+
+                        {/* Clear Filters Button */}
+                        <button
+                            onClick={() => {
+                                setSearchTerm("");
+                                setSelectedCategory("All Categories");
+                                setSelectedOrganization("All Organizations");
+                                setSelectedYear("All Years");
+                            }}
+                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
                         >
-                            {categories.map((cat) => (
-                                <option key={cat} value={cat}>
-                                    {cat}
-                                </option>
-                            ))}
-                        </select>
-                        <ChevronDown
-                            className="absolute right-3 top-2.5 text-gray-400 pointer-events-none"
-                            size={18}
-                        />
+                            Clear Filters
+                        </button>
                     </div>
                 </div>
             </div>
@@ -201,7 +284,7 @@ export default function ResearchRepository() {
                                     <div className="flex gap-4">
                                         {/* Icon */}
                                         <div
-                                            className={`${doc.color} w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0`}
+                                            className={`${doc.color} w-12 h-12 rounded-lg flex items-center justify-center shrink-0`}
                                         >
                                             <FileText />
                                         </div>
