@@ -59,6 +59,7 @@ const defaultFormData = {
     climate_relevance_category: "",
     climate_relevance_justification: "",
     location_segregation: "",
+    supporting_link: "",
 };
 
 const formatDateForInput = (dateStr) => {
@@ -197,6 +198,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         projectData.climate_relevance_justification || "",
                     location_segregation:
                         projectData.location_segregation || "",
+                    supporting_link: projectData.supporting_link || "",
                 });
             } else {
                 throw new Error("Project not found");
@@ -499,6 +501,12 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     selectedFile.name
                 );
             }
+
+            // Append supporting link if provided
+            formDataToSend.append(
+                "supporting_link",
+                formData.supporting_link || ""
+            );
 
             // Append array fields as JSON strings (to match sample)
             formDataToSend.append(
@@ -1206,9 +1214,33 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     {/* Supporting Documents */}
                     <div>
                         <h3 className="text-lg font-medium text-gray-900 mb-4">
-                            Supporting Documents
+                            Supporting Documents & Links
                         </h3>
-                        <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
+                        <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm space-y-6">
+                            {/* Supporting Link */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Supporting Link
+                                </label>
+                                <p className="text-sm text-gray-500 mb-3">
+                                    Add a URL to a website, document, or resource that provides additional information about your project.
+                                </p>
+                                <input
+                                    type="url"
+                                    name="supporting_link"
+                                    value={formData.supporting_link || ""}
+                                    onChange={handleInputChange}
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="https://example.com/project-details"
+                                />
+                                {errors.supporting_link && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.supporting_link}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Project Document Upload */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Project Document

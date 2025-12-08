@@ -51,9 +51,9 @@ export const getRepositoryTransliteration = (language) => {
 
 export const getDeshboardDescriptionTransliteration = (language) => {
     if (language === "bn") {
-        return "বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ রিয়েল-টাইমে ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন। সহজ ও বিস্তারিত প্রতিবেদনের মাধ্যমে একটি সমগ্র ওভারভিউ পান।";
+        return "বাংলাদেশে জলবায়ু অর্থায়নের প্রবাহ ট্র্যাক, বিশ্লেষণ ও চিত্রায়িত করুন।";
     }
-    return "Track, analyze and visualize climate finance flows in Bangladesh with real-time overview and comprehensive reporting.";
+    return "Track, analyze and visualize climate finance flows in Bangladesh.";
 };
 
 export const getRepositoryCardDescriptionTransliteration = (language) => {
