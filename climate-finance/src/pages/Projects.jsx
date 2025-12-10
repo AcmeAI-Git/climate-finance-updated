@@ -459,6 +459,45 @@ const Projects = () => {
         }
     };
 
+    const getTimelineYears = (beginning, closing) => {
+        if (!beginning && !closing) return null;
+        
+        // Handle "Ongoing" string
+        if (closing === "Ongoing" || closing === "ongoing") {
+            const startDate = new Date(beginning);
+            if (!isNaN(startDate.getTime())) {
+                const startYear = startDate.getFullYear();
+                return `${startYear} - Ongoing`;
+            }
+        }
+        
+        // Extract years from dates
+        const startDate = beginning ? new Date(beginning) : null;
+        const endDate = closing ? new Date(closing) : null;
+        
+        if (startDate && !isNaN(startDate.getTime()) && endDate && !isNaN(endDate.getTime())) {
+            const startYear = startDate.getFullYear();
+            const endYear = endDate.getFullYear();
+            
+            if (startYear === endYear) {
+                return `${startYear}`;
+            }
+            return `${startYear} - ${endYear}`;
+        }
+        
+        // Fallback: try to extract year from string if date parsing fails
+        if (beginning) {
+            const yearMatch = beginning.match(/\d{4}/);
+            if (yearMatch) {
+                return closing && closing !== "Ongoing" 
+                    ? `${yearMatch[0]} - ${closing.match(/\d{4}/)?.[0] || closing}`
+                    : yearMatch[0];
+            }
+        }
+        
+        return null;
+    };
+
     const handleViewDetails = (e, projectId) => {
         e.stopPropagation();
         navigate(`/projects/${projectId}`);
@@ -880,26 +919,16 @@ const Projects = () => {
                                                 </div>
                                             )}
 
-                                            {project.beginning &&
-                                                project.closing && (
-                                                    <div className="text-sm">
-                                                        <span className="text-gray-600 font-medium">
-                                                            Duration:
-                                                        </span>
-                                                        <div className="text-gray-700 mt-1 text-xs">
-                                                            {formatDate(
-                                                                project.beginning
-                                                            )}{" "}
-                                                            -{" "}
-                                                            {project.closing ===
-                                                            "Ongoing"
-                                                                ? project.closing
-                                                                : formatDate(
-                                                                      project.closing
-                                                                  )}
-                                                        </div>
+                                            {getTimelineYears(project.beginning, project.closing) && (
+                                                <div className="text-sm">
+                                                    <span className="text-gray-600 font-medium">
+                                                        Duration:
+                                                    </span>
+                                                    <div className="text-gray-700 mt-1 text-xs">
+                                                        {getTimelineYears(project.beginning, project.closing)}
                                                     </div>
-                                                )}
+                                                </div>
+                                            )}
 
                                             {project.agencies &&
                                                 project.agencies.length > 0 && (

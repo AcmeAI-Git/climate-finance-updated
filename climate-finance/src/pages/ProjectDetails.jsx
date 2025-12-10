@@ -156,11 +156,27 @@ const ProjectDetails = () => {
 
     const getTimeline = (proj) => {
         if (proj.beginning && proj.closing) {
-            return `${new Date(
-                proj.beginning
-            ).toLocaleDateString()} - ${new Date(
-                proj.closing
-            ).toLocaleDateString()}`;
+            // Handle "Ongoing" string
+            if (proj.closing === "Ongoing" || proj.closing === "ongoing") {
+                const startYear = new Date(proj.beginning).getFullYear();
+                if (!isNaN(startYear)) {
+                    return `${startYear} - Ongoing`;
+                }
+            }
+            
+            // Extract years from dates
+            const startDate = new Date(proj.beginning);
+            const endDate = new Date(proj.closing);
+            
+            if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                const startYear = startDate.getFullYear();
+                const endYear = endDate.getFullYear();
+                
+                if (startYear === endYear) {
+                    return `${startYear}`;
+                }
+                return `${startYear} - ${endYear}`;
+            }
         }
         return proj.timeline || "Not specified";
     };
@@ -559,7 +575,7 @@ const ProjectDetails = () => {
                                 <div className="text-sm text-gray-600 font-medium mb-1">
                                     Direct Beneficiaries:
                                 </div>
-                                <div className="text-lg font-semibold text-gray-900">
+                                <div className="text-sm font-semibold text-gray-900">
                                     {" "}
                                     {project.direct_beneficiaries > 0
                                         ? project.direct_beneficiaries.toLocaleString()
@@ -571,7 +587,7 @@ const ProjectDetails = () => {
                                 <div className="text-sm text-gray-600 font-medium mb-1">
                                     Indirect Beneficiaries
                                 </div>
-                                <div className="text-lg font-semibold text-gray-900">
+                                <div className="text-sm font-semibold text-gray-900">
                                     {project.indirect_beneficiaries > 0
                                         ? project.indirect_beneficiaries.toLocaleString()
                                         : "Not Available"}
@@ -739,7 +755,7 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             )}
-                            {project.alignment_nap && (
+                            {project.alignment_nap && project.alignment_nap.trim() && (
                                 <div>
                                     <div className="text-sm text-gray-600 font-medium mb-1">
                                         NAP Alignment
@@ -749,13 +765,23 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             )}
-                            {project.alignment_cff && (
+                            {project.alignment_cff && project.alignment_cff.trim() && (
                                 <div>
                                     <div className="text-sm text-gray-600 font-medium mb-1">
                                         CFF Alignment
                                     </div>
                                     <div className="text-sm text-gray-700">
                                         {project.alignment_cff}
+                                    </div>
+                                </div>
+                            )}
+                            {project.other_alignment && project.other_alignment.trim() && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        Other Alignment
+                                    </div>
+                                    <div className="text-sm text-gray-700">
+                                        {project.other_alignment}
                                     </div>
                                 </div>
                             )}
