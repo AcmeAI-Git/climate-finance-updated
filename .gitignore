@@ -170,3 +170,8 @@ coverage/
 test/
 *.xlsx
 *.xls
+
+
+migration/
+parse-excel.js
+parsed-excel-data.json

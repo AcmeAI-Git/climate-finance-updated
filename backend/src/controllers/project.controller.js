@@ -260,3 +260,77 @@ exports.getDistrictProjectDistribution = async (req, res) => {
         });
     }
 };
+
+// ================== NEW STATISTICS ENDPOINTS ==================
+
+exports.getProjectByHotspot = async (req, res) => {
+    try {
+        const response = await Project.getProjectByHotspot();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getProjectByVulnerabilityType = async (req, res) => {
+    try {
+        const response = await Project.getProjectByVulnerabilityType();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getProjectByPortfolioType = async (req, res) => {
+    try {
+        const response = await Project.getProjectByPortfolioType();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getImplementingEntityStats = async (req, res) => {
+    try {
+        const response = await Project.getImplementingEntityStats();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getExecutingAgencyStats = async (req, res) => {
+    try {
+        const response = await Project.getExecutingAgencyStats();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
+
+exports.getDeliveryPartnerStats = async (req, res) => {
+    try {
+        const response = await Project.getDeliveryPartnerStats();
+        res.status(200).json({ status: true, data: response });
+    } catch (e) {
+        res.status(500).json({
+            status: false,
+            message: `Server Error: ${e.message}`,
+        });
+    }
+};
