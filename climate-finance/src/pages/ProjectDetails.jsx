@@ -317,9 +317,11 @@ const ProjectDetails = () => {
                                         Direct Beneficiaries:
                                     </span>
                                     <span className="text-gray-600 ml-2">
-                                        {Number(
-                                            project.direct_beneficiaries
-                                        ).toLocaleString()}
+                                        {project.direct_beneficiaries > 0
+                                            ? Number(
+                                                  project.direct_beneficiaries
+                                              ).toLocaleString()
+                                            : "Not Available"}
                                     </span>
                                 </div>
                             )}
@@ -330,9 +332,11 @@ const ProjectDetails = () => {
                                         Indirect Beneficiaries:
                                     </div>
                                     <span className="text-gray-600 ml-2">
-                                        {Number(
-                                            project.indirect_beneficiaries
-                                        ).toLocaleString()}
+                                        {project.indirect_beneficiaries > 0
+                                            ? Number(
+                                                  project.indirect_beneficiaries
+                                              ).toLocaleString()
+                                            : "Not Available"}
                                     </span>
                                 </div>
                             )}
@@ -554,7 +558,9 @@ const ProjectDetails = () => {
                                 </div>
                                 <div className="text-lg font-semibold text-gray-900">
                                     {" "}
-                                    {project.direct_beneficiaries.toLocaleString()}
+                                    {project.direct_beneficiaries > 0
+                                        ? project.direct_beneficiaries.toLocaleString()
+                                        : "Not Available"}
                                 </div>
                             </div>
 
@@ -563,7 +569,9 @@ const ProjectDetails = () => {
                                     Indirect Beneficiaries
                                 </div>
                                 <div className="text-lg font-semibold text-gray-900">
-                                    {project.indirect_beneficiaries.toLocaleString()}
+                                    {project.indirect_beneficiaries > 0
+                                        ? project.indirect_beneficiaries.toLocaleString()
+                                        : "Not Available"}
                                 </div>
                             </div>
 

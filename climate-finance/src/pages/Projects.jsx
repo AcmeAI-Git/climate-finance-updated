@@ -52,7 +52,14 @@ const Projects = () => {
         geographic_division: "All",
         agency_id: "All",
         funding_source_id: "All",
+        sector: "All",
+        type: "All",
+        hotspot_vulnerability_type: "All",
+        districts: "All",
     });
+    
+    // Year range filter (separate from dropdown filters)
+    const [yearRange, setYearRange] = useState({ min: null, max: null });
 
     // Add filtered projects state
     const [filteredProjects, setFilteredProjects] = useState([]);
@@ -198,12 +205,41 @@ const Projects = () => {
           })
         : [];
 
+    // Intermediate filtered state (from SearchFilter)
+    const [searchFilteredProjects, setSearchFilteredProjects] = useState([]);
+
     // Set default filtered projects when projectsList changes
     useEffect(() => {
         if (projectsList.length > 0) {
-            setFilteredProjects(projectsList);
+            setSearchFilteredProjects(projectsList);
         }
     }, [projectsList]);
+
+    // Apply year range filter on top of SearchFilter results
+    useEffect(() => {
+        if (!searchFilteredProjects || searchFilteredProjects.length === 0) {
+            setFilteredProjects([]);
+            return;
+        }
+
+        // If no year range is set, use all searchFiltered projects
+        if (!yearRange.min && !yearRange.max) {
+            setFilteredProjects(searchFilteredProjects);
+            return;
+        }
+
+        const filtered = searchFilteredProjects.filter((project) => {
+            if (!project.beginning) return true; // Include projects without dates
+            const projectYear = parseInt(project.beginning.substring(0, 4), 10);
+            if (isNaN(projectYear)) return true;
+            
+            const minY = yearRange.min || 0;
+            const maxY = yearRange.max || 9999;
+            return projectYear >= minY && projectYear <= maxY;
+        });
+
+        setFilteredProjects(filtered);
+    }, [searchFilteredProjects, yearRange]);
 
     // Reset to first page when filters change
     useEffect(() => {
@@ -250,6 +286,44 @@ const Projects = () => {
         const equityMarkers = Array.from(
             new Set(projectsList.map((p) => p.equity_marker).filter(Boolean))
         ).sort();
+        
+        // Extract years from beginning date (duration) only
+        const allYears = projectsList
+            .map((p) => {
+                if (p.beginning) {
+                    const year = parseInt(p.beginning.substring(0, 4), 10);
+                    return isNaN(year) ? null : year;
+                }
+                return null;
+            })
+            .filter(Boolean);
+        
+        const minYear = allYears.length > 0 ? Math.min(...allYears) : null;
+        const maxYear = allYears.length > 0 ? Math.max(...allYears) : null;
+
+        const sectors = Array.from(
+            new Set(projectsList.map((p) => p.sector).filter(Boolean))
+        ).sort();
+
+        const types = Array.from(
+            new Set(projectsList.map((p) => p.type).filter(Boolean))
+        ).sort();
+
+        const vulnerabilityTypes = Array.from(
+            new Set(projectsList.map((p) => p.hotspot_vulnerability_type).filter(Boolean))
+        ).sort();
+
+        const districtsList = Array.from(
+            new Set(
+                projectsList
+                    .flatMap((p) =>
+                        Array.isArray(p.districts)
+                            ? p.districts
+                            : [p.districts]
+                    )
+                    .filter(Boolean)
+            )
+        ).sort();
 
         const filters = [];
         filters.push({
@@ -260,6 +334,29 @@ const Projects = () => {
                 ...statuses.map((status) => ({ value: status, label: status })),
             ],
         });
+        
+        if (sectors.length > 0) {
+            filters.push({
+                key: "sector",
+                label: "Sector",
+                options: [
+                    { value: "All", label: "All Sectors" },
+                    ...sectors.map((sector) => ({ value: sector, label: sector })),
+                ],
+            });
+        }
+        
+        if (types.length > 0) {
+            filters.push({
+                key: "type",
+                label: "Project Type",
+                options: [
+                    { value: "All", label: "All Types" },
+                    ...types.map((type) => ({ value: type, label: type })),
+                ],
+            });
+        }
+        
         if (divisions.length > 0) {
             filters.push({
                 key: "geographic_division",
@@ -270,6 +367,18 @@ const Projects = () => {
                 ],
             });
         }
+        
+        if (districtsList.length > 0) {
+            filters.push({
+                key: "districts",
+                label: "Districts",
+                options: [
+                    { value: "All", label: "All Districts" },
+                    ...districtsList.map((district) => ({ value: district, label: district })),
+                ],
+            });
+        }
+        
         filters.push({
             key: "agency_id",
             label: "Agency",
@@ -286,6 +395,18 @@ const Projects = () => {
                 ...fundingSources.map((f) => ({ value: f.funding_source_id, label: f.name })),
             ],
         });
+        
+        if (vulnerabilityTypes.length > 0) {
+            filters.push({
+                key: "hotspot_vulnerability_type",
+                label: "Vulnerability Type",
+                options: [
+                    { value: "All", label: "All Vulnerability Types" },
+                    ...vulnerabilityTypes.map((type) => ({ value: type, label: type })),
+                ],
+            });
+        }
+        
         if (equityMarkers.length > 0) {
             filters.push({
                 key: "equity_marker",
@@ -319,6 +440,7 @@ const Projects = () => {
                 { key: "assessment", label: "Assessment", weight: 1 },
             ],
             filters: filters,
+            yearRange: { minYear, maxYear },
         };
     }, [projectsList, agencies, fundingSources]);
 
@@ -552,7 +674,7 @@ const Projects = () => {
 
                     <SearchFilter
                         data={projectsList}
-                        onFilteredData={setFilteredProjects}
+                        onFilteredData={setSearchFilteredProjects}
                         searchValue={searchTerm}
                         onSearchChange={setSearchTerm}
                         searchPlaceholder="Search projects by title, ID, objectives..."
@@ -568,9 +690,111 @@ const Projects = () => {
                                 geographic_division: "All",
                                 agency_id: "All",
                                 funding_source_id: "All",
+                                sector: "All",
+                                type: "All",
+                                hotspot_vulnerability_type: "All",
+                                districts: "All",
                             });
+                            setYearRange({ min: null, max: null });
                         }}
                     />
+                    
+                    {/* Year Range Filter */}
+                    {getProjectsConfig.yearRange.minYear && getProjectsConfig.yearRange.maxYear && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    Filter by Year:
+                                </label>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                        <label htmlFor="start-year" className="text-sm text-gray-600">
+                                            From:
+                                        </label>
+                                        <input
+                                            id="start-year"
+                                            type="number"
+                                            value={yearRange.min || ''}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (value === '') {
+                                                    setYearRange(prev => ({ ...prev, min: null }));
+                                                    return;
+                                                }
+                                                const year = parseInt(value, 10);
+                                                if (!isNaN(year)) {
+                                                    setYearRange(prev => ({ ...prev, min: year }));
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                const value = e.target.value;
+                                                if (value === '') return;
+                                                const year = parseInt(value, 10);
+                                                if (!isNaN(year)) {
+                                                    // Validate and adjust on blur
+                                                    if (year < getProjectsConfig.yearRange.minYear) {
+                                                        setYearRange(prev => ({ ...prev, min: getProjectsConfig.yearRange.minYear }));
+                                                    } else if (yearRange.max && year > yearRange.max) {
+                                                        setYearRange({ min: year, max: year });
+                                                    }
+                                                }
+                                            }}
+                                            placeholder={getProjectsConfig.yearRange.minYear.toString()}
+                                            className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <span className="text-gray-400">—</span>
+                                    <div className="flex items-center gap-2">
+                                        <label htmlFor="end-year" className="text-sm text-gray-600">
+                                            To:
+                                        </label>
+                                        <input
+                                            id="end-year"
+                                            type="number"
+                                            value={yearRange.max || ''}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (value === '') {
+                                                    setYearRange(prev => ({ ...prev, max: null }));
+                                                    return;
+                                                }
+                                                const year = parseInt(value, 10);
+                                                if (!isNaN(year)) {
+                                                    setYearRange(prev => ({ ...prev, max: year }));
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                const value = e.target.value;
+                                                if (value === '') return;
+                                                const year = parseInt(value, 10);
+                                                if (!isNaN(year)) {
+                                                    // Validate and adjust on blur
+                                                    if (year > getProjectsConfig.yearRange.maxYear) {
+                                                        setYearRange(prev => ({ ...prev, max: getProjectsConfig.yearRange.maxYear }));
+                                                    } else if (yearRange.min && year < yearRange.min) {
+                                                        setYearRange({ min: year, max: year });
+                                                    }
+                                                }
+                                            }}
+                                            placeholder={getProjectsConfig.yearRange.maxYear.toString()}
+                                            className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    {(yearRange.min || yearRange.max) && (
+                                        <button
+                                            onClick={() => setYearRange({ min: null, max: null })}
+                                            className="text-xs text-purple-600 hover:text-purple-700 underline ml-2"
+                                        >
+                                            Reset
+                                        </button>
+                                    )}
+                                </div>
+                                <span className="text-xs text-gray-500 ml-auto">
+                                    Available: {getProjectsConfig.yearRange.minYear} - {getProjectsConfig.yearRange.maxYear}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {projectsList.length === 0 ? (
@@ -782,13 +1006,16 @@ const Projects = () => {
                             onClick={() => {
                                 setSearchTerm("");
                                 setActiveFilters({
-                                    sector: "All",
                                     status: "All",
-                                    type: "All",
                                     geographic_division: "All",
                                     agency_id: "All",
                                     funding_source_id: "All",
+                                    sector: "All",
+                                    type: "All",
+                                    hotspot_vulnerability_type: "All",
+                                    districts: "All",
                                 });
+                                setYearRange({ min: null, max: null });
                             }}
                             variant="outline"
                         >
