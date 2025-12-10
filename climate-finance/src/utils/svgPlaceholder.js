@@ -81,7 +81,7 @@ export const generatePatternPlaceholder = (id, baseColor = '8B5CF6', size = 64) 
 /**
  * Generate an organizational logo placeholder based on organization type
  * @param {string} name - Organization name
- * @param {string} type - Organization type (Multilateral, Bilateral, etc.)
+ * @param {string|undefined} type - Organization type (Multilateral, Bilateral, etc.) - optional
  * @param {number} size - Size of the SVG
  * @returns {string} - SVG data URI
  */
@@ -95,6 +95,7 @@ export const generateOrganizationLogo = (name, type, size = 64) => {
     'NGO': 'D97706',          // Amber
   };
 
-  const color = typeColors[type] || '8B5CF6';
+  // Use default color if type is not provided or not found in typeColors
+  const color = type && typeColors[type] ? typeColors[type] : '8B5CF6';
   return generateInitialsPlaceholder(name, color, 'FFFFFF', size);
 };

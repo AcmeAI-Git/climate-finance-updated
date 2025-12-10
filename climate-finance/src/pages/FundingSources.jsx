@@ -29,7 +29,6 @@ const FundingSources = () => {
     // State management
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilters, setActiveFilters] = useState({
-        type: "All",
         region: "All",
         status: "All",
     });
@@ -41,7 +40,6 @@ const FundingSources = () => {
     // API data states
     const [fundingSourcesList, setFundingSourcesList] = useState([]);
     const [overviewStats, setOverviewStats] = useState([]);
-    const [fundingByType, setFundingByType] = useState([]);
     const [fundingTrend, setFundingTrend] = useState([]);
     const [topFundingSources, setTopFundingSources] = useState([]);
     const [fundingOverview, setFundingOverview] = useState(null);
@@ -139,9 +137,7 @@ const FundingSources = () => {
                 {
                     title: "Active Funding Sources",
                     value: overviewData.active_funding_source,
-                    change: `${
-                        new Set(sources.map((s) => s.type).filter(Boolean)).size
-                    } categories`,
+                    change: `${sources.length} total sources`,
                 },
                 {
                     title: "Committed Funds",
@@ -152,25 +148,6 @@ const FundingSources = () => {
                 },
             ]);
 
-            // Calculate funding by type
-            const typeData = sources.reduce((acc, fs) => {
-                const type =
-                    fs.type || (Number(fs.grant_amount) > 0 ? "Grant" : "Loan");
-                if (!acc[type]) acc[type] = { count: 0, totalAmount: 0 };
-                acc[type].count++;
-                acc[type].totalAmount +=
-                    Number(fs.grant_amount || 0) + Number(fs.loan_amount || 0);
-                return acc;
-            }, {});
-
-            const fundingByType = Object.entries(typeData).map(
-                ([name, data]) => ({
-                    name,
-                    value: Number(data.totalAmount) || 0,
-                    count: data.count,
-                })
-            );
-            setFundingByType(fundingByType);
 
             // Remove trend chart - set to empty
             setFundingTrend([]);
@@ -186,7 +163,6 @@ const FundingSources = () => {
             // Clear all data on error
             setFundingSourcesList([]);
             setOverviewStats([]);
-            setFundingByType([]);
             setFundingTrend([]);
         } finally {
             setIsLoading(false);
@@ -207,16 +183,10 @@ const FundingSources = () => {
                 (source.name?.toLowerCase() || "").includes(
                     searchTerm.toLowerCase()
                 ) ||
-                (source.type?.toLowerCase() || "").includes(
-                    searchTerm.toLowerCase()
-                ) ||
                 (String(source.funding_source_id || "").toLowerCase()).includes(
                     searchTerm.toLowerCase()
                 );
 
-            const matchesType =
-                activeFilters.type === "All" ||
-                source.type === activeFilters.type;
             const matchesRegion =
                 activeFilters.region === "All" ||
                 source.region === activeFilters.region;
@@ -225,7 +195,7 @@ const FundingSources = () => {
                 source.status === activeFilters.status;
 
             return (
-                matchesSearch && matchesType && matchesRegion && matchesStatus
+                matchesSearch && matchesRegion && matchesStatus
             );
         });
     }, [fundingSourcesList, searchTerm, activeFilters]);
@@ -301,7 +271,6 @@ const FundingSources = () => {
                             fundingSources: filteredSources,
                             overview: overviewStats,
                             chartData: {
-                                fundingByType,
                                 fundingTrend,
                             },
                         }}
@@ -344,18 +313,6 @@ const FundingSources = () => {
                         />
                     </div>
 
-                    <div
-                        className="animate-fade-in-up h-full"
-                        style={{ animationDelay: `300ms` }}
-                    >
-                        <StatCard
-                            title="Categories"
-                            value={3}
-                            change=""
-                            color="secondary"
-                            icon={<Globe size={20} />}
-                        />
-                    </div>
                 </div>
             ) : (
                 <></>
@@ -485,7 +442,7 @@ const FundingSources = () => {
                                             <img
                                                 src={generateOrganizationLogo(
                                                     source.name || "Unknown",
-                                                    source.type || "Unknown",
+                                                    undefined,
                                                     64
                                                 )}
                                                 alt={
@@ -501,11 +458,6 @@ const FundingSources = () => {
                                                 {source.name ||
                                                     "Unknown Source"}
                                             </h4>
-                                            {source.type && (
-                                                <span className="inline-flex px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
-                                                    {source.type}
-                                                </span>
-                                            )}
                                         </div>
                                     </div>
 

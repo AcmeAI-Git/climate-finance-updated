@@ -12,46 +12,27 @@ const FundingSourceFormPage = ({ mode = 'add' }) => {
       required: true,
       className: 'md:col-span-2'
     },
-    {
-      name: 'type',
-      label: 'Category',
-      type: 'select',
-      placeholder: 'Select funding source category',
-      required: true,
-      options: [
-        { value: 'UNFCCC', label: 'UNFCCC Climate Funds' },
-        { value: 'Multilateral/Bilateral', label: 'Multilateral/Bilateral' },
-        { value: 'Domestic', label: 'Domestic Fund' },
-      ],
-      className: 'md:col-span-2'
-    },
     // Note: grant_amount, loan_amount, counterpart_funding are now
     // calculated automatically from linked projects - not editable here
   ];
 
   const defaultFormData = {
-    name: '',
-    type: ''
+    name: ''
   };
 
   const validationRules = {
     name: {
       required: true,
       minLength: 2
-    },
-    type: {
-      required: true
     }
   };
 
   const transformSubmitData = (data) => ({
-    name: data.name?.trim(),
-    type: data.type || null
+    name: data.name?.trim()
   });
 
   const transformLoadData = (data) => ({
-    name: data.name || '',
-    type: data.type || ''
+    name: data.name || ''
   });
 
   return (

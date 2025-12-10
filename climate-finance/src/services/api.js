@@ -409,8 +409,6 @@ export const fundingSourceApi = {
     },
 
     // Funding Source Analytics
-    getFundingSourceByType: () =>
-        apiRequest("/project/get-funding-source-by-type"),
     getFundingSourceOverview: () =>
         apiRequest("/project/get-funding-source-overview"),
     getFundingSourceTrend: () =>

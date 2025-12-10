@@ -11,11 +11,6 @@ const AdminFundingSources = () => {
       searchKey: 'name'
     },
     {
-      key: 'type',
-      header: 'Category',
-      searchKey: 'type'
-    },
-    {
       key: 'grant_amount',
       header: 'Total Grants',
       type: 'currency'
@@ -35,7 +30,7 @@ const AdminFundingSources = () => {
   return (
     <AdminListPage
       title="Funding Sources Management"
-      subtitle="Manage funding sources by category (UNFCCC, Multilateral/Bilateral, Domestic)"
+      subtitle="Manage funding sources and their financial information"
       apiService={fundingSourceApi}
       entityName="funding-source"
       columns={columns}

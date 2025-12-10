@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { projectApi, agencyApi, fundingSourceApi } from "../services/api";
-import { formatCurrency, formatDate } from "../utils/formatters";
+import { formatCurrency } from "../utils/formatters";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import StatCard from "../components/ui/StatCard";
@@ -132,8 +132,10 @@ const Projects = () => {
 
                 setOverviewStats([
                     {
-                        title: "Total Projects",
-                        value: overviewData.total_projects,
+                        title: "Total Investment",
+                        value: formatCurrency(
+                            overviewData.total_investment
+                        ),
                         change: "",
                     },
                     {
@@ -142,15 +144,13 @@ const Projects = () => {
                         change: "",
                     },
                     {
-                        title: "Total Investment",
-                        value: formatCurrency(
-                            overviewData.total_investment
-                        ),
+                        title: "Completed Projects",
+                        value: overviewData.completed_projects,
                         change: "",
                     },
                     {
-                        title: "Completed Projects",
-                        value: overviewData.completed_projects,
+                        title: "Total Projects",
+                        value: overviewData.total_projects,
                         change: "",
                     },
                 ]);

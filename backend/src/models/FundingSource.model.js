@@ -2,14 +2,14 @@ const { pool } = require('../config/db');
 const FundingSource = {};
 
 FundingSource.addFundingSource = async (data) => {
-    const { name, type } = data;
+    const { name } = data;
 
     const query = `
-        INSERT INTO FundingSource (name, type)
-        VALUES ($1, $2)
+        INSERT INTO FundingSource (name)
+        VALUES ($1)
         RETURNING *
     `;
-    const values = [name, type];
+    const values = [name];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
@@ -19,7 +19,6 @@ FundingSource.getAllFundingSources = async () => {
         SELECT
             fs.funding_source_id,
             fs.name,
-            fs.type,
             COALESCE(SUM(p.gef_grant), 0) as grant_amount,
             COALESCE(SUM(p.loan_amount), 0) as loan_amount,
             COALESCE(SUM(p.cofinancing), 0) as counterpart_funding,
@@ -27,7 +26,7 @@ FundingSource.getAllFundingSources = async () => {
         FROM FundingSource fs
         LEFT JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
         LEFT JOIN Project p ON pfs.project_id = p.project_id
-        GROUP BY fs.funding_source_id, fs.name, fs.type
+        GROUP BY fs.funding_source_id, fs.name
         ORDER BY fs.name
     `;
     const { rows } = await pool.query(query);
@@ -106,8 +105,8 @@ FundingSource.getFundingSourceById = async (id) => {
 };
 
 FundingSource.updateFundingSource = async (id, data) => {
-    // Only allow updating name and type
-    const allowedFields = ['name', 'type'];
+    // Only allow updating name
+    const allowedFields = ['name'];
     const filteredData = {};
     for (const key of allowedFields) {
         if (data[key] !== undefined) {

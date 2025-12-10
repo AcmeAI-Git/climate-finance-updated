@@ -5,14 +5,10 @@ import {
     Calendar,
     MapPin,
     DollarSign,
-    Users,
-    Building,
     FileText,
     CheckCircle,
     Clock,
     Target,
-    Globe,
-    Banknote,
     Play,
     Pause,
     AlertCircle,
@@ -133,35 +129,9 @@ const FundingSourceDetails = () => {
         );
     }
 
-    const getTypeIcon = (type) => {
-        switch (type) {
-            case "UNFCCC":
-                return <Globe size={16} />;
-            case "Multilateral/Bilateral":
-                return <Users size={16} />;
-            case "Domestic":
-                return <Building size={16} />;
-            default:
-                return <Banknote size={16} />;
-        }
-    };
-
-    const getTypeColor = (type) => {
-        switch (type) {
-            case "UNFCCC":
-                return "bg-green-100 text-green-800";
-            case "Multilateral/Bilateral":
-                return "bg-blue-100 text-blue-800";
-            case "Domestic":
-                return "bg-purple-100 text-purple-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
 
     const exportData = {
         source: source?.name,
-        type: source?.type,
         totalCommitted: source?.total_committed || source?.grant_amount || 0,
         activeProjects: source?.active_projects || 0,
         sectors: source?.sectors || [],
@@ -227,7 +197,7 @@ const FundingSourceDetails = () => {
                         <img
                             src={generateOrganizationLogo(
                                 source.name,
-                                source.type,
+                                undefined,
                                 64
                             )}
                             alt={source.name}
@@ -237,14 +207,6 @@ const FundingSourceDetails = () => {
                             <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">
                                 {source.name}
                             </h1>
-                            <span
-                                className={`inline-flex text-sm px-3 py-1 rounded-full font-semibold items-center gap-1 ${getTypeColor(
-                                    source.type
-                                )}`}
-                            >
-                                {getTypeIcon(source.type)}
-                                {source.type || "Funding Source"}
-                            </span>
                         </div>
                     </div>
 
