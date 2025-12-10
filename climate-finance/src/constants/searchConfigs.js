@@ -61,7 +61,6 @@ export const SEARCH_CONFIGS = {
         searchFields: [
             { key: "name", label: "Source Name", weight: 3 },
             { key: "funding_source_id", label: "Source ID", weight: 3 },
-            { key: "dev_partner", label: "Development Partner", weight: 2 },
         ],
         // filters: [
         //   {

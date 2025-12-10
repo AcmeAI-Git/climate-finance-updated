@@ -417,13 +417,8 @@ const ProjectDetails = () => {
                                             key={index}
                                             className="p-3 bg-primary-50 rounded-lg border border-primary-100"
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <div className="font-medium text-gray-900">
-                                                    {source.name}
-                                                </div>
-                                                <div className="text-sm text-primary-700 font-medium">
-                                                    {source.dev_partner}
-                                                </div>
+                                            <div className="font-medium text-gray-900">
+                                                {source.name}
                                             </div>
                                             <div className="mt-2 text-sm text-gray-600 flex gap-3">
                                                 {/* Grant */}

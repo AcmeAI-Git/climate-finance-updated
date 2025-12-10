@@ -600,7 +600,7 @@ Project.getProjectById = async (id) => {
 
         // Get funding sources
         const fundingSourcesQuery = `
-            SELECT fs.funding_source_id, fs.name, fs.dev_partner, fs.grant_amount, fs.loan_amount
+            SELECT fs.funding_source_id, fs.name, fs.grant_amount, fs.loan_amount
             FROM FundingSource fs
             INNER JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
             WHERE pfs.project_id = $1
@@ -940,13 +940,12 @@ Project.getFundingSource = async () => {
         SELECT 
             fs.funding_source_id,
             fs.name,
-            fs.dev_partner,
             COUNT(DISTINCT pfs.project_id) AS project_count,
             COALESCE(SUM(p.total_cost_usd), 0) AS total_finance
         FROM FundingSource fs
         LEFT JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
         LEFT JOIN Project p ON pfs.project_id = p.project_id
-        GROUP BY fs.funding_source_id, fs.name, fs.dev_partner
+        GROUP BY fs.funding_source_id, fs.name
         ORDER BY total_finance DESC
     `;
     const { rows } = await pool.query(query);

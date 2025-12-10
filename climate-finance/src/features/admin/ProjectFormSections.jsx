@@ -232,7 +232,6 @@ const ProjectFormSections = ({
                     }
                     getOptionId={(source) => source.funding_source_id}
                     getOptionLabel={(source) => source.name}
-                    getOptionSubtext={(source) => `Development Partner: ${source.dev_partner}`}
                     onAddNew={handleAddFundingSource}
                     addButtonText="Add Funding Source"
                 />

@@ -53,8 +53,7 @@ FundingSource.getFundingSourceOverview = async () => {
     const query = `
         SELECT
             COUNT(DISTINCT fs.funding_source_id) AS total_funding_sources,
-            COUNT(DISTINCT pfs.project_id) AS total_projects_supported,
-            COUNT(DISTINCT fs.dev_partner) AS total_development_partners
+            COUNT(DISTINCT pfs.project_id) AS total_projects_supported
         FROM FundingSource fs
                  LEFT JOIN ProjectFundingSource pfs
                            ON fs.funding_source_id = pfs.funding_source_id;

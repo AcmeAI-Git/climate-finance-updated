@@ -95,8 +95,6 @@ const FundingSources = () => {
                         Number(overviewData.total_funding_sources) || 0,
                     total_projects_supported:
                         Number(overviewData.total_projects_supported) || 0,
-                    total_development_partners:
-                        Number(overviewData.total_development_partners) || 0,
                 });
             } catch (err) {
                 console.warn(
@@ -118,10 +116,6 @@ const FundingSources = () => {
                 active_funding_source: sources.length,
                 committed_funds: sources.reduce(
                     (sum, fs) => sum + Number(fs.grant_amount || 0),
-                    0
-                ),
-                disbursed_funds: sources.reduce(
-                    (sum, fs) => sum + Number(fs.disbursement || 0),
                     0
                 ),
             };
