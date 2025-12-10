@@ -284,6 +284,99 @@ export const agencyApi = {
     },
 };
 
+// Implementing Entity API endpoints
+export const implementingEntityApi = {
+    getAll: () => apiRequest("/implementing-entity/all"),
+    getById: (id) => {
+        if (!id) throw new Error("Implementing entity ID is required");
+        return apiRequest(`/implementing-entity/get/${id}`);
+    },
+    add: (entityData) => {
+        if (!entityData || !entityData.name)
+            throw new Error("Implementing entity name is required");
+        return apiRequest("/implementing-entity/add", {
+            method: "POST",
+            body: JSON.stringify(entityData),
+        });
+    },
+    update: (id, entityData) => {
+        if (!id) throw new Error("Implementing entity ID is required");
+        if (!entityData) throw new Error("Implementing entity data is required");
+        return apiRequest(`/implementing-entity/update/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(entityData),
+        });
+    },
+    delete: (id) => {
+        if (!id) throw new Error("Implementing entity ID is required");
+        return apiRequest(`/implementing-entity/delete/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
+// Executing Agency API endpoints
+export const executingAgencyApi = {
+    getAll: () => apiRequest("/executing-agency/all"),
+    getById: (id) => {
+        if (!id) throw new Error("Executing agency ID is required");
+        return apiRequest(`/executing-agency/get/${id}`);
+    },
+    add: (agencyData) => {
+        if (!agencyData || !agencyData.name)
+            throw new Error("Executing agency name is required");
+        return apiRequest("/executing-agency/add", {
+            method: "POST",
+            body: JSON.stringify(agencyData),
+        });
+    },
+    update: (id, agencyData) => {
+        if (!id) throw new Error("Executing agency ID is required");
+        if (!agencyData) throw new Error("Executing agency data is required");
+        return apiRequest(`/executing-agency/update/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(agencyData),
+        });
+    },
+    delete: (id) => {
+        if (!id) throw new Error("Executing agency ID is required");
+        return apiRequest(`/executing-agency/delete/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
+// Delivery Partner API endpoints
+export const deliveryPartnerApi = {
+    getAll: () => apiRequest("/delivery-partner/all"),
+    getById: (id) => {
+        if (!id) throw new Error("Delivery partner ID is required");
+        return apiRequest(`/delivery-partner/get/${id}`);
+    },
+    add: (partnerData) => {
+        if (!partnerData || !partnerData.name)
+            throw new Error("Delivery partner name is required");
+        return apiRequest("/delivery-partner/add", {
+            method: "POST",
+            body: JSON.stringify(partnerData),
+        });
+    },
+    update: (id, partnerData) => {
+        if (!id) throw new Error("Delivery partner ID is required");
+        if (!partnerData) throw new Error("Delivery partner data is required");
+        return apiRequest(`/delivery-partner/update/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(partnerData),
+        });
+    },
+    delete: (id) => {
+        if (!id) throw new Error("Delivery partner ID is required");
+        return apiRequest(`/delivery-partner/delete/${id}`, {
+            method: "DELETE",
+        });
+    },
+};
+
 // Funding Source API endpoints
 export const fundingSourceApi = {
     getAll: () => apiRequest("/funding-source/all"),

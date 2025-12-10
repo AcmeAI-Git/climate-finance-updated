@@ -11,23 +11,23 @@ const AdminFundingSources = () => {
       searchKey: 'name'
     },
     {
-      key: 'dev_partner',
-      header: 'Development Partner',
-      searchKey: 'dev_partner'
+      key: 'type',
+      header: 'Category',
+      searchKey: 'type'
     },
     {
       key: 'grant_amount',
-      header: 'Grant Amount',
+      header: 'Total Grants',
       type: 'currency'
     },
     {
       key: 'loan_amount',
-      header: 'Loan Amount',
+      header: 'Total Loans',
       type: 'currency'
     },
     {
       key: 'counterpart_funding',
-      header: 'Counterpart Funding',
+      header: 'Co-Financing',
       type: 'currency'
     }
   ];
@@ -35,7 +35,7 @@ const AdminFundingSources = () => {
   return (
     <AdminListPage
       title="Funding Sources Management"
-      subtitle="Manage funding sources and development partners"
+      subtitle="Manage funding sources by category (UNFCCC, Multilateral/Bilateral, Domestic)"
       apiService={fundingSourceApi}
       entityName="funding-source"
       columns={columns}

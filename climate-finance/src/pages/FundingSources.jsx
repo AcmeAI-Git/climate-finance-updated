@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
     Building,
     Globe,
-    ExternalLink,
     DollarSign,
     TrendingUp,
     CheckCircle,
@@ -208,7 +207,7 @@ const FundingSources = () => {
                 (source.name?.toLowerCase() || "").includes(
                     searchTerm.toLowerCase()
                 ) ||
-                (source.dev_partner?.toLowerCase() || "").includes(
+                (source.type?.toLowerCase() || "").includes(
                     searchTerm.toLowerCase()
                 ) ||
                 (String(source.funding_source_id || "").toLowerCase()).includes(
@@ -350,8 +349,8 @@ const FundingSources = () => {
                         style={{ animationDelay: `300ms` }}
                     >
                         <StatCard
-                            title="Development Partners"
-                            value={fundingOverview.total_development_partners}
+                            title="Categories"
+                            value={3}
                             change=""
                             color="secondary"
                             icon={<Globe size={20} />}
@@ -498,39 +497,15 @@ const FundingSources = () => {
                                         </div>
 
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-                                                <h4 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors mb-2 sm:mb-0">
-                                                    {source.name ||
-                                                        "Unknown Source"}
-                                                </h4>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {source.type && (
-                                                        <span className="inline-flex px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
-                                                            {source.type}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {source.dev_partner && (
-                                                <div className="flex items-center text-sm text-gray-600 mb-3">
-                                                    <Globe
-                                                        size={14}
-                                                        className="mr-2 shrink-0"
-                                                    />
-                                                    <span>
-                                                        Development Partner:{" "}
-                                                        {source.dev_partner}
-                                                    </span>
-                                                </div>
+                                            <h4 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors mb-2">
+                                                {source.name ||
+                                                    "Unknown Source"}
+                                            </h4>
+                                            {source.type && (
+                                                <span className="inline-flex px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+                                                    {source.type}
+                                                </span>
                                             )}
-
-                                            <div className="text-sm text-gray-500">
-                                                {source.description ||
-                                                    `${
-                                                        source.type || "Funding"
-                                                    } organization supporting climate finance initiatives`}
-                                            </div>
                                         </div>
                                     </div>
 
@@ -554,9 +529,8 @@ const FundingSources = () => {
                                                     );
                                                 }
                                             }}
-                                            className="flex items-center gap-2 px-4 py-2 text-purple-600 border-purple-600 hover:bg-purple-50 cursor-pointer"
+                                            className="px-4 py-2 text-purple-600 border-purple-600 hover:bg-purple-50 cursor-pointer"
                                         >
-                                            <ExternalLink size={14} />
                                             View Details
                                         </Button>
                                     </div>

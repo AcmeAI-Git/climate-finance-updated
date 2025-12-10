@@ -37,15 +37,6 @@ const FundingSourceDetails = () => {
     const [error, setError] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
 
-    useEffect(() => {
-        if (sourceId) {
-            fetchFundingSource();
-        } else {
-            setError("No funding source ID provided");
-            setLoading(false);
-        }
-    }, [sourceId, fetchFundingSource]);
-
     const fetchFundingSource = useCallback(async () => {
         try {
             setLoading(true);
@@ -65,6 +56,15 @@ const FundingSourceDetails = () => {
             setLoading(false);
         }
     }, [sourceId]);
+
+    useEffect(() => {
+        if (sourceId) {
+            fetchFundingSource();
+        } else {
+            setError("No funding source ID provided");
+            setLoading(false);
+        }
+    }, [sourceId, fetchFundingSource]);
 
     const handleRetry = () => {
         setRetryCount((prev) => prev + 1);
@@ -135,29 +135,25 @@ const FundingSourceDetails = () => {
 
     const getTypeIcon = (type) => {
         switch (type) {
-            case "Multilateral":
+            case "UNFCCC":
                 return <Globe size={16} />;
-            case "Bilateral":
+            case "Multilateral/Bilateral":
                 return <Users size={16} />;
-            case "Private":
+            case "Domestic":
                 return <Building size={16} />;
-            case "Climate Fund":
-                return <Banknote size={16} />;
             default:
-                return <Building size={16} />;
+                return <Banknote size={16} />;
         }
     };
 
     const getTypeColor = (type) => {
         switch (type) {
-            case "Multilateral":
-                return "bg-blue-100 text-blue-800";
-            case "Bilateral":
+            case "UNFCCC":
                 return "bg-green-100 text-green-800";
-            case "Private":
+            case "Multilateral/Bilateral":
+                return "bg-blue-100 text-blue-800";
+            case "Domestic":
                 return "bg-purple-100 text-purple-800";
-            case "Climate Fund":
-                return "bg-yellow-100 text-yellow-800";
             default:
                 return "bg-gray-100 text-gray-800";
         }
@@ -169,8 +165,24 @@ const FundingSourceDetails = () => {
         totalCommitted: source?.total_committed || source?.grant_amount || 0,
         activeProjects: source?.active_projects || 0,
         sectors: source?.sectors || [],
-        devPartner: source?.dev_partner,
     };
+
+    // Compute active and completed counts from projects (fallbacks if not provided)
+    const activeCount =
+        source?.projects && Array.isArray(source.projects)
+            ? source.projects.filter(
+                  (p) =>
+                      (p.status || "").toString().toLowerCase() === "active" ||
+                      (p.status || "").toString().toLowerCase() === "ongoing"
+              ).length
+            : source?.active_projects || 0;
+
+    const completedCount =
+        source?.projects && Array.isArray(source.projects)
+            ? source.projects.filter(
+                  (p) => (p.status || "").toString().toLowerCase() === "completed"
+              ).length
+            : 0;
 
     return (
         <PageLayout bgColor="bg-gray-50">
@@ -190,21 +202,11 @@ const FundingSourceDetails = () => {
             <div className="layout-container">
                 {/* Main Funding Source Card */}
                 <Card className="mb-6" padding="p-4 sm:p-6">
-                    {/* Top Bar: Type, ID, Export */}
+                    {/* Top Bar: ID and Export */}
                     <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-                        <div className="flex items-center gap-3">
-                            <span
-                                className={`text-sm px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${getTypeColor(
-                                    source.type
-                                )}`}
-                            >
-                                {getTypeIcon(source.type)}
-                                {source.type || "Funding Source"}
-                            </span>
-                            <span className="text-sm text-gray-500 font-medium">
-                                #{source.funding_source_id || source.id}
-                            </span>
-                        </div>
+                        <span className="text-sm text-gray-500 font-medium">
+                            #{source.funding_source_id || source.id}
+                        </span>
                         <ExportButton
                             data={exportData}
                             filename={`${source.name.replace(
@@ -220,7 +222,7 @@ const FundingSourceDetails = () => {
                         />
                     </div>
 
-                    {/* Logo, Title and Description */}
+                    {/* Logo and Title */}
                     <div className="flex items-start gap-4 mb-6">
                         <img
                             src={generateOrganizationLogo(
@@ -235,12 +237,14 @@ const FundingSourceDetails = () => {
                             <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">
                                 {source.name}
                             </h1>
-                            <p className="text-base text-gray-600 leading-relaxed">
-                                {source.description ||
-                                    `${
-                                        source.type || "Funding"
-                                    } organization supporting climate finance initiatives in Bangladesh.`}
-                            </p>
+                            <span
+                                className={`inline-flex text-sm px-3 py-1 rounded-full font-semibold items-center gap-1 ${getTypeColor(
+                                    source.type
+                                )}`}
+                            >
+                                {getTypeIcon(source.type)}
+                                {source.type || "Funding Source"}
+                            </span>
                         </div>
                     </div>
 
@@ -252,7 +256,7 @@ const FundingSourceDetails = () => {
                             </div>
                             <div className="text-lg font-bold text-gray-900">
                                 {formatCurrency(
-                                    source.total_grant + source.total_loan
+                                    (source.total_grant || 0) + (source.total_loan || 0)
                                 )}
                             </div>
                         </div>
@@ -262,29 +266,21 @@ const FundingSourceDetails = () => {
                                 Projects
                             </div>
                             <div className="text-lg font-bold text-primary-600">
-                                {source.projects &&
-                                Array.isArray(source.projects)
-                                    ? source.projects.filter(
-                                          (p) =>
-                                              p.status === "Active" ||
-                                              p.status === "Ongoing" ||
-                                              p.status === "active" ||
-                                              p.status === "ongoing"
-                                      ).length
-                                    : source.active_projects || 0}{" "}
-                                Active
+                                {activeCount} Active{" "}
+                                <span className="text-sm text-gray-500 font-medium">
+                                    · {completedCount} Completed
+                                </span>
                             </div>
                         </div>
 
                         <div className="text-center">
                             <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                                Partner
+                                Total Projects
                             </div>
-                            <div
-                                className="text-sm font-semibold text-gray-900 truncate"
-                                title={source.dev_partner || "Not specified"}
-                            >
-                                {source.dev_partner || "Not specified"}
+                            <div className="text-lg font-bold text-gray-900">
+                                {source.projects && Array.isArray(source.projects)
+                                    ? source.projects.length
+                                    : 0}
                             </div>
                         </div>
                     </div>

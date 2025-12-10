@@ -49,7 +49,14 @@ const ProjectDetails = () => {
             // Prefer full related objects when they exist (mock API sometimes returns both IDs and full objects)
             const enrichedProject = {
                 ...projectData,
-                // project may already include detailed arrays (projectAgencies/projectFundingSources/projectSDGs)
+                // New agency types
+                projectImplementingEntities:
+                    projectData.projectImplementingEntities || projectData.implementing_entities || [],
+                projectExecutingAgencies:
+                    projectData.projectExecutingAgencies || projectData.executing_agencies || [],
+                projectDeliveryPartners:
+                    projectData.projectDeliveryPartners || projectData.delivery_partners || [],
+                // Legacy agencies (for backward compatibility)
                 projectAgencies:
                     projectData.projectAgencies || projectData.agencies || [],
                 projectLocations:
@@ -344,46 +351,91 @@ const ProjectDetails = () => {
                 </Card>
 
                 {/* Secondary Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    {/* Agencies */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    {/* Implementing Entities */}
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Implementing & Executing Agencies
+                            Implementing Entities
                         </h3>
-                        {Array.isArray(project.projectAgencies) &&
-                        project.projectAgencies.length > 0 ? (
-                            <div className="space-y-3">
-                                {project.projectAgencies
-                                    .slice(0, 4)
-                                    .map((agency, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                                        >
-                                            <div className="font-medium text-gray-900">
-                                                {agency.name}
-                                            </div>
-                                            <div className="text-sm text-gray-500 font-medium">
-                                                {agency.type}
-                                            </div>
+                        {Array.isArray(project.projectImplementingEntities) &&
+                        project.projectImplementingEntities.length > 0 ? (
+                            <div className="space-y-2">
+                                {project.projectImplementingEntities.map((entity, index) => (
+                                    <div
+                                        key={index}
+                                        className="p-3 bg-blue-50 rounded-lg border border-blue-100"
+                                    >
+                                        <div className="font-medium text-gray-900">
+                                            {entity.name}
                                         </div>
-                                    ))}
-                                {project.projectAgencies.length > 4 && (
-                                    <div className="text-sm text-gray-500 text-center font-medium">
-                                        +{project.projectAgencies.length - 4}{" "}
-                                        more agencies
                                     </div>
-                                )}
+                                ))}
                             </div>
                         ) : (
                             <div className="text-center py-8 text-gray-500">
                                 <Building size={24} className="mx-auto mb-2" />
-                                <p className="font-medium">No agencies data</p>
+                                <p className="font-medium">No implementing entities</p>
                             </div>
                         )}
                     </Card>
 
-                    {/* Funding Sources */}
+                    {/* Executing Agencies */}
+                    <Card padding="p-4 sm:p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Executing Agencies
+                        </h3>
+                        {Array.isArray(project.projectExecutingAgencies) &&
+                        project.projectExecutingAgencies.length > 0 ? (
+                            <div className="space-y-2">
+                                {project.projectExecutingAgencies.map((agency, index) => (
+                                    <div
+                                        key={index}
+                                        className="p-3 bg-green-50 rounded-lg border border-green-100"
+                                    >
+                                        <div className="font-medium text-gray-900">
+                                            {agency.name}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <Building size={24} className="mx-auto mb-2" />
+                                <p className="font-medium">No executing agencies</p>
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Delivery Partners */}
+                    <Card padding="p-4 sm:p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Delivery Partners
+                        </h3>
+                        {Array.isArray(project.projectDeliveryPartners) &&
+                        project.projectDeliveryPartners.length > 0 ? (
+                            <div className="space-y-2">
+                                {project.projectDeliveryPartners.map((partner, index) => (
+                                    <div
+                                        key={index}
+                                        className="p-3 bg-purple-50 rounded-lg border border-purple-100"
+                                    >
+                                        <div className="font-medium text-gray-900">
+                                            {partner.name}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <Building size={24} className="mx-auto mb-2" />
+                                <p className="font-medium">No delivery partners</p>
+                            </div>
+                        )}
+                    </Card>
+                </div>
+
+                {/* Funding Sources - Full Width */}
+                <div className="grid grid-cols-1 gap-6 mb-6">
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Funding Sources
@@ -575,13 +627,32 @@ const ProjectDetails = () => {
                                 </div>
                             </div>
 
-                            {project.hotspot_vulnerability_type && (
+                            {/* Hotspot Types (multi-select) */}
+                            {Array.isArray(project.hotspot_types) && project.hotspot_types.length > 0 && (
                                 <div>
-                                    <div className="text-md f text-gray-600 font-semibold mb-1">
+                                    <div className="text-md text-gray-600 font-semibold mb-2">
+                                        Hotspot Types
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {project.hotspot_types.map((type, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded font-medium"
+                                            >
+                                                {type}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {project.vulnerability_type && (
+                                <div>
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
                                         Vulnerability Type
                                     </div>
                                     <div className="text-sm text-gray-700">
-                                        {project.hotspot_vulnerability_type}
+                                        {project.vulnerability_type}
                                     </div>
                                 </div>
                             )}

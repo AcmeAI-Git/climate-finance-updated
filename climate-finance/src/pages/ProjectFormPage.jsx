@@ -6,6 +6,9 @@ import {
     fundingSourceApi,
     projectApi,
     pendingProjectApi,
+    implementingEntityApi,
+    executingAgencyApi,
+    deliveryPartnerApi,
 } from "../services/api";
 import Button from "../components/ui/Button";
 import Loading from "../components/ui/Loading";
@@ -31,6 +34,11 @@ const defaultFormData = {
     closing: "",
     approval_fy: "",
     objectives: "",
+    // New separate agency types
+    implementing_entity_ids: [],
+    executing_agency_ids: [],
+    delivery_partner_ids: [],
+    // Keep agencies for backward compatibility
     agencies: [],
     funding_sources: [],
     wash_component: {
@@ -41,7 +49,8 @@ const defaultFormData = {
     submitter_email: "",
 
     // New fields for client requirements
-    hotspot_vulnerability_type: "",
+    hotspot_types: [], // Changed to array for multi-select
+    vulnerability_type: "",
     wash_component_description: "",
     direct_beneficiaries: "",
     indirect_beneficiaries: "",
@@ -60,6 +69,11 @@ const defaultFormData = {
     climate_relevance_justification: "",
     location_segregation: "",
     supporting_link: "",
+    // Additional new fields
+    additional_location_info: "",
+    portfolio_type: "",
+    funding_source_name: "",
+    activities: [],
 };
 
 const formatDateForInput = (dateStr) => {
@@ -79,6 +93,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [agencies, setAgencies] = useState([]);
+    const [implementingEntities, setImplementingEntities] = useState([]);
+    const [executingAgencies, setExecutingAgencies] = useState([]);
+    const [deliveryPartners, setDeliveryPartners] = useState([]);
     const [fundingSources, setFundingSources] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [error, setError] = useState(null);
@@ -127,6 +144,20 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     approval_fy: projectData.approval_fy || "",
                     beneficiaries: projectData.beneficiaries || "",
                     objectives: projectData.objectives || "",
+                    // New agency types
+                    implementing_entity_ids:
+                        Array.isArray(projectData.implementing_entity_ids)
+                            ? projectData.implementing_entity_ids
+                            : [],
+                    executing_agency_ids:
+                        Array.isArray(projectData.executing_agency_ids)
+                            ? projectData.executing_agency_ids
+                            : [],
+                    delivery_partner_ids:
+                        Array.isArray(projectData.delivery_partner_ids)
+                            ? projectData.delivery_partner_ids
+                            : [],
+                    // Keep agencies for backward compatibility
                     agencies:
                         Array.isArray(projectData.agencies) &&
                         projectData.agencies.length > 0 &&
@@ -174,8 +205,11 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             ? projectData.projectSDGs.map((ps) => ps.sdg_id)
                             : [],
                     assessment: projectData.assessment || "",
-                    hotspot_vulnerability_type:
-                        projectData.hotspot_vulnerability_type || "",
+                    // Changed: hotspot_types is now an array
+                    hotspot_types: Array.isArray(projectData.hotspot_types)
+                        ? projectData.hotspot_types
+                        : [],
+                    vulnerability_type: projectData.vulnerability_type || "",
                     wash_component_description:
                         projectData.wash_component_description || "",
                     direct_beneficiaries:
@@ -199,6 +233,14 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     location_segregation:
                         projectData.location_segregation || "",
                     supporting_link: projectData.supporting_link || "",
+                    // Additional new fields
+                    additional_location_info:
+                        projectData.additional_location_info || "",
+                    portfolio_type: projectData.portfolio_type || "",
+                    funding_source_name: projectData.funding_source_name || "",
+                    activities: Array.isArray(projectData.activities)
+                        ? projectData.activities
+                        : [],
                 });
             } else {
                 throw new Error("Project not found");
@@ -227,16 +269,30 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
         try {
             setIsLoadingData(true);
 
-            // Fetch all data in parallel
-            const [agenciesResponse, fundingSourcesResponse] =
-                await Promise.all([
-                    agencyApi
-                        .getAll()
-                        .catch(() => ({ status: false, data: [] })),
-                    fundingSourceApi
-                        .getAll()
-                        .catch(() => ({ status: false, data: [] })),
-                ]);
+            // Fetch all data in parallel including new agency types
+            const [
+                agenciesResponse,
+                fundingSourcesResponse,
+                implementingEntitiesResponse,
+                executingAgenciesResponse,
+                deliveryPartnersResponse,
+            ] = await Promise.all([
+                agencyApi
+                    .getAll()
+                    .catch(() => ({ status: false, data: [] })),
+                fundingSourceApi
+                    .getAll()
+                    .catch(() => ({ status: false, data: [] })),
+                implementingEntityApi
+                    .getAll()
+                    .catch(() => ({ status: false, data: [] })),
+                executingAgencyApi
+                    .getAll()
+                    .catch(() => ({ status: false, data: [] })),
+                deliveryPartnerApi
+                    .getAll()
+                    .catch(() => ({ status: false, data: [] })),
+            ]);
 
             // Set data or fallback to empty arrays if API calls fail
             setAgencies(
@@ -249,10 +305,28 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     ? fundingSourcesResponse.data
                     : []
             );
+            setImplementingEntities(
+                implementingEntitiesResponse.status && implementingEntitiesResponse.data
+                    ? implementingEntitiesResponse.data
+                    : []
+            );
+            setExecutingAgencies(
+                executingAgenciesResponse.status && executingAgenciesResponse.data
+                    ? executingAgenciesResponse.data
+                    : []
+            );
+            setDeliveryPartners(
+                deliveryPartnersResponse.status && deliveryPartnersResponse.data
+                    ? deliveryPartnersResponse.data
+                    : []
+            );
         } catch (error) {
             console.error("Error fetching form data:", error);
             setAgencies([]);
             setFundingSources([]);
+            setImplementingEntities([]);
+            setExecutingAgencies([]);
+            setDeliveryPartners([]);
         } finally {
             setIsLoadingData(false);
         }
@@ -436,8 +510,12 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             );
 
             formDataToSend.append(
-                "hotspot_vulnerability_type",
-                formData.hotspot_vulnerability_type || ""
+                "hotspot_types",
+                JSON.stringify(formData.hotspot_types || [])
+            );
+            formDataToSend.append(
+                "vulnerability_type",
+                formData.vulnerability_type || ""
             );
             formDataToSend.append(
                 "wash_component_description",
@@ -509,6 +587,20 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             );
 
             // Append array fields as JSON strings (to match sample)
+            // New agency types
+            formDataToSend.append(
+                "implementing_entity_ids",
+                JSON.stringify(formData.implementing_entity_ids || [])
+            );
+            formDataToSend.append(
+                "executing_agency_ids",
+                JSON.stringify(formData.executing_agency_ids || [])
+            );
+            formDataToSend.append(
+                "delivery_partner_ids",
+                JSON.stringify(formData.delivery_partner_ids || [])
+            );
+            // Keep agency_ids for backward compatibility
             formDataToSend.append(
                 "agency_ids",
                 JSON.stringify(formData.agencies || [])
@@ -538,6 +630,24 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append(
                 "location_segregation",
                 formData.location_segregation || ""
+            );
+
+            // Additional new fields
+            formDataToSend.append(
+                "additional_location_info",
+                formData.additional_location_info || ""
+            );
+            formDataToSend.append(
+                "portfolio_type",
+                formData.portfolio_type || ""
+            );
+            formDataToSend.append(
+                "funding_source_name",
+                formData.funding_source_name || ""
+            );
+            formDataToSend.append(
+                "activities",
+                JSON.stringify(formData.activities || [])
             );
 
             if (actualMode === "public") {
@@ -950,6 +1060,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         handleInputChange={handleInputChange}
                         handleWashComponentChange={handleWashComponentChange}
                         agencies={agencies}
+                        implementingEntities={implementingEntities}
+                        executingAgencies={executingAgencies}
+                        deliveryPartners={deliveryPartners}
                         fundingSources={fundingSources}
                         errors={errors}
                     />

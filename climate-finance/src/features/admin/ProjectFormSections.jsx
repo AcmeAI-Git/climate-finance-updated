@@ -11,7 +11,11 @@ const ProjectFormSections = ({
     formData,
     handleInputChange,
     handleWashComponentChange,
-    agencies,
+    // eslint-disable-next-line no-unused-vars
+    agencies, // kept for backward compatibility
+    implementingEntities,
+    executingAgencies,
+    deliveryPartners,
     fundingSources,
     setFormData, // Added setFormData prop
 }) => {
@@ -145,26 +149,69 @@ const ProjectFormSections = ({
 
     return (
         <>
-            {/* Agencies */}
+            {/* Implementing Entities */}
             <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Implementing & Executing Agencies
+                    Implementing Entities
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                    {formFieldDescriptions.agencies}
+                    {formFieldDescriptions.implementing_entities || "Organizations that provide funding and oversight for the project"}
                 </p>
                 <CheckboxGroup
-                    label="Select Agencies"
-                    options={agencies}
-                    selectedValues={formData.agencies || []}
+                    label="Select Implementing Entities"
+                    options={implementingEntities || []}
+                    selectedValues={formData.implementing_entity_ids || []}
                     onChange={(values) =>
-                        setFormData((prev) => ({ ...prev, agencies: values }))
+                        setFormData((prev) => ({ ...prev, implementing_entity_ids: values }))
+                    }
+                    getOptionId={(entity) => entity.entity_id}
+                    getOptionLabel={(entity) => entity.name}
+                    onAddNew={handleAddAgency}
+                    addButtonText="Add Implementing Entity"
+                />
+            </div>
+
+            {/* Executing Agencies */}
+            <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Executing Agencies
+                </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.executing_agencies || "Organizations responsible for executing the project activities"}
+                </p>
+                <CheckboxGroup
+                    label="Select Executing Agencies"
+                    options={executingAgencies || []}
+                    selectedValues={formData.executing_agency_ids || []}
+                    onChange={(values) =>
+                        setFormData((prev) => ({ ...prev, executing_agency_ids: values }))
                     }
                     getOptionId={(agency) => agency.agency_id}
                     getOptionLabel={(agency) => agency.name}
-                    getOptionSubtext={(agency) => agency.type}
                     onAddNew={handleAddAgency}
-                    addButtonText="Add Agency"
+                    addButtonText="Add Executing Agency"
+                />
+            </div>
+
+            {/* Delivery Partners */}
+            <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Delivery Partners
+                </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.delivery_partners || "Organizations that deliver project services on the ground"}
+                </p>
+                <CheckboxGroup
+                    label="Select Delivery Partners"
+                    options={deliveryPartners || []}
+                    selectedValues={formData.delivery_partner_ids || []}
+                    onChange={(values) =>
+                        setFormData((prev) => ({ ...prev, delivery_partner_ids: values }))
+                    }
+                    getOptionId={(partner) => partner.partner_id}
+                    getOptionLabel={(partner) => partner.name}
+                    onAddNew={handleAddAgency}
+                    addButtonText="Add Delivery Partner"
                 />
             </div>
 
@@ -293,36 +340,55 @@ const ProjectFormSections = ({
                 />
             </div>
 
-            {/* Hotspot/Vulnerability Type */}
+            {/* Hotspot Types (Multi-select) */}
             <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Hotspot/Vulnerability Type
+                    Hotspot Types
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                    {formFieldDescriptions.hotspot_vulnerability_type}
+                    {formFieldDescriptions.hotspot_types || "Select all applicable hotspot/vulnerability types"}
+                </p>
+                <CheckboxGroup
+                    label="Select Hotspot Types"
+                    options={[
+                        { id: "SWM", name: "South-western coastal area and Sundarbans (SWM)" },
+                        { id: "SEE", name: "South-east and eastern coastal area (SEE)" },
+                        { id: "CHT", name: "Chattogram Hill Tracts (CHT)" },
+                        { id: "FPE", name: "Rivers, floodplains, and erosion-prone areas (FPE)" },
+                        { id: "HFF", name: "Haor and flash floods areas (HFF)" },
+                        { id: "DBA", name: "Drought-prone and Barind areas (DBA)" },
+                        { id: "NNW", name: "Northern, north-western region (NNW)" },
+                        { id: "CBL", name: "Chalan beel and low-lying area of the north-western region (CBL)" },
+                        { id: "CHI", name: "Char and Islands (CHI)" },
+                        { id: "BoB", name: "Bay of Bengal and Ocean (BoB)" },
+                        { id: "URB", name: "Urban areas (URB)" },
+                    ]}
+                    selectedValues={formData.hotspot_types || []}
+                    onChange={(values) =>
+                        setFormData((prev) => ({ ...prev, hotspot_types: values }))
+                    }
+                    getOptionId={(option) => option.id}
+                    getOptionLabel={(option) => option.name}
+                />
+            </div>
+
+            {/* Vulnerability Type */}
+            <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Vulnerability Type
+                </h3>
+                <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                    {formFieldDescriptions.vulnerability_type || "Describe the type of vulnerability addressed"}
                 </p>
                 <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
-                    <div>
-                        <select
-                            name="hotspot_vulnerability_type"
-                            value={formData.hotspot_vulnerability_type || ""}
-                            onChange={handleInputChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        >
-                            <option value="">Select</option>
-                            <option value="South-western coastal area and Sundarbans (SWM)">South-western coastal area and Sundarbans (SWM)</option>
-                            <option value="South-east and eastern coastal area (SEE)">South-east and eastern coastal area (SEE)</option>
-                            <option value="Chattogram Hill Tracts (CHT)">Chattogram Hill Tracts (CHT)</option>
-                            <option value="Rivers, floodplains, and erosion-prone areas (FPE)">Rivers, floodplains, and erosion-prone areas (FPE)</option>
-                            <option value="Haor and flash floods areas (HFF)">Haor and flash floods areas (HFF)</option>
-                            <option value="Drought-prone and Barind areas (DBA)">Drought-prone and Barind areas (DBA)</option>
-                            <option value="Northern, north-western region (NNW)">Northern, north-western region (NNW)</option>
-                            <option value="Chalan beel and low-lying area of the north-western region (CBL)">Chalan beel and low-lying area of the north-western region (CBL)</option>
-                            <option value="Char and Islands (CHI)">Char and Islands (CHI)</option>
-                            <option value="Bay of Bengal and Ocean (BoB)">Bay of Bengal and Ocean (BoB)</option>
-                            <option value="Urban areas (URB)">Urban areas (URB)</option>
-                        </select>
-                    </div>
+                    <textarea
+                        name="vulnerability_type"
+                        value={formData.vulnerability_type || ""}
+                        onChange={handleInputChange}
+                        rows={3}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Describe the vulnerability type..."
+                    />
                 </div>
             </div>
 
