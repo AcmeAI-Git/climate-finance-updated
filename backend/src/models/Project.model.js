@@ -676,7 +676,16 @@ Project.getOverviewStats = async () => {
             COUNT(*) FILTER (WHERE p.status = 'Active') AS active_projects,
             COUNT(*) FILTER (WHERE p.status = 'Completed') AS completed_projects,
             AVG(p.climate_relevance_score) AS avg_climate_relevance,
-            SUM(p.total_cost_usd * COALESCE(wc.wash_percentage/100, 0)) AS total_wash_finance
+            COALESCE(
+                SUM(
+                    CASE 
+                        WHEN wc.presence = TRUE AND wc.wash_percentage IS NOT NULL
+                        THEN p.total_cost_usd * (wc.wash_percentage / 100.0)
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_wash_finance
         FROM Project p
         LEFT JOIN WASHComponent wc ON p.project_id = wc.project_id
     `;

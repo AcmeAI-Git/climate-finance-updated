@@ -143,9 +143,9 @@ const Projects = () => {
                     },
                     {
                         title: "Total Investment",
-                        value: `${formatCurrency(
+                        value: formatCurrency(
                             overviewData.total_investment
-                        )} M`,
+                        ),
                         change: "",
                     },
                     {
@@ -864,8 +864,7 @@ const Projects = () => {
                                                     <span className="text-green-600 font-semibold text-xs sm:text-sm">
                                                         {formatCurrency(
                                                             project.total_cost_usd
-                                                        )}{" "}
-                                                        M
+                                                        )}
                                                     </span>
                                                 </div>
                                             )}
@@ -876,7 +875,7 @@ const Projects = () => {
                                                         Grant:
                                                     </span>
                                                     <span className="text-blue-600 font-semibold text-xs sm:text-sm">
-                                                        {formatCurrency(project.gef_grant)} M
+                                                        {formatCurrency(project.gef_grant)}
                                                     </span>
                                                 </div>
                                             )}

@@ -90,16 +90,16 @@ const LandingPage = () => {
                 setOverviewStats([
                     {
                         title: "Total Climate Finance",
-                        value: `${formatCurrency(
+                        value: formatCurrency(
                             Number(data.total_climate_finance || 0)
-                        )} M`,
+                        ),
                         change: "",
                     },
                     {
                         title: "Total WASH Finance",
-                        value: `${formatCurrency(
+                        value: formatCurrency(
                             Number(data.total_wash_finance || 0)
-                        )} M`,
+                        ),
                         change: "",
                     },
                     {
