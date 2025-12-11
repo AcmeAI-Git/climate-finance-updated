@@ -539,6 +539,7 @@ const LandingPage = () => {
                                     data={climateFinanceTrend}
                                     xAxisKey="year"
                                     scrollable={true}
+                                    formatYAxis={true}
                                     bars={[{
                                         dataKey: "Total_Finance",
                                         name: "Total Climate Finance (USD M)",
