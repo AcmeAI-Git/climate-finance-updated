@@ -11,51 +11,30 @@ const AgencyFormPage = ({ mode = 'add' }) => {
       placeholder: 'Enter agency name',
       required: true,
       className: 'md:col-span-2'
-    },
-    {
-      name: 'type',
-      label: 'Agency Type',
-      type: 'select',
-      required: true,
-      options: [
-        { value: '', label: 'Select agency type' },
-        { value: 'Implementing', label: 'Implementing' },
-        { value: 'Executing', label: 'Executing' },
-        { value: 'Accredited', label: 'Accredited' }
-      ],
-      className: 'md:col-span-1'
     }
   ];
 
   const defaultFormData = {
-    name: '',
-    type: ''
+    name: ''
   };
 
   const validationRules = {
     name: {
       required: true,
       minLength: 2
-    },
-    type: {
-      required: true
     }
   };
 
   const transformSubmitData = (data) => {
-    const transformed = {
-      name: data.name?.trim(),
-      type: data.type
+    return {
+      name: data.name?.trim()
     };
-    return transformed;
   };
 
   const transformLoadData = (data) => {
-    const transformed = {
-      name: data.name || '',
-      type: data.type || ''
+    return {
+      name: data.name || ''
     };
-    return transformed;
   };
 
   return (

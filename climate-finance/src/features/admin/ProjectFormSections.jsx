@@ -199,7 +199,7 @@ const ProjectFormSections = ({
                     onChange={(values) =>
                         setFormData((prev) => ({ ...prev, implementing_entity_ids: values }))
                     }
-                    getOptionId={(entity) => entity.id || entity.entity_id}
+                    getOptionId={(entity) => entity.id || entity.agency_id}
                     getOptionLabel={(entity) => entity.name}
                     onAddNew={handleAddAgency}
                     addButtonText="Add Implementing Entity"

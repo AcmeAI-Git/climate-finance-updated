@@ -12,9 +12,7 @@ const documentRepositoryRoutes = require("./documentRepository.routes");
 const pendingDocumentRepositoryRoutes = require("./pendingDocumentRepository.routes");
 const feedbackRoutes = require("./feedback.routes");
 const activityRoutes = require("./activity.routes");
-// New agency routes
-const implementingEntityRoutes = require("./implementingEntity.routes");
-const executingAgencyRoutes = require("./executingAgency.routes");
+// Delivery partner routes (separate from agencies)
 const deliveryPartnerRoutes = require("./deliveryPartner.routes");
 
 const router = express.Router();
@@ -32,9 +30,7 @@ router.use("/document-repository", documentRepositoryRoutes);
 router.use("/pending-document-repository", pendingDocumentRepositoryRoutes);
 router.use("/feedback", feedbackRoutes);
 router.use("/activity", activityRoutes);
-// New agency routes
-router.use("/implementing-entity", implementingEntityRoutes);
-router.use("/executing-agency", executingAgencyRoutes);
+// Delivery partner routes (separate from agencies)
 router.use("/delivery-partner", deliveryPartnerRoutes);
 
 module.exports = router;

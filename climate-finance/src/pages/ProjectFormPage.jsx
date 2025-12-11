@@ -6,8 +6,6 @@ import {
     fundingSourceApi,
     projectApi,
     pendingProjectApi,
-    implementingEntityApi,
-    executingAgencyApi,
     deliveryPartnerApi,
 } from "../services/api";
 import Button from "../components/ui/Button";
@@ -258,12 +256,10 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
         try {
             setIsLoadingData(true);
 
-            // Fetch all data in parallel including new agency types
+            // Fetch all data in parallel - agencies are now unified
             const [
                 agenciesResponse,
                 fundingSourcesResponse,
-                implementingEntitiesResponse,
-                executingAgenciesResponse,
                 deliveryPartnersResponse,
             ] = await Promise.all([
                 agencyApi
@@ -272,36 +268,24 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 fundingSourceApi
                     .getAll()
                     .catch(() => ({ status: false, data: [] })),
-                implementingEntityApi
-                    .getAll()
-                    .catch(() => ({ status: false, data: [] })),
-                executingAgencyApi
-                    .getAll()
-                    .catch(() => ({ status: false, data: [] })),
                 deliveryPartnerApi
                     .getAll()
                     .catch(() => ({ status: false, data: [] })),
             ]);
 
             // Set data or fallback to empty arrays if API calls fail
-            setAgencies(
-                agenciesResponse.status && agenciesResponse.data
-                    ? agenciesResponse.data
-                    : []
-            );
+            const agenciesData = agenciesResponse.status && agenciesResponse.data
+                ? agenciesResponse.data
+                : [];
+            
+            // Use unified agency list for both implementing and executing
+            setAgencies(agenciesData);
+            setImplementingEntities(agenciesData);
+            setExecutingAgencies(agenciesData);
+            
             setFundingSources(
                 fundingSourcesResponse.status && fundingSourcesResponse.data
                     ? fundingSourcesResponse.data
-                    : []
-            );
-            setImplementingEntities(
-                implementingEntitiesResponse.status && implementingEntitiesResponse.data
-                    ? implementingEntitiesResponse.data
-                    : []
-            );
-            setExecutingAgencies(
-                executingAgenciesResponse.status && executingAgenciesResponse.data
-                    ? executingAgenciesResponse.data
                     : []
             );
             setDeliveryPartners(

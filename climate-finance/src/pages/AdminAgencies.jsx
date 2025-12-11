@@ -34,43 +34,19 @@ const AdminAgencies = () => {
 
   const columns = [
     {
-      key: 'agency_id',
+      key: 'id',
       header: 'Agency ID',
-      searchKey: 'agency_id'
+      searchKey: 'id'
     },
     {
       key: 'name',
       header: 'Name',
       searchKey: 'name'
-    },
-    {
-      key: 'type',
-      header: 'Type',
-      type: 'status',
-      statusType: 'agency'
     }
   ];
 
-  // Generate dynamic filters from actual agency data
-  const filters = useMemo(() => {
-    if (!agenciesList || agenciesList.length === 0) {
-      return [];
-    }
-
-    // Create unique option arrays using the actual fields available
-    const types = Array.from(new Set(agenciesList.map(a => a.type).filter(Boolean))).sort();
-
-    return [
-      {
-        key: 'type',
-        defaultValue: 'All',
-        options: [
-          { value: 'All', label: 'All Types' },
-          ...types.map(type => ({ value: type, label: type }))
-        ]
-      }
-    ];
-  }, [agenciesList]);
+  // No filters needed - all agencies are unified
+  const filters = [];
 
   const handleAddAgency = () => {
     navigate('/admin/agencies/new');
@@ -80,11 +56,11 @@ const AdminAgencies = () => {
     {
       ...defaultActions[0],
       onClick: (row) => {
-        if (!row.agency_id) {
+        if (!row.id && !row.agency_id) {
           setError('Error: No agency ID found for this record');
           return;
         }
-        navigate(`/admin/agencies/${row.agency_id}/edit`);
+        navigate(`/admin/agencies/${row.id || row.agency_id}/edit`);
       }
     },
     defaultActions[1] // Keep delete action as is
@@ -129,7 +105,7 @@ const AdminAgencies = () => {
       
       <AdminListPage
         title="Agencies Management"
-        subtitle="Manage implementing and executing agencies"
+        subtitle="Manage agencies (for implementing and executing roles)"
         apiService={agencyApi}
         entityName="agency"
         columns={columns}

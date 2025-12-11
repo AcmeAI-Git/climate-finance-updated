@@ -1,33 +1,51 @@
 const { pool } = require('../config/db');
+
 const Agency = {};
 
-Agency.addAgency = async ({ name, type }) => {
-    const query = `INSERT INTO Agency (name, type) VALUES ($1, $2) RETURNING *`;
-    const values = [name, type];
+Agency.add = async ({ name }) => {
+    const query = `INSERT INTO agency (name) VALUES ($1) RETURNING *`;
+    const values = [name];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
 
-Agency.getAllAgencies = async () => {
-    const { rows } = await pool.query('SELECT * FROM Agency');
+Agency.getAll = async () => {
+    const { rows } = await pool.query('SELECT agency_id as id, name, created_at FROM agency ORDER BY name');
     return rows;
 };
 
-Agency.updateAgency = async (id, { name, type }) => {
+Agency.update = async (id, { name }) => {
     const { rows } = await pool.query(
-        'UPDATE Agency SET name = $1, type = $2 WHERE agency_id = $3 RETURNING *',
-        [name, type, id]
+        'UPDATE agency SET name = $1 WHERE agency_id = $2 RETURNING agency_id as id, name, created_at',
+        [name, id]
     );
     return rows[0];
 };
 
-Agency.deleteAgency = async (id) => {
-    await pool.query('DELETE FROM Agency WHERE agency_id = $1', [id]);
+Agency.delete = async (id) => {
+    // First delete from junction tables
+    await pool.query('DELETE FROM projectimplementingagency WHERE agency_id = $1', [id]);
+    await pool.query('DELETE FROM projectexecutingagency WHERE agency_id = $1', [id]);
+    // Then delete the agency
+    await pool.query('DELETE FROM agency WHERE agency_id = $1', [id]);
 };
 
-Agency.getAgencyById = async (id) => {
-    const { rows } = await pool.query('SELECT * FROM Agency WHERE agency_id = $1', [id]);
+Agency.getById = async (id) => {
+    const { rows } = await pool.query('SELECT agency_id as id, name, created_at FROM agency WHERE agency_id = $1', [id]);
     return rows[0];
+};
+
+Agency.findOrCreate = async (name) => {
+    // First try to find existing
+    const { rows: existing } = await pool.query(
+        'SELECT agency_id as id, name, created_at FROM agency WHERE LOWER(name) = LOWER($1)',
+        [name]
+    );
+    if (existing.length > 0) {
+        return existing[0];
+    }
+    // Create new
+    return await Agency.add({ name });
 };
 
 module.exports = Agency;

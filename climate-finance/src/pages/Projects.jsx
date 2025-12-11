@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { projectApi, fundingSourceApi, implementingEntityApi, executingAgencyApi, deliveryPartnerApi } from "../services/api";
+import { projectApi, fundingSourceApi, agencyApi, deliveryPartnerApi } from "../services/api";
 import { formatCurrency } from "../utils/formatters";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -88,14 +88,16 @@ const Projects = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch implementing entities, executing agencies, delivery partners, and funding sources
-        implementingEntityApi.getAll().then((res) => {
-            if (res?.status && Array.isArray(res.data)) setImplementingEntities(res.data);
-            else setImplementingEntities([]);
-        });
-        executingAgencyApi.getAll().then((res) => {
-            if (res?.status && Array.isArray(res.data)) setExecutingAgencies(res.data);
-            else setExecutingAgencies([]);
+        // Fetch agencies (unified), delivery partners, and funding sources
+        agencyApi.getAll().then((res) => {
+            if (res?.status && Array.isArray(res.data)) {
+                // Use unified agency list for both implementing and executing
+                setImplementingEntities(res.data);
+                setExecutingAgencies(res.data);
+            } else {
+                setImplementingEntities([]);
+                setExecutingAgencies([]);
+            }
         });
         deliveryPartnerApi.getAll().then((res) => {
             if (res?.status && Array.isArray(res.data)) setDeliveryPartners(res.data);

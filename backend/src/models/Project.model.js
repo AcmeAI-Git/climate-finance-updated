@@ -176,11 +176,11 @@ Project.addProjectWithRelations = async (data) => {
             );
         }
 
-        // --- IMPLEMENTING ENTITIES ---
-        for (const entity_id of parsedImplementingEntityIds) {
+        // --- IMPLEMENTING AGENCIES ---
+        for (const agency_id of parsedImplementingEntityIds) {
             await client.query(
-                "INSERT INTO projectimplementingentity (project_id, entity_id) VALUES ($1, $2)",
-                [project_id, entity_id]
+                "INSERT INTO projectimplementingagency (project_id, agency_id) VALUES ($1, $2)",
+                [project_id, agency_id]
             );
         }
 
@@ -245,17 +245,17 @@ Project.getAllProjects = async () => {
 
         // Get implementing entities for all projects
         const implementingEntityQuery = `
-            SELECT pie.project_id, ie.entity_id, ie.name as entity_name
-            FROM projectimplementingentity pie
-            INNER JOIN implementingentity ie ON pie.entity_id = ie.entity_id
+            SELECT pia.project_id, a.agency_id, a.name as entity_name
+            FROM "projectimplementingagency" pia
+            INNER JOIN agency a ON pia.agency_id = a.agency_id
         `;
         const implementingEntityResult = await client.query(implementingEntityQuery);
 
         // Get executing agencies for all projects
         const executingAgencyQuery = `
-            SELECT pea.project_id, ea.agency_id, ea.name as agency_name
-            FROM projectexecutingagency pea
-            INNER JOIN executingagency ea ON pea.agency_id = ea.agency_id
+            SELECT pea.project_id, a.agency_id, a.name as agency_name
+            FROM "projectexecutingagency" pea
+            INNER JOIN agency a ON pea.agency_id = a.agency_id
         `;
         const executingAgencyResult = await client.query(executingAgencyQuery);
 
@@ -499,17 +499,17 @@ Project.updateProject = async (id, data) => {
         }
 
         // Update relationships - delete old and insert new
-        await client.query("DELETE FROM projectimplementingentity WHERE project_id = $1", [id]);
+        await client.query('DELETE FROM "projectimplementingagency" WHERE project_id = $1', [id]);
         await client.query("DELETE FROM projectexecutingagency WHERE project_id = $1", [id]);
         await client.query("DELETE FROM projectdeliverypartner WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectFundingSource WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [id]);
 
         // Insert implementing entities
-        for (const entity_id of parsedImplementingEntityIds) {
+        for (const agency_id of parsedImplementingEntityIds) {
             await client.query(
-                "INSERT INTO projectimplementingentity (project_id, entity_id) VALUES ($1, $2)",
-                [id, entity_id]
+                "INSERT INTO projectimplementingagency (project_id, agency_id) VALUES ($1, $2)",
+                [id, agency_id]
             );
         }
 
@@ -573,18 +573,18 @@ Project.getProjectById = async (id) => {
 
         // Get implementing entities
         const implementingEntitiesQuery = `
-            SELECT ie.entity_id as id, ie.name
-            FROM implementingentity ie
-            INNER JOIN projectimplementingentity pie ON ie.entity_id = pie.entity_id
-            WHERE pie.project_id = $1
+            SELECT a.agency_id as id, a.name
+            FROM agency a
+            INNER JOIN "projectimplementingagency" pia ON a.agency_id = pia.agency_id
+            WHERE pia.project_id = $1
         `;
         const implementingEntitiesResult = await client.query(implementingEntitiesQuery, [id]);
 
         // Get executing agencies
         const executingAgenciesQuery = `
-            SELECT ea.agency_id as id, ea.name
-            FROM executingagency ea
-            INNER JOIN projectexecutingagency pea ON ea.agency_id = pea.agency_id
+            SELECT a.agency_id as id, a.name
+            FROM agency a
+            INNER JOIN "projectexecutingagency" pea ON a.agency_id = pea.agency_id
             WHERE pea.project_id = $1
         `;
         const executingAgenciesResult = await client.query(executingAgenciesQuery, [id]);
@@ -652,7 +652,7 @@ Project.deleteProject = async (id) => {
         await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectFundingSource WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectLocation WHERE project_id = $1", [id]);
-        await client.query("DELETE FROM projectimplementingentity WHERE project_id = $1", [id]);
+        await client.query('DELETE FROM "projectimplementingagency" WHERE project_id = $1', [id]);
         await client.query("DELETE FROM projectexecutingagency WHERE project_id = $1", [id]);
         await client.query("DELETE FROM projectdeliverypartner WHERE project_id = $1", [id]);
         await client.query("DELETE FROM WASHComponent WHERE project_id = $1", [id]);
@@ -1003,14 +1003,14 @@ Project.getProjectByPortfolioType = async () => {
 Project.getImplementingEntityStats = async () => {
     const query = `
         SELECT 
-            ie.entity_id as id,
-            ie.name,
-            COUNT(DISTINCT pie.project_id) AS project_count,
+            a.agency_id as id,
+            a.name,
+            COUNT(DISTINCT pia.project_id) AS project_count,
             COALESCE(SUM(p.total_cost_usd), 0) AS total_finance
-        FROM implementingentity ie
-        LEFT JOIN projectimplementingentity pie ON ie.entity_id = pie.entity_id
-        LEFT JOIN Project p ON pie.project_id = p.project_id
-        GROUP BY ie.entity_id, ie.name
+        FROM agency a
+        LEFT JOIN "projectimplementingagency" pia ON a.agency_id = pia.agency_id
+        LEFT JOIN Project p ON pia.project_id = p.project_id
+        GROUP BY a.agency_id, a.name
         ORDER BY project_count DESC
     `;
     const { rows } = await pool.query(query);
@@ -1020,14 +1020,14 @@ Project.getImplementingEntityStats = async () => {
 Project.getExecutingAgencyStats = async () => {
     const query = `
         SELECT 
-            ea.agency_id as id,
-            ea.name,
+            a.agency_id as id,
+            a.name,
             COUNT(DISTINCT pea.project_id) AS project_count,
             COALESCE(SUM(p.total_cost_usd), 0) AS total_finance
-        FROM executingagency ea
-        LEFT JOIN projectexecutingagency pea ON ea.agency_id = pea.agency_id
+        FROM agency a
+        LEFT JOIN "projectexecutingagency" pea ON a.agency_id = pea.agency_id
         LEFT JOIN Project p ON pea.project_id = p.project_id
-        GROUP BY ea.agency_id, ea.name
+        GROUP BY a.agency_id, a.name
         ORDER BY project_count DESC
     `;
     const { rows } = await pool.query(query);
