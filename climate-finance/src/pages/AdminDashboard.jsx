@@ -6,6 +6,7 @@ import PageHeader from "../components/layouts/PageHeader";
 import Card from "../components/ui/Card";
 import Loading from "../components/ui/Loading";
 import ErrorState from "../components/ui/ErrorState";
+import Button from "../components/ui/Button";
 import { projectApi, activityApi } from "../services/api";
 import {
     Users,
@@ -18,6 +19,7 @@ import {
     User,
     CheckCircle,
     Handshake,
+    RefreshCw,
 } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -28,6 +30,8 @@ const AdminDashboard = () => {
     const [activities, setActivities] = useState([]);
     const [activitiesLoading, setActivitiesLoading] = useState(true);
     const [activitiesError, setActivitiesError] = useState(null);
+    const [activitiesLimit, setActivitiesLimit] = useState(10);
+    const [hasMoreActivities, setHasMoreActivities] = useState(false);
 
     // Fetch dashboard statistics and activities
     useEffect(() => {
@@ -52,29 +56,41 @@ const AdminDashboard = () => {
         }
     };
 
-    const fetchRecentActivities = async () => {
+    const fetchRecentActivities = async (limit = null) => {
         try {
             setActivitiesLoading(true);
             setActivitiesError(null);
-            const response = await activityApi.getRecentActivities(10);
+            const fetchLimit = limit || activitiesLimit;
+            const response = await activityApi.getRecentActivities(fetchLimit);
             
             console.log("Recent activities response:", response);
             
             if (response.status && response.data) {
                 console.log("Activities data:", response.data);
-                setActivities(Array.isArray(response.data) ? response.data : []);
+                const activitiesData = Array.isArray(response.data) ? response.data : [];
+                setActivities(activitiesData);
+                // If we got exactly the limit, there might be more activities
+                setHasMoreActivities(activitiesData.length === fetchLimit);
             } else {
                 console.warn("Invalid response format:", response);
                 setActivitiesError("Failed to load recent activities: Invalid response format");
                 setActivities([]);
+                setHasMoreActivities(false);
             }
         } catch (error) {
             console.error("Error fetching recent activities:", error);
             setActivitiesError(`Failed to load recent activities: ${error.message || "Unknown error"}`);
             setActivities([]);
+            setHasMoreActivities(false);
         } finally {
             setActivitiesLoading(false);
         }
+    };
+
+    const handleLoadMoreActivities = () => {
+        const newLimit = activitiesLimit + 10;
+        setActivitiesLimit(newLimit);
+        fetchRecentActivities(newLimit);
     };
 
     const handleLogout = () => {
@@ -289,13 +305,23 @@ const AdminDashboard = () => {
                     <h2 className="text-lg font-semibold text-gray-900">
                         Recent Activity
                     </h2>
-                    <button
-                        onClick={fetchRecentActivities}
-                        className="text-sm text-purple-600 hover:text-purple-700 underline"
+                    <Button
+                        variant="ghost"
+                        leftIcon={
+                            <RefreshCw
+                                size={16}
+                                className={activitiesLoading ? "animate-spin" : ""}
+                            />
+                        }
+                        onClick={() => {
+                            setActivitiesLimit(10);
+                            fetchRecentActivities(10);
+                        }}
                         disabled={activitiesLoading}
+                        loading={activitiesLoading}
                     >
-                        Refresh
-                    </button>
+                        {activitiesLoading ? "Refreshing..." : "Refresh"}
+                    </Button>
                 </div>
                 {activitiesLoading ? (
                     <div className="flex justify-center items-center py-8">
@@ -319,34 +345,47 @@ const AdminDashboard = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {activities.map((activity, index) => {
-                            const colors = getActivityColorClasses(activity.activity_color);
-                            return (
-                                <div
-                                    key={index}
-                                    className={`flex items-center p-4 ${colors.bg} rounded-xl border ${colors.border} ${colors.hover} transition-colors duration-200`}
+                    <>
+                        <div className="space-y-4">
+                            {activities.map((activity, index) => {
+                                const colors = getActivityColorClasses(activity.activity_color);
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`flex items-center p-4 ${colors.bg} rounded-xl border ${colors.border} ${colors.hover} transition-colors duration-200`}
+                                    >
+                                        <div className={`p-2 ${colors.iconBg} rounded-full`}>
+                                            <span className={colors.iconText}>
+                                                {getActivityIcon(activity.activity_icon)}
+                                            </span>
+                                        </div>
+                                        <div className="ml-4 flex-1">
+                                            <p className="text-sm font-semibold text-gray-900">
+                                                {activity.activity_title}
+                                            </p>
+                                            <p className="text-xs text-gray-600">
+                                                {activity.activity_description}
+                                            </p>
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {activity.time_ago}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {hasMoreActivities && (
+                            <div className="mt-6 text-center">
+                                <button
+                                    onClick={handleLoadMoreActivities}
+                                    disabled={activitiesLoading}
+                                    className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 hover:border-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <div className={`p-2 ${colors.iconBg} rounded-full`}>
-                                        <span className={colors.iconText}>
-                                            {getActivityIcon(activity.activity_icon)}
-                                        </span>
-                                    </div>
-                                    <div className="ml-4 flex-1">
-                                        <p className="text-sm font-semibold text-gray-900">
-                                            {activity.activity_title}
-                                        </p>
-                                        <p className="text-xs text-gray-600">
-                                            {activity.activity_description}
-                                        </p>
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                        {activity.time_ago}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                    {activitiesLoading ? "Loading..." : `Load More (Showing ${activities.length} of recent activities)`}
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </Card>
         </PageLayout>
