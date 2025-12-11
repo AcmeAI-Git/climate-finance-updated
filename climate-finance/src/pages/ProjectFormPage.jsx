@@ -16,7 +16,6 @@ import ProjectFormSections from "../features/admin/ProjectFormSections";
 import { ArrowLeft, FolderTree, CheckCircle } from "lucide-react";
 import { useToast } from "../components/ui/Toast";
 import CheckboxGroup from "../components/ui/CheckboxGroup";
-import { useLanguage } from "../context/LanguageContext";
 
 const defaultFormData = {
     project_id: "",
@@ -96,7 +95,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
-    const { language } = useLanguage();
+    const [existingDocument, setExistingDocument] = useState(null);
 
     // Determine mode based on params, authentication, and URL query
     const urlParams = new URLSearchParams(location.search);
@@ -223,12 +222,18 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     location_segregation:
                         projectData.location_segregation || "",
                     supporting_link: projectData.supporting_link || "",
+                    supporting_document: projectData.supporting_document || "",
                     // Additional new fields
                     additional_location_info:
                         projectData.additional_location_info || "",
                     portfolio_type: projectData.portfolio_type || "",
                     funding_source_name: projectData.funding_source_name || "",
                 });
+                
+                // Set existing document if available
+                if (projectData.supporting_document) {
+                    setExistingDocument(projectData.supporting_document);
+                }
             } else {
                 throw new Error("Project not found");
             }
@@ -471,12 +476,13 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("loan_amount", loanAmount.toString());
             formDataToSend.append("beginning", formData.beginning);
             formDataToSend.append("closing", formData.closing);
-            formDataToSend.append(
-                "approval_fy",
-                formData.approval_fy && formData.approval_fy.toString().trim()
-                    ? parseInt(formData.approval_fy, 10).toString()
-                    : ""
-            );
+            // Only append approval_fy if it has a valid value
+            if (formData.approval_fy && formData.approval_fy.toString().trim()) {
+                formDataToSend.append(
+                    "approval_fy",
+                    parseInt(formData.approval_fy, 10).toString()
+                );
+            }
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
                 "submitter_email",
@@ -551,12 +557,16 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             );
 
             // Append file if selected, with filename
+            // Note: If editing without uploading new file, backend should preserve existing document
             if (selectedFile) {
                 formDataToSend.append(
                     "supporting_document",
                     selectedFile,
                     selectedFile.name
                 );
+            } else if (actualMode === "edit" && existingDocument) {
+                // Send existing document URL as string to preserve it
+                formDataToSend.append("supporting_document", existingDocument);
             }
 
             // Append supporting link if provided
@@ -623,10 +633,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append(
                 "funding_source_name",
                 formData.funding_source_name || ""
-            );
-            formDataToSend.append(
-                "supporting_link",
-                formData.supporting_link || ""
             );
 
             if (actualMode === "public") {
@@ -1052,7 +1058,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Beginning Date
                                 </label>
                                 <div className="flex flex-col gap-2">
@@ -1072,10 +1078,11 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                         onChange={handleInputChange}
                                         className="block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                                     />
+                                    <div className="h-5"></div>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Closing Date
                                 </label>
                                 <div className="flex flex-col gap-2">
@@ -1123,30 +1130,34 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Approval Year
                                 </label>
-                                <p className="text-xs text-gray-500 mt-1 mb-2">
-                                    Leave empty if N/A
-                                </p>
-                                <input
-                                    type="number"
-                                    name="approval_fy"
-                                    value={formData.approval_fy}
-                                    onChange={handleInputChange}
-                                    className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                                        errors.approval_fy
-                                            ? "border-red-300"
-                                            : "border-gray-300"
-                                    }`}
-                                    min="2000"
-                                    max="2030"
-                                />
-                                {errors.approval_fy && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {errors.approval_fy}
+                                <div className="flex flex-col gap-2">
+                                    <input
+                                        type="number"
+                                        name="approval_fy"
+                                        value={formData.approval_fy}
+                                        onChange={handleInputChange}
+                                        className={`block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                            errors.approval_fy
+                                                ? "border-red-300"
+                                                : "border-gray-300"
+                                        }`}
+                                        min="2000"
+                                        max="2030"
+                                    />
+                                                                        <p className="text-xs text-gray-500">
+                                        Leave empty if N/A
                                     </p>
-                                )}
+                                    {errors.approval_fy ? (
+                                        <p className="text-sm text-red-600">
+                                            {errors.approval_fy}
+                                        </p>
+                                    ) : (
+                                        <div className="h-5"></div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1290,6 +1301,47 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                     provide additional project details or
                                     supporting materials.
                                 </p>
+
+                                {/* Show existing document when editing */}
+                                {existingDocument && !selectedFile && actualMode === "edit" && (
+                                    <div className="border border-blue-200 bg-blue-50 rounded-xl p-4 mb-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="shrink-0">
+                                                    <svg
+                                                        className="h-8 w-8 text-blue-600"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        Current Document
+                                                    </p>
+                                                    <a
+                                                        href={existingDocument}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm text-blue-600 hover:text-blue-700 underline break-all"
+                                                    >
+                                                        {existingDocument}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">
+                                            Upload a new file to replace the existing document
+                                        </p>
+                                    </div>
+                                )}
 
                                 {!selectedFile ? (
                                     <div className="relative">

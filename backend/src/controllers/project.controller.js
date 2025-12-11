@@ -42,7 +42,12 @@ exports.updateProject = async (req, res) => {
         if (req.files && req.files.supporting_document) {
             const fileUrl = await uploadFile(req.files.supporting_document);
             projectData.supporting_document = fileUrl;
+        } else if (req.body.supporting_document && typeof req.body.supporting_document === 'string') {
+            // Preserve existing document URL if provided as string (when editing without uploading new file)
+            projectData.supporting_document = req.body.supporting_document;
         }
+        // If neither file nor string is provided, supporting_document will be undefined
+        // and the model should preserve the existing value (we'll need to handle this in the model)
 
         const result = await Project.updateProject(req.params.id, projectData);
         res.status(200).json({

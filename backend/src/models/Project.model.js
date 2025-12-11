@@ -157,7 +157,7 @@ Project.addProjectWithRelations = async (data) => {
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
-            supporting_link || null,
+            normalizedSupportingLink || null,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -420,6 +420,44 @@ Project.updateProject = async (id, data) => {
         const parsedDeliveryPartnerIds = parseArrayField(delivery_partner_ids, 'delivery_partner_ids');
         const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
 
+        // Get existing document if not provided
+        let finalSupportingDocument = supporting_document;
+        if (supporting_document === undefined) {
+            const existingProject = await client.query(
+                'SELECT supporting_document FROM Project WHERE project_id = $1',
+                [id]
+            );
+            if (existingProject.rows.length > 0) {
+                finalSupportingDocument = existingProject.rows[0].supporting_document;
+            }
+        }
+        
+        // Normalize supporting_link to ensure it's always a string
+        let normalizedSupportingLink = supporting_link;
+        if (normalizedSupportingLink) {
+            if (typeof normalizedSupportingLink === 'string') {
+                // Try to parse if it looks like JSON
+                if (normalizedSupportingLink.trim().startsWith('[') || normalizedSupportingLink.trim().startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(normalizedSupportingLink);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            normalizedSupportingLink = parsed[0]; // Take first URL if array
+                        } else if (typeof parsed === 'string') {
+                            normalizedSupportingLink = parsed;
+                        } else {
+                            normalizedSupportingLink = null;
+                        }
+                    } catch (e) {
+                        // Not valid JSON, use as is
+                    }
+                }
+            } else if (Array.isArray(normalizedSupportingLink) && normalizedSupportingLink.length > 0) {
+                normalizedSupportingLink = normalizedSupportingLink[0];
+            } else {
+                normalizedSupportingLink = null;
+            }
+        }
+
         const updateProjectQuery = `
             UPDATE Project SET 
                 title = $1, status = $2, approval_fy = $3, beginning = $4, closing = $5,
@@ -462,7 +500,7 @@ Project.updateProject = async (id, data) => {
             climate_relevance_category || null,
             climate_relevance_justification || null,
             wash_component_description || null,
-            supporting_document || null,
+            finalSupportingDocument || null,
             parsedDistricts,
             parseFloat(loan_amount) || 0,
             parsedLocationSegregation,
@@ -471,7 +509,7 @@ Project.updateProject = async (id, data) => {
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
-            supporting_link || null,
+            normalizedSupportingLink || null,
             id,
         ];
 
