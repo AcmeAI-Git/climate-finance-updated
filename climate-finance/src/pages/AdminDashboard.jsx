@@ -4,10 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import PageLayout from "../components/layouts/PageLayout";
 import PageHeader from "../components/layouts/PageHeader";
 import Card from "../components/ui/Card";
-import StatCard from "../components/ui/StatCard";
 import Loading from "../components/ui/Loading";
 import ErrorState from "../components/ui/ErrorState";
-import { formatCurrency } from "../utils/formatters";
 import { projectApi } from "../services/api";
 import {
     Users,
@@ -18,19 +16,12 @@ import {
     BookOpenText,
     Plus,
     User,
-    Banknote,
-    RefreshCw,
-    Activity,
     CheckCircle,
 } from "lucide-react";
-import { getChartTranslation } from "../utils/chartTranslations";
-import { useLanguage } from "../context/LanguageContext";
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
-    const { language } = useLanguage();
     const navigate = useNavigate();
-    const [dashboardStats, setDashboardStats] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -45,102 +36,12 @@ const AdminDashboard = () => {
             setError(null);
             const response = await projectApi.getDashboardOverviewStats();
 
-            if (response.status && response.data) {
-                const data = response.data;
-
-                setDashboardStats([
-                    {
-                        title: getChartTranslation(
-                            language,
-                            null,
-                            "projectsByStatus"
-                        ),
-                        value: data.total_projects || 0,
-                        change: "All projects",
-                        color: "primary",
-                        icon: <FolderTree size={20} />,
-                    },
-                    {
-                        title: getChartTranslation(
-                            language,
-                            null,
-                            "projectsByType"
-                        ),
-                        value: data.active_projects || 0,
-                        change: "Currently active",
-                        color: "success",
-                        icon: <Activity size={20} />,
-                    },
-                    {
-                        title: getChartTranslation(
-                            language,
-                            null,
-                            "fundingByType"
-                        ),
-                        value: formatCurrency(data.total_climate_finance || 0),
-                        change: "All-time total",
-                        color: "warning",
-                        icon: <Banknote size={20} />,
-                    },
-                    {
-                        title:
-                            language === "bn"
-                                ? "সম্পূর্ণ প্রকল্প"
-                                : "Completed Projects",
-                        value: data.completed_projects || 0,
-                        change: "Successfully completed",
-                        color: "primary",
-                        icon: <DollarSign size={20} />,
-                    },
-                ]);
-            } else {
+            if (!response.status || !response.data) {
                 throw new Error("Invalid response data");
             }
         } catch (error) {
             console.error("Error fetching dashboard stats:", error);
             setError("Failed to load dashboard statistics");
-            // Fallback to default values
-            setDashboardStats([
-                {
-                    title: getChartTranslation(
-                        language,
-                        null,
-                        "projectsByStatus"
-                    ),
-                    value: 0,
-                    change: "No data available",
-                    color: "primary",
-                    icon: <FolderTree size={20} />,
-                },
-                {
-                    title: getChartTranslation(
-                        language,
-                        null,
-                        "projectsByType"
-                    ),
-                    value: 0,
-                    change: "No data available",
-                    color: "success",
-                    icon: <Activity size={20} />,
-                },
-                {
-                    title: getChartTranslation(language, null, "fundingByType"),
-                    value: formatCurrency(0),
-                    change: "No data available",
-                    color: "warning",
-                    icon: <Banknote size={20} />,
-                },
-                {
-                    title:
-                        language === "bn"
-                            ? "অ্যাডাপটেশন ফাইন্যান্স"
-                            : "Adaptation Finance",
-                    value: formatCurrency(0),
-                    change: "No data available",
-                    color: "primary",
-                    icon: <DollarSign size={20} />,
-                },
-            ]);
         } finally {
             setIsLoading(false);
         }
@@ -154,7 +55,7 @@ const AdminDashboard = () => {
     const menuItems = [
         {
             title: "Project Management",
-            description: "Add, edit, and manage climate projects",
+            description: "Add, edit, and manage projects",
             icon: <FolderTree size={20} />,
             path: "/admin/projects",
             color: "bg-primary-600",
@@ -168,7 +69,7 @@ const AdminDashboard = () => {
         },
         {
             title: "User Management",
-            description: "Manage admin users and permissions",
+            description: "Manage administrators and permissions",
             icon: <Users size={20} />,
             path: "/admin/users",
             color: "bg-success-600",
@@ -176,14 +77,14 @@ const AdminDashboard = () => {
         },
         {
             title: "Funding Sources",
-            description: "Manage funding sources and partners",
+            description: "Manage funding sources",
             icon: <DollarSign size={20} />,
             path: "/admin/funding-sources",
             color: "bg-warning-600",
         },
         {
             title: "Agencies",
-            description: "Manage implementing agencies",
+            description: "Manage agencies",
             icon: <Building2 size={20} />,
             path: "/admin/agencies",
             color: "bg-primary-500",
@@ -197,7 +98,7 @@ const AdminDashboard = () => {
         },
         {
             title: "Repository Management",
-            description: "Edit, and manage climate repositories",
+            description: "Edit, and manage repositories",
             icon: <BookOpenText size={20} />,
             path: "/admin/repository-management",
             color: "bg-success-500",
