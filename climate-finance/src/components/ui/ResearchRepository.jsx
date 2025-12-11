@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { RepositoryApi, downloadDocumentApi } from "../../services/api";
 import Pagination from "./Pagination";
+import { formatCategoryToTitleCase } from "../../utils/transliteration";
 
 export default function ResearchRepository() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -60,7 +61,7 @@ export default function ResearchRepository() {
 
                     setDocuments(transformedDocs);
 
-                    // Extract unique categories
+                    // Extract unique categories (keep original for filtering, but format for display)
                     const uniqueCategories = [
                         "All Categories",
                         ...new Set(transformedDocs.map((doc) => doc.category)),
@@ -176,7 +177,7 @@ export default function ResearchRepository() {
                             >
                                 {categories.map((cat) => (
                                     <option key={cat} value={cat}>
-                                        {cat}
+                                        {cat === "All Categories" ? cat : formatCategoryToTitleCase(cat)}
                                     </option>
                                 ))}
                             </select>
@@ -293,7 +294,7 @@ export default function ResearchRepository() {
                                         <div className="flex-1 min-w-0">
                                             <div className="inline-block">
                                                 <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded mb-2 inline-block">
-                                                    {doc.category}
+                                                    {formatCategoryToTitleCase(doc.category)}
                                                 </span>
                                             </div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-1">

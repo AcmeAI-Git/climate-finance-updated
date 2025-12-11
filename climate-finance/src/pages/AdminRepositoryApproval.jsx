@@ -13,6 +13,7 @@ import { useAuth } from "../context/AuthContext";
 import { pendingRepositoryApi, downloadDocumentApi } from "../services/api";
 import { formatDate } from "../utils/formatDate";
 import { formatCurrency } from "../utils/formatters";
+import { formatCategoryToTitleCase } from "../utils/transliteration";
 
 const AdminRepositoryApproval = () => {
     const [pendingrepositorys, setPendingrepositorys] = useState([]);
@@ -209,7 +210,7 @@ const AdminRepositoryApproval = () => {
                             },
                             {
                                 label: "Categories",
-                                value: repository.categories ?? "N/A",
+                                value: repository.categories ? formatCategoryToTitleCase(repository.categories) : "N/A",
                             },
                             {
                                 label: "Document",

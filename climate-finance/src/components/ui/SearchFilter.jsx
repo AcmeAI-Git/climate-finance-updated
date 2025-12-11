@@ -58,6 +58,34 @@ const filterData = (data, activeFilters) => {
 
                 let itemValue = getNestedValue(item, key);
 
+                // Special handling for implementing_entity_id, executing_agency_id, delivery_partner_id
+                // These filter keys need to check specific arrays with 'id' field
+                if (key === "implementing_entity_id" || key === "executing_agency_id" || key === "delivery_partner_id") {
+                    let arrayName;
+                    if (key === "implementing_entity_id") {
+                        arrayName = "implementing_entities";
+                    } else if (key === "executing_agency_id") {
+                        arrayName = "executing_agencies";
+                    } else if (key === "delivery_partner_id") {
+                        arrayName = "delivery_partners";
+                    }
+                    
+                    if (arrayName && item[arrayName] && Array.isArray(item[arrayName])) {
+                        const matches = item[arrayName].some((el) => {
+                            if (el && typeof el === "object" && el.id !== undefined) {
+                                return el.id.toString() === value.toString();
+                            }
+                            return false;
+                        });
+                        return matches;
+                    }
+                    // If array doesn't exist or is empty, exclude item (unless value is "N/A")
+                    if (value === "N/A") {
+                        return !item[arrayName] || item[arrayName].length === 0;
+                    }
+                    return false;
+                }
+
                 // If the field doesn't exist at the top-level/path, try to find it inside
                 // nested arrays/objects (e.g. project.agencies => [{agency_id, name}, ...])
                 if (itemValue === undefined || itemValue === null) {

@@ -81,12 +81,39 @@ export const getRepositoryCategoryCASESTUDYTransliteration = (language) => {
     if (language === "bn") {
         return "কেস স্টাডি";
     }
-    return "CASE STUDY";
+    return "Case Study";
 };
 
 export const getRepositoryCategoryIMPACTTransliteration = (language) => {
     if (language === "bn") {
         return "ইম্প্যাক্ট রিপোর্ট";
     }
-    return "IMPACT REPORT";
+    return "Impact Report";
+};
+
+// Format category to title case (e.g., "CASE STUDY" -> "Case Study")
+export const formatCategoryToTitleCase = (category) => {
+    if (!category) return category;
+    
+    // Handle common category names
+    const categoryMap = {
+        "CASE STUDY": "Case Study",
+        "IMPACT REPORT": "Impact Report",
+        "FIELD NOTES": "Field Notes",
+        "case study": "Case Study",
+        "impact report": "Impact Report",
+        "field notes": "Field Notes",
+    };
+    
+    // Check if it's a known category
+    if (categoryMap[category]) {
+        return categoryMap[category];
+    }
+    
+    // Otherwise, convert to title case
+    return category
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 };

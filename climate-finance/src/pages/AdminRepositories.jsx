@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import AdminListPage from "../features/admin/AdminListPage";
 import { RepositoryApi } from "../services/api";
 import { getChartTranslation } from "../utils/chartTranslations";
+import { formatCategoryToTitleCase } from "../utils/transliteration";
 
 const AdminRepositories = () => {
     const [repositoriesList, setRepositoriesList] = useState([]);
@@ -101,7 +102,7 @@ const AdminRepositories = () => {
                     { value: "All", label: "All Categories" },
                     ...categories.map((category) => ({
                         value: category,
-                        label: category,
+                        label: formatCategoryToTitleCase(category),
                     })),
                 ],
             },

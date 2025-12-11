@@ -266,17 +266,17 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                                 required
                             >
                                 <option value="">Select Category</option>
-                                <option value="CASE STUDY">
+                                <option value="Case Study">
                                     {getRepositoryCategoryCASESTUDYTransliteration(
                                         language
                                     )}
                                 </option>
-                                <option value="IMPACT REPORT">
+                                <option value="Impact Report">
                                     {getRepositoryCategoryIMPACTTransliteration(
                                         language
                                     )}
                                 </option>
-                                <option value="FIELD NOTES">FIELD NOTES</option>
+                                <option value="Field Notes">Field Notes</option>
                             </select>
                             {errors.category && (
                                 <p className="mt-1 text-sm text-red-600">

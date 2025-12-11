@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { projectApi, agencyApi, fundingSourceApi } from "../services/api";
+import { projectApi, fundingSourceApi, implementingEntityApi, executingAgencyApi, deliveryPartnerApi } from "../services/api";
 import { formatCurrency } from "../utils/formatters";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -51,7 +51,9 @@ const Projects = () => {
     const [activeFilters, setActiveFilters] = useState({
         status: "All",
         geographic_division: "All",
-        agency_id: "All",
+        implementing_entity_id: "All",
+        executing_agency_id: "All",
+        delivery_partner_id: "All",
         funding_source_id: "All",
         sector: "All",
         type: "All",
@@ -70,7 +72,9 @@ const Projects = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(9);
 
-    const [agencies, setAgencies] = useState([]);
+    const [implementingEntities, setImplementingEntities] = useState([]);
+    const [executingAgencies, setExecutingAgencies] = useState([]);
+    const [deliveryPartners, setDeliveryPartners] = useState([]);
     const [fundingSources, setFundingSources] = useState([]);
 
     const { language } = useLanguage();
@@ -80,10 +84,18 @@ const Projects = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch agencies and funding sources
-        agencyApi.getAll().then((res) => {
-            if (res?.status && Array.isArray(res.data)) setAgencies(res.data);
-            else setAgencies([]);
+        // Fetch implementing entities, executing agencies, delivery partners, and funding sources
+        implementingEntityApi.getAll().then((res) => {
+            if (res?.status && Array.isArray(res.data)) setImplementingEntities(res.data);
+            else setImplementingEntities([]);
+        });
+        executingAgencyApi.getAll().then((res) => {
+            if (res?.status && Array.isArray(res.data)) setExecutingAgencies(res.data);
+            else setExecutingAgencies([]);
+        });
+        deliveryPartnerApi.getAll().then((res) => {
+            if (res?.status && Array.isArray(res.data)) setDeliveryPartners(res.data);
+            else setDeliveryPartners([]);
         });
         fundingSourceApi.getAll().then((res) => {
             if (res?.status && Array.isArray(res.data))
@@ -405,11 +417,27 @@ const Projects = () => {
         }
         
         filters.push({
-            key: "agency_id",
-            label: "Agency",
+            key: "implementing_entity_id",
+            label: "Implementing Entity",
             options: [
-                { value: "All", label: "All Agencies" },
-                ...agencies.map((a) => ({ value: a.agency_id, label: a.name })),
+                { value: "All", label: "All Implementing Entities" },
+                ...implementingEntities.map((e) => ({ value: e.id, label: e.name })),
+            ],
+        });
+        filters.push({
+            key: "executing_agency_id",
+            label: "Executing Agency",
+            options: [
+                { value: "All", label: "All Executing Agencies" },
+                ...executingAgencies.map((a) => ({ value: a.id, label: a.name })),
+            ],
+        });
+        filters.push({
+            key: "delivery_partner_id",
+            label: "Delivery Partner",
+            options: [
+                { value: "All", label: "All Delivery Partners" },
+                ...deliveryPartners.map((p) => ({ value: p.id, label: p.name })),
             ],
         });
         filters.push({
@@ -486,7 +514,7 @@ const Projects = () => {
             filters: filters,
             yearRange: { minYear, maxYear },
         };
-    }, [projectsList, agencies, fundingSources]);
+    }, [projectsList, implementingEntities, executingAgencies, deliveryPartners, fundingSources]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -771,7 +799,9 @@ const Projects = () => {
                             setActiveFilters({
                                 status: "All",
                                 geographic_division: "All",
-                                agency_id: "All",
+                                implementing_entity_id: "All",
+                                executing_agency_id: "All",
+                                delivery_partner_id: "All",
                                 funding_source_id: "All",
                                 sector: "All",
                                 type: "All",
@@ -1105,7 +1135,9 @@ const Projects = () => {
                                 setActiveFilters({
                                     status: "All",
                                     geographic_division: "All",
-                                    agency_id: "All",
+                                    implementing_entity_id: "All",
+                                    executing_agency_id: "All",
+                                    delivery_partner_id: "All",
                                     funding_source_id: "All",
                                     sector: "All",
                                     type: "All",
