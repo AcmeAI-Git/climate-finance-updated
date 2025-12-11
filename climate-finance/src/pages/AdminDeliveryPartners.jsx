@@ -83,3 +83,4 @@ const AdminDeliveryPartners = () => {
 
 export default AdminDeliveryPartners;
 
+

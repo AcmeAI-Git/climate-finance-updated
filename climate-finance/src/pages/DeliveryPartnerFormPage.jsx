@@ -51,3 +51,4 @@ const DeliveryPartnerFormPage = ({ mode = 'add' }) => {
 
 export default DeliveryPartnerFormPage;
 
+

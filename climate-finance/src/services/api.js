@@ -114,6 +114,12 @@ export const projectApi = {
     getDashboardOverviewStats: () => apiRequest("/project/get-overview-stat"),
 };
 
+// Activity API endpoints
+export const activityApi = {
+    getRecentActivities: (limit = 10) => 
+        apiRequest(`/activity/recent?limit=${limit}`),
+};
+
 // Pending Project API endpoints
 export const pendingProjectApi = {
     // Public submission
