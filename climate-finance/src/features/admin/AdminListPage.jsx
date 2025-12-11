@@ -218,6 +218,8 @@ const AdminListPage = ({
                               id = row.location_id;
                           } else if (entityName === "funding-source") {
                               id = row.funding_source_id;
+                          } else if (entityName === "delivery-partner") {
+                              id = row.id;
                           } else if (entityName === "user") {
                               id = row.id;
                           } else {
@@ -229,7 +231,12 @@ const AdminListPage = ({
                               );
                               return;
                           }
-                          navigate(`/admin/${entityName}s/${id}/edit`);
+                          const pathMap = {
+                              'delivery-partner': 'delivery-partners',
+                              'funding-source': 'funding-sources'
+                          };
+                          const pathSegment = pathMap[entityName] || `${entityName}s`;
+                          navigate(`/admin/${pathSegment}/${id}/edit`);
                       },
                   },
                   {

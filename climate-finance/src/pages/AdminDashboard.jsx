@@ -17,6 +17,7 @@ import {
     Plus,
     User,
     CheckCircle,
+    Handshake,
 } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -87,6 +88,13 @@ const AdminDashboard = () => {
             description: "Manage agencies",
             icon: <Building2 size={20} />,
             path: "/admin/agencies",
+            color: "bg-primary-500",
+        },
+        {
+            title: "Delivery Partners",
+            description: "Manage delivery partners",
+            icon: <Handshake size={20} />,
+            path: "/admin/delivery-partners",
             color: "bg-primary-500",
         },
         {

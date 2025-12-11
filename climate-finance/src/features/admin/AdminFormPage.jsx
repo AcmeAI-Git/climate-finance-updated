@@ -34,6 +34,7 @@ const AdminFormPage = ({
     const pluralRules = {
       'agency': 'agencies',
       'funding-source': 'funding-sources',
+      'delivery-partner': 'delivery-partners',
       'location': 'locations',
       'user': 'users',
       'project': 'projects'

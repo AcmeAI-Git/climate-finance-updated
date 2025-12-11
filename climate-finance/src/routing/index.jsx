@@ -17,10 +17,12 @@ import AdminUsers from "../pages/AdminUsers";
 import AdminProjects from "../pages/AdminProjects";
 import AdminAgencies from "../pages/AdminAgencies";
 import AdminFundingSources from "../pages/AdminFundingSources";
+import AdminDeliveryPartners from "../pages/AdminDeliveryPartners";
 import AdminLocations from "../pages/AdminLocations";
 import AdminProjectApproval from "../pages/AdminProjectApproval";
 import UserFormPage from "../pages/UserFormPage";
 import AgencyFormPage from "../pages/AgencyFormPage";
+import DeliveryPartnerFormPage from "../pages/DeliveryPartnerFormPage";
 import LocationFormPage from "../pages/LocationFormPage";
 import AboutPage from "../pages/AboutPage";
 import RepositoryFormPage from "../pages/RepositoryFormPage";
@@ -282,6 +284,36 @@ const Routing = () => {
                 element={
                     <AdminRoute>
                         <FundingSourceFormPage mode="edit" />
+                    </AdminRoute>
+                }
+            />
+
+            {/* Admin Delivery Partners */}
+            <Route
+                path="/admin/delivery-partners"
+                element={
+                    <AdminRoute>
+                        <AdminDeliveryPartners />
+                    </AdminRoute>
+                }
+            />
+            <Route
+                path="/admin/delivery-partners/add"
+                element={<Navigate to="/admin/delivery-partners/new" replace />}
+            />
+            <Route
+                path="/admin/delivery-partners/new"
+                element={
+                    <AdminRoute>
+                        <DeliveryPartnerFormPage mode="add" />
+                    </AdminRoute>
+                }
+            />
+            <Route
+                path="/admin/delivery-partners/:id/edit"
+                element={
+                    <AdminRoute>
+                        <DeliveryPartnerFormPage mode="edit" />
                     </AdminRoute>
                 }
             />
