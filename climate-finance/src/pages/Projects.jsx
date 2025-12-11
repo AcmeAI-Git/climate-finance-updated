@@ -46,20 +46,21 @@ const Projects = () => {
     const [error, setError] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
 
-    // Filter states
+    // Filter states - using arrays for multi-select support
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilters, setActiveFilters] = useState({
-        status: "All",
-        geographic_division: "All",
-        implementing_entity_id: "All",
-        executing_agency_id: "All",
-        delivery_partner_id: "All",
-        funding_source_id: "All",
-        sector: "All",
-        type: "All",
-        hotspot_vulnerability_type: "All",
-        hotspot_types: "All",
-        districts: "All",
+        status: [],
+        geographic_division: [],
+        implementing_entity_id: [],
+        executing_agency_id: [],
+        delivery_partner_id: [],
+        funding_source_id: [],
+        sector: [],
+        type: [],
+        hotspot_vulnerability_type: [],
+        hotspot_types: [],
+        districts: [],
+        equity_marker: [],
     });
     
     // Year range filter (separate from dropdown filters)
@@ -76,6 +77,9 @@ const Projects = () => {
     const [executingAgencies, setExecutingAgencies] = useState([]);
     const [deliveryPartners, setDeliveryPartners] = useState([]);
     const [fundingSources, setFundingSources] = useState([]);
+    
+    // Districts data for filtering based on divisions
+    const [districtsData, setDistrictsData] = useState({});
 
     const { language } = useLanguage();
 
@@ -102,6 +106,16 @@ const Projects = () => {
                 setFundingSources(res.data);
             else setFundingSources([]);
         });
+    }, []);
+
+    // Load districts data from JSON file
+    useEffect(() => {
+        fetch("/bd-districts.json")
+            .then((res) => res.json())
+            .then((data) => {
+                setDistrictsData(data);
+            })
+            .catch((err) => console.error("Error loading districts:", err));
     }, []);
 
     const fetchAllProjectData = async () => {
@@ -359,7 +373,8 @@ const Projects = () => {
                    deliveryPartners === undefined;
         });
 
-        const districtsList = Array.from(
+        // Get all districts from projects (for fallback)
+        const allDistrictsFromProjects = Array.from(
             new Set(
                 projectsList
                     .flatMap((p) =>
@@ -370,6 +385,33 @@ const Projects = () => {
                     .filter(Boolean)
             )
         ).sort();
+
+        // Filter districts based on selected divisions
+        let districtsList = allDistrictsFromProjects;
+        const selectedDivisions = activeFilters.geographic_division || [];
+        const hasSelectedDivisions = selectedDivisions.length > 0 && !selectedDivisions.includes("All");
+        
+        if (hasSelectedDivisions && Object.keys(districtsData).length > 0) {
+            // Filter districts based on selected divisions
+            let filteredDistricts = [];
+            selectedDivisions.forEach((division) => {
+                if (districtsData[division] && Array.isArray(districtsData[division])) {
+                    filteredDistricts = filteredDistricts.concat(districtsData[division]);
+                }
+            });
+            
+            // Remove duplicates and sort
+            if (filteredDistricts.length > 0) {
+                districtsList = Array.from(new Set(filteredDistricts)).sort();
+            }
+        } else if (Object.keys(districtsData).length > 0) {
+            // If no divisions selected, show all districts from the JSON file
+            districtsList = Array.from(
+                new Set(
+                    Object.values(districtsData).flat()
+                )
+            ).sort();
+        }
 
         const filters = [];
         filters.push({
@@ -533,7 +575,7 @@ const Projects = () => {
             filters: filters,
             yearRange: { minYear, maxYear },
         };
-    }, [projectsList, implementingEntities, executingAgencies, deliveryPartners, fundingSources]);
+    }, [projectsList, implementingEntities, executingAgencies, deliveryPartners, fundingSources, activeFilters.geographic_division, districtsData]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -813,20 +855,22 @@ const Projects = () => {
                         activeFilters={activeFilters}
                         onFiltersChange={setActiveFilters}
                         showAdvancedSearch={true}
+                        multiSelect={true}
                         onClearAll={() => {
                             setSearchTerm("");
                             setActiveFilters({
-                                status: "All",
-                                geographic_division: "All",
-                                implementing_entity_id: "All",
-                                executing_agency_id: "All",
-                                delivery_partner_id: "All",
-                                funding_source_id: "All",
-                                sector: "All",
-                                type: "All",
-                                hotspot_vulnerability_type: "All",
-                                hotspot_types: "All",
-                                districts: "All",
+                                status: [],
+                                geographic_division: [],
+                                implementing_entity_id: [],
+                                executing_agency_id: [],
+                                delivery_partner_id: [],
+                                funding_source_id: [],
+                                sector: [],
+                                type: [],
+                                hotspot_vulnerability_type: [],
+                                hotspot_types: [],
+                                districts: [],
+                                equity_marker: [],
                             });
                             setYearRange({ min: null, max: null });
                         }}
@@ -1138,17 +1182,18 @@ const Projects = () => {
                             onClick={() => {
                                 setSearchTerm("");
                                 setActiveFilters({
-                                    status: "All",
-                                    geographic_division: "All",
-                                    implementing_entity_id: "All",
-                                    executing_agency_id: "All",
-                                    delivery_partner_id: "All",
-                                    funding_source_id: "All",
-                                    sector: "All",
-                                    type: "All",
-                                    hotspot_vulnerability_type: "All",
-                                    hotspot_types: "All",
-                                    districts: "All",
+                                    status: [],
+                                    geographic_division: [],
+                                    implementing_entity_id: [],
+                                    executing_agency_id: [],
+                                    delivery_partner_id: [],
+                                    funding_source_id: [],
+                                    sector: [],
+                                    type: [],
+                                    hotspot_vulnerability_type: [],
+                                    hotspot_types: [],
+                                    districts: [],
+                                    equity_marker: [],
                                 });
                                 setYearRange({ min: null, max: null });
                             }}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, X, Check } from 'lucide-react';
 import Badge from './Badge';
 
@@ -12,6 +12,8 @@ const MultiSelect = ({
   maxDisplay = 3,
   className = '',
   error = false,
+  dropdownMinWidth = 'min-w-[300px]',
+  dropdownMaxHeight = 'max-h-96',
   ...props
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,10 +21,23 @@ const MultiSelect = ({
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  // Filter options based on search term
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Check if "All" option exists and get its value
+  const allOption = options.find(opt => opt.value === "All" || opt.label.toLowerCase().includes("all"));
+  const allOptionValue = allOption?.value;
+
+  // Filter options based on search term, but always show "All" first if it exists
+  const filteredOptions = useMemo(() => {
+    const filtered = options.filter(option =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    // Ensure "All" option appears first if it exists and matches search
+    if (allOption && (searchTerm === '' || allOption.label.toLowerCase().includes(searchTerm.toLowerCase()))) {
+      const withoutAll = filtered.filter(opt => opt.value !== allOptionValue);
+      return [allOption, ...withoutAll];
+    }
+    return filtered;
+  }, [options, searchTerm, allOption, allOptionValue]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -45,10 +60,36 @@ const MultiSelect = ({
   }, [isOpen, searchable]);
 
   const handleToggleOption = (optionValue) => {
-    const newValue = value.includes(optionValue)
-      ? value.filter(v => v !== optionValue)
-      : [...value, optionValue];
-    onChange(newValue);
+    // Handle "All" option specially
+    if (optionValue === allOptionValue) {
+      // If "All" is selected, clear all other selections
+      if (value.includes(allOptionValue)) {
+        // Deselecting "All" - do nothing (keep empty array)
+        onChange([]);
+      } else {
+        // Selecting "All" - clear all other selections
+        onChange([allOptionValue]);
+      }
+    } else {
+      // Handle regular options
+      let newValue;
+      if (value.includes(optionValue)) {
+        // Deselecting a regular option
+        newValue = value.filter(v => v !== optionValue);
+        // If "All" was selected, remove it when selecting a specific option
+        if (allOptionValue && newValue.includes(allOptionValue)) {
+          newValue = newValue.filter(v => v !== allOptionValue);
+        }
+      } else {
+        // Selecting a regular option
+        newValue = [...value, optionValue];
+        // If "All" was selected, remove it when selecting a specific option
+        if (allOptionValue && newValue.includes(allOptionValue)) {
+          newValue = newValue.filter(v => v !== allOptionValue);
+        }
+      }
+      onChange(newValue);
+    }
   };
 
   const handleRemoveOption = (optionValue, e) => {
@@ -64,8 +105,12 @@ const MultiSelect = ({
   };
 
   const selectedLabels = getSelectedLabels();
-  const displayedLabels = selectedLabels.slice(0, maxDisplay);
-  const remainingCount = selectedLabels.length - maxDisplay;
+  // If "All" is selected, show only "All" in the display
+  const isAllSelected = allOptionValue && value.includes(allOptionValue);
+  const displayedLabels = isAllSelected 
+    ? [allOption?.label || "All"]
+    : selectedLabels.slice(0, maxDisplay);
+  const remainingCount = isAllSelected ? 0 : selectedLabels.length - maxDisplay;
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
@@ -83,12 +128,13 @@ const MultiSelect = ({
         {...props}
       >
         <div className="flex-1 flex flex-wrap gap-1 min-h-[1.5rem] items-center">
-          {selectedLabels.length === 0 ? (
+          {selectedLabels.length === 0 && !isAllSelected ? (
             <span className="text-gray-500 text-sm">{placeholder}</span>
           ) : (
             <>
               {displayedLabels.map((label) => {
                 const option = options.find(opt => opt.label === label);
+                if (!option) return null;
                 return (
                   <Badge
                     key={option.value}
@@ -125,7 +171,7 @@ const MultiSelect = ({
 
       {/* Dropdown */}
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-hidden">
+        <div className={`absolute top-full left-0 ${dropdownMinWidth} w-max max-w-[500px] mt-1 bg-white border border-gray-300 rounded-lg shadow-xl z-50 ${dropdownMaxHeight} overflow-hidden`}>
           {/* Search */}
           {searchable && (
             <div className="p-2 border-b border-gray-200">
@@ -142,7 +188,7 @@ const MultiSelect = ({
           )}
 
           {/* Options */}
-          <div className="max-h-48 overflow-y-auto">
+          <div className={`${dropdownMaxHeight === 'max-h-96' ? 'max-h-80' : 'max-h-64'} overflow-y-auto`}>
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
                 {searchTerm ? 'No options found' : 'No options available'}

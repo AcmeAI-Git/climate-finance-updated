@@ -379,10 +379,10 @@ const ProjectFormSections = ({
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Additional Location Information
+                            Additional Information
                         </label>
                         <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                            Additional location details such as Upazila, Paurashava, Union, etc.
+                            Location details such as Upazila, Paurashava, Union, etc.
                         </p>
                         <textarea
                             name="additional_location_info"
@@ -395,7 +395,6 @@ const ProjectFormSections = ({
                             }
                             rows={3}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                            placeholder="e.g., 14 Drought-prone Upazilas, Only in char and flood-prone areas"
                         />
                     </div>
                 </div>
@@ -524,7 +523,6 @@ const ProjectFormSections = ({
                         onChange={handleInputChange}
                         rows={3}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        placeholder="Describe the vulnerability type..."
                     />
                 </div>
             </div>
@@ -701,7 +699,6 @@ const ProjectFormSections = ({
                             onChange={handleInputChange}
                             rows={4}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                            placeholder="e.g., Strong NAP. Focus on water security, salinity & drought adaptation; Aligned with Bangladesh NDC & Energy Efficiency Masterplan"
                         />
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { SEARCH_CONFIGS } from "../../constants/searchConfigs";
+import MultiSelect from "./MultiSelect";
 
 // Advanced search function with weighted scoring
 const advancedSearch = (data, searchValue, searchConfig) => {
@@ -54,6 +55,15 @@ const filterData = (data, activeFilters) => {
     return data.filter((item) => {
         const passesAllFilters = Object.entries(activeFilters).every(
             ([key, value]) => {
+                // Handle array values (multi-select mode)
+                if (Array.isArray(value)) {
+                    // Empty array means "All" - show everything
+                    if (value.length === 0) return true;
+                    // Check if "All" is in the array
+                    if (value.includes("All")) return true;
+                }
+                
+                // Handle single values (backward compatibility)
                 if (!value || value === "All") return true;
 
                 let itemValue = getNestedValue(item, key);
@@ -70,6 +80,31 @@ const filterData = (data, activeFilters) => {
                         arrayName = "delivery_partners";
                     }
                     
+                    // Handle array values (multi-select)
+                    if (Array.isArray(value)) {
+                        // Check for "N/A" in array
+                        const hasNA = value.includes("N/A");
+                        const hasOtherValues = value.some(v => v !== "N/A" && v !== "All");
+                        
+                        // Check N/A condition
+                        const isNA = !item[arrayName] || !Array.isArray(item[arrayName]) || item[arrayName].length === 0;
+                        if (hasNA && isNA) return true;
+                        if (hasNA && !hasOtherValues) return isNA;
+                        
+                        // Check other values
+                        if (hasOtherValues && item[arrayName] && Array.isArray(item[arrayName]) && item[arrayName].length > 0) {
+                            const matches = item[arrayName].some((el) => {
+                                if (el && typeof el === "object" && el.id !== undefined) {
+                                    return value.some(v => v !== "N/A" && v !== "All" && el.id.toString() === v.toString());
+                                }
+                                return false;
+                            });
+                            return matches;
+                        }
+                        return false;
+                    }
+                    
+                    // Handle single value (backward compatibility)
                     // Check for "N/A" first - if array doesn't exist or is empty
                     if (value === "N/A") {
                         return !item[arrayName] || !Array.isArray(item[arrayName]) || item[arrayName].length === 0;
@@ -141,6 +176,33 @@ const filterData = (data, activeFilters) => {
                 // If the item value is an array (e.g., geographic_division stored as an array),
                 // check whether the selected filter value exists in the array (case-insensitive).
                 if (Array.isArray(itemValue)) {
+                    // Handle array filter values (multi-select)
+                    if (Array.isArray(value)) {
+                        // Check for "N/A" in filter values
+                        const hasNA = value.includes("N/A");
+                        const hasOtherValues = value.some(v => v !== "N/A" && v !== "All");
+                        
+                        // Check N/A condition
+                        const isNA = itemValue.length === 0;
+                        if (hasNA && isNA) return true;
+                        if (hasNA && !hasOtherValues) return isNA;
+                        
+                        // Check other values
+                        if (hasOtherValues) {
+                            const matches = itemValue.some((v) => {
+                                if (v === undefined || v === null) return false;
+                                return value.some(filterVal => 
+                                    filterVal !== "N/A" && 
+                                    filterVal !== "All" &&
+                                    v.toString().toLowerCase() === filterVal.toString().toLowerCase()
+                                );
+                            });
+                            return matches;
+                        }
+                        return false;
+                    }
+                    
+                    // Handle single filter value (backward compatibility)
                     // If filters are set to 'All', pass through
                     if (value === "All") return true;
                     
@@ -158,6 +220,44 @@ const filterData = (data, activeFilters) => {
                     });
 
                     return matches;
+                }
+                
+                // Handle array filter values when itemValue is not an array
+                if (Array.isArray(value)) {
+                    // Check for "N/A" in filter values
+                    const hasNA = value.includes("N/A");
+                    const hasOtherValues = value.some(v => v !== "N/A" && v !== "All");
+                    
+                    // Check N/A condition
+                    const isNA = itemValue === null || itemValue === undefined || itemValue === "";
+                    if (hasNA && isNA) return true;
+                    if (hasNA && !hasOtherValues) return isNA;
+                    
+                    // Check other values
+                    if (hasOtherValues) {
+                        return value.some(filterVal => {
+                            if (filterVal === "N/A" || filterVal === "All") return false;
+                            
+                            // Handle case-insensitive matching for string values
+                            if (typeof itemValue === "string" && typeof filterVal === "string") {
+                                return itemValue.toLowerCase() === filterVal.toLowerCase();
+                            }
+                            
+                            // Handle numeric values (like IDs)
+                            if (typeof itemValue === "number" && typeof filterVal === "string") {
+                                return itemValue.toString() === filterVal;
+                            }
+                            
+                            // Handle string values that should be compared as numbers
+                            if (typeof itemValue === "string" && typeof filterVal === "string" &&
+                                !isNaN(itemValue) && !isNaN(filterVal)) {
+                                return itemValue === filterVal;
+                            }
+                            
+                            return itemValue === filterVal;
+                        });
+                    }
+                    return false;
                 }
                 
                 // Handle "N/A" filter for null/undefined values (when itemValue is not an array)
@@ -218,6 +318,7 @@ const SearchFilter = ({
     className = "",
     showAdvancedSearch = false,
     onClearAll = null,
+    multiSelect = false, // New prop for multi-select mode
 }) => {
     // Get search configuration
     const searchConfig = useMemo(() => {
@@ -275,7 +376,12 @@ const SearchFilter = ({
 
     const hasActiveFilters =
         searchValue ||
-        Object.values(activeFilters).some((v) => v && v !== "All");
+        Object.values(activeFilters).some((v) => {
+            if (Array.isArray(v)) {
+                return v.length > 0 && !v.includes("All");
+            }
+            return v && v !== "All";
+        });
 
     return (
         <div className={`space-y-4 ${className}`}>
@@ -306,34 +412,62 @@ const SearchFilter = ({
                 {/* Filter Dropdowns Grid */}
                 {searchConfig.filters && searchConfig.filters.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {searchConfig.filters.map((filter) => (
-                            <select
-                                key={filter.key}
-                                value={activeFilters[filter.key] || "All"}
-                                onChange={(e) => {
-                                    handleFilterChange(
-                                        filter.key,
-                                        e.target.value
-                                    );
-                                }}
-                                className={`px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                                    filter.selectProps?.className || ""
-                                }`}
-                                translate={
-                                    filter.selectProps?.translate || undefined
-                                }
-                            >
-                                {filter.options.map((option, index) => (
-                                    <option
-                                        key={`${filter.key}-${option.value}-${index}`}
-                                        value={option.value}
-                                        className="overflow-hidden text-ellipsis"
+                        {searchConfig.filters.map((filter) => {
+                            if (multiSelect) {
+                                // Use MultiSelect component
+                                const filterValue = activeFilters[filter.key];
+                                const arrayValue = Array.isArray(filterValue) 
+                                    ? filterValue 
+                                    : (filterValue && filterValue !== "All" ? [filterValue] : []);
+                                
+                                return (
+                                    <MultiSelect
+                                        key={filter.key}
+                                        options={filter.options}
+                                        value={arrayValue}
+                                        onChange={(newValue) => {
+                                            handleFilterChange(filter.key, newValue);
+                                        }}
+                                        placeholder={`Select ${filter.label.toLowerCase()}...`}
+                                        searchable={true}
+                                        maxDisplay={2}
+                                        className="w-full"
+                                        dropdownMinWidth="min-w-[350px]"
+                                        dropdownMaxHeight="max-h-96"
+                                    />
+                                );
+                            } else {
+                                // Use regular select (backward compatibility)
+                                return (
+                                    <select
+                                        key={filter.key}
+                                        value={activeFilters[filter.key] || "All"}
+                                        onChange={(e) => {
+                                            handleFilterChange(
+                                                filter.key,
+                                                e.target.value
+                                            );
+                                        }}
+                                        className={`px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                                            filter.selectProps?.className || ""
+                                        }`}
+                                        translate={
+                                            filter.selectProps?.translate || undefined
+                                        }
                                     >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        ))}
+                                        {filter.options.map((option, index) => (
+                                            <option
+                                                key={`${filter.key}-${option.value}-${index}`}
+                                                value={option.value}
+                                                className="overflow-hidden text-ellipsis"
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                );
+                            }
+                        })}
                     </div>
                 )}
             </div>
