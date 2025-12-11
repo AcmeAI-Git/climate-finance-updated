@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Loading from "../components/ui/Loading";
 
 // Import existing page components
 import LandingPage from "../pages/LandingPage";
@@ -29,7 +30,16 @@ import Repository from "../pages/Repository";
 
 // Protected route wrapper that uses AuthContext
 function ProtectedRoute({ children, requireAuth = true }) {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
+
+    // Wait for auth state to be initialized before making redirect decision
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loading size="lg" />
+            </div>
+        );
+    }
 
     if (requireAuth && !isAuthenticated) {
         return <Navigate to="/admin/login" replace />;
@@ -40,7 +50,16 @@ function ProtectedRoute({ children, requireAuth = true }) {
 
 // Admin route wrapper
 function AdminRoute({ children }) {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
+
+    // Wait for auth state to be initialized before making redirect decision
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loading size="lg" />
+            </div>
+        );
+    }
 
     if (!isAuthenticated) {
         return <Navigate to="/admin/login" replace />;

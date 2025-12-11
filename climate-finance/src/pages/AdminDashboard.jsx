@@ -219,9 +219,6 @@ const AdminDashboard = () => {
             {/* Page Header - Using reusable component */}
             <PageHeader
                 title="Admin Portal"
-                subtitle={`Welcome, ${
-                    user?.fullName || user?.full_name || "Admin"
-                }`}
                 backPath="/"
                 backText="Back to Main Site"
                 showUserInfo={true}
@@ -238,25 +235,6 @@ const AdminDashboard = () => {
                     className="mb-6"
                 />
             )}
-
-            {/* Dashboard Stats - Now using consistent StatCard */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {dashboardStats.map((stat, index) => (
-                    <div
-                        key={index}
-                        className="animate-fade-in-up"
-                        style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                        <StatCard
-                            title={stat.title}
-                            value={stat.value}
-                            change={stat.change}
-                            color={stat.color}
-                            icon={stat.icon}
-                        />
-                    </div>
-                ))}
-            </div>
 
             {/* Quick Actions Menu */}
             <Card padding="p-4 sm:p-6" className="mb-8">

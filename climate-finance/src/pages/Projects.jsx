@@ -961,10 +961,7 @@ const Projects = () => {
                                 }}
                             >
                                 <div
-                                    className="group bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 cursor-pointer h-full flex flex-col"
-                                    onClick={(e) =>
-                                        handleViewDetails(e, project.project_id)
-                                    }
+                                    className="group bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 h-full flex flex-col"
                                 >
                                     <div className="p-4 sm:p-6 flex flex-col h-full min-h-80">
                                         <div className="mb-4 min-h-[100px] flex flex-col justify-start">

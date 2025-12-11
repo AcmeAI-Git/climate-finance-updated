@@ -742,6 +742,16 @@ const ProjectDetails = () => {
                                         </div>
                                     </div>
                                 )}
+                                {project.location_segregation && (
+                                    <div>
+                                        <div className="text-md text-gray-600 font-semibold mb-1">
+                                            Location Segregation
+                                        </div>
+                                        <div className="text-sm text-gray-700">
+                                            {project.location_segregation}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </Card>
                     )}
@@ -876,6 +886,57 @@ const ProjectDetails = () => {
                         </h3>
                         <div className="text-sm text-gray-700">
                             {project.assessment}
+                        </div>
+                    </Card>
+                )}
+
+                {/* Supporting Documents & Links */}
+                {(project.supporting_link || project.supporting_document) && (
+                    <Card padding="p-4 sm:p-6" className="mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Supporting Documents & Links
+                        </h3>
+                        <div className="space-y-4">
+                            {project.supporting_link && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        Supporting Link
+                                    </div>
+                                    <div className="text-sm">
+                                        <a
+                                            href={project.supporting_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-purple-600 hover:text-purple-700 underline break-all"
+                                        >
+                                            {project.supporting_link}
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                            {project.supporting_document && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        Supporting Document
+                                    </div>
+                                    <div className="text-sm">
+                                        {project.supporting_document.startsWith('http') || project.supporting_document.startsWith('/') ? (
+                                            <a
+                                                href={project.supporting_document}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-purple-600 hover:text-purple-700 underline break-all"
+                                            >
+                                                {project.supporting_document}
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-700">
+                                                {project.supporting_document}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </Card>
                 )}

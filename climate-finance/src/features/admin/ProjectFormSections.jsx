@@ -199,7 +199,7 @@ const ProjectFormSections = ({
                     onChange={(values) =>
                         setFormData((prev) => ({ ...prev, implementing_entity_ids: values }))
                     }
-                    getOptionId={(entity) => entity.entity_id}
+                    getOptionId={(entity) => entity.id || entity.entity_id}
                     getOptionLabel={(entity) => entity.name}
                     onAddNew={handleAddAgency}
                     addButtonText="Add Implementing Entity"
@@ -221,7 +221,7 @@ const ProjectFormSections = ({
                     onChange={(values) =>
                         setFormData((prev) => ({ ...prev, executing_agency_ids: values }))
                     }
-                    getOptionId={(agency) => agency.agency_id}
+                    getOptionId={(agency) => agency.id || agency.agency_id}
                     getOptionLabel={(agency) => agency.name}
                     onAddNew={handleAddAgency}
                     addButtonText="Add Executing Agency"
@@ -243,7 +243,7 @@ const ProjectFormSections = ({
                     onChange={(values) =>
                         setFormData((prev) => ({ ...prev, delivery_partner_ids: values }))
                     }
-                    getOptionId={(partner) => partner.partner_id}
+                    getOptionId={(partner) => partner.id || partner.partner_id}
                     getOptionLabel={(partner) => partner.name}
                     onAddNew={handleAddAgency}
                     addButtonText="Add Delivery Partner"
@@ -301,10 +301,10 @@ const ProjectFormSections = ({
                                                 additional_location_info: "", // Clear additional_location_info when Nationwide
                                             }));
                                         } else {
-                                            // Deselect Nationwide and clear divisions
+                                            // Deselect Nationwide and clear ALL divisions
                                             setFormData((prev) => ({
                                                 ...prev,
-                                                geographic_division: prev.geographic_division?.filter(d => d !== "Nationwide") || [],
+                                                geographic_division: [],
                                                 districts: [],
                                             }));
                                         }

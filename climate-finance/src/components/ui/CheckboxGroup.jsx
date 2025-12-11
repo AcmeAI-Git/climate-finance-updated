@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Plus, Search, X } from 'lucide-react';
 
 const CheckboxGroup = ({ 
   label, 
@@ -16,12 +16,39 @@ const CheckboxGroup = ({
   preventTranslate = false,
   disabled = false,
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return options;
+    }
+    const searchLower = searchTerm.toLowerCase();
+    return options.filter(option => {
+      const label = getOptionLabel(option);
+      const subtext = getOptionSubtext(option);
+      return (
+        label?.toLowerCase().includes(searchLower) ||
+        (subtext && subtext.toLowerCase().includes(searchLower))
+      );
+    });
+  }, [options, searchTerm, getOptionLabel, getOptionSubtext]);
+
   const handleCheckboxChange = (optionId, isChecked) => {
     let newSelectedValues;
     if (isChecked) {
-      newSelectedValues = [...selectedValues, optionId];
+      // Ensure we don't add duplicates - use String conversion for consistent comparison
+      const alreadySelected = selectedValues.some(id => String(id) === String(optionId));
+      if (!alreadySelected) {
+        newSelectedValues = [...selectedValues, optionId];
+      } else {
+        newSelectedValues = selectedValues;
+      }
     } else {
-      newSelectedValues = selectedValues.filter(id => id !== optionId);
+      newSelectedValues = selectedValues.filter(id => {
+        // Use String conversion to handle type mismatches (number vs string)
+        return String(id) !== String(optionId);
+      });
     }
     onChange(newSelectedValues);
   };
@@ -44,12 +71,40 @@ const CheckboxGroup = ({
           </button>
         )}
       </div>
+
+      {/* Search Bar */}
+      {options.length > 0 && (
+        <div className="mb-3 relative">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search options..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              disabled={disabled}
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                disabled={disabled}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       
-      {options.length > 0 ? (
+      {filteredOptions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-          {options.map(option => {
+          {filteredOptions.map(option => {
             const optionId = getOptionId(option);
-            const isSelected = selectedValues.includes(optionId);
+            // Use String conversion for consistent comparison
+            const isSelected = selectedValues.some(id => String(id) === String(optionId));
             const subtext = getOptionSubtext(option);
             
             return (
@@ -101,7 +156,9 @@ const CheckboxGroup = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-500">No options available</p>
+          <p className="text-sm text-gray-500">
+            {searchTerm ? 'No options found matching your search' : 'No options available'}
+          </p>
           {onAddNew && (
             <button
               type="button"

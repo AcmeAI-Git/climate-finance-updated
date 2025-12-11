@@ -415,19 +415,6 @@ const FundingSources = () => {
                                         source.id ||
                                         index
                                     }
-                                    onClick={() => {
-                                        const id =
-                                            source.funding_source_id ||
-                                            source.id;
-                                        if (id) {
-                                            navigate(`/funding-sources/${id}`);
-                                        } else {
-                                            console.error(
-                                                "No valid ID found for funding source:",
-                                                source
-                                            );
-                                        }
-                                    }}
                                     className="flex flex-col lg:flex-row lg:items-center p-6 border border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all duration-200 group"
                                 >
                                     {/* Logo and Basic Info */}
