@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    role VARCHAR(50) NOT NULL DEFAULT 'Viewer' CHECK (role IN ('Viewer', 'Super Admin', 'Project Manager', 'Finance Admin', 'Data Manager')),
+    role VARCHAR(50) NOT NULL DEFAULT 'viewer' CHECK (role IN ('viewer', 'admin', 'superadmin')),
     department VARCHAR(100) NOT NULL,
     active BOOLEAN NOT NULL,
     last_login TIMESTAMP DEFAULT NULL

@@ -102,22 +102,12 @@ export const AGENCY_TYPE_CONFIG = {
 
 // User roles - Mapping backend roles to frontend display
 export const USER_ROLE_CONFIG = {
-  'super-admin': {
+  'superadmin': {
     label: 'Super Admin',
     color: 'bg-red-100 text-red-800',
     iconName: 'Users'
   },
-  'project-manager': {
-    label: 'Admin',
-    color: 'bg-blue-100 text-blue-800',
-    iconName: 'Target'
-  },
-  'finance-admin': {
-    label: 'Admin',
-    color: 'bg-blue-100 text-blue-800',
-    iconName: 'Target'
-  },
-  'data-manager': {
+  'admin': {
     label: 'Admin',
     color: 'bg-blue-100 text-blue-800',
     iconName: 'Target'
@@ -169,7 +159,7 @@ export const getStatusConfig = (status, type = 'project') => {
     case 'agency':
       return AGENCY_TYPE_CONFIG[normalizedStatus] || AGENCY_TYPE_CONFIG.implementing;
     case 'user':
-      return USER_ROLE_CONFIG[normalizedStatus] || USER_ROLE_CONFIG['project-manager'];
+      return USER_ROLE_CONFIG[normalizedStatus] || USER_ROLE_CONFIG['viewer'];
     case 'region':
       return REGION_CONFIG[normalizedStatus] || { label: status, color: 'bg-gray-100 text-gray-800' };
     default:

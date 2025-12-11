@@ -172,7 +172,7 @@ const AdminDashboard = () => {
             icon: <Users size={20} />,
             path: "/admin/users",
             color: "bg-success-600",
-            disabled: user?.role === "Project Manager",
+            disabled: user?.role === "admin",
         },
         {
             title: "Funding Sources",
