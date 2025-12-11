@@ -20,4 +20,3 @@ exports.getRecentActivities = async (req, res) => {
         });
     }
 };
-
