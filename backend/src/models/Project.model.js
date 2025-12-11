@@ -102,6 +102,34 @@ Project.addProjectWithRelations = async (data) => {
             throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
         }
 
+        // Normalize supporting_link to ensure it's always a string
+        let normalizedSupportingLink = supporting_link || null;
+        if (normalizedSupportingLink) {
+            if (typeof normalizedSupportingLink === 'string') {
+                // Try to parse if it looks like JSON
+                if (normalizedSupportingLink.trim().startsWith('[') || normalizedSupportingLink.trim().startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(normalizedSupportingLink);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            normalizedSupportingLink = parsed[0]; // Take first URL if array
+                        } else if (typeof parsed === 'string') {
+                            normalizedSupportingLink = parsed;
+                        } else {
+                            normalizedSupportingLink = null;
+                        }
+                    } catch (e) {
+                        // Not valid JSON, use as is
+                    }
+                }
+            } else if (Array.isArray(normalizedSupportingLink) && normalizedSupportingLink.length > 0) {
+                normalizedSupportingLink = normalizedSupportingLink[0];
+            } else {
+                normalizedSupportingLink = null;
+            }
+        } else {
+            normalizedSupportingLink = null;
+        }
+
         const project_id = uuidv4();
 
         const insertProjectQuery = `
@@ -157,7 +185,7 @@ Project.addProjectWithRelations = async (data) => {
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
-            normalizedSupportingLink || null,
+            normalizedSupportingLink,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -433,7 +461,7 @@ Project.updateProject = async (id, data) => {
         }
         
         // Normalize supporting_link to ensure it's always a string
-        let normalizedSupportingLink = supporting_link;
+        let normalizedSupportingLink = supporting_link || null;
         if (normalizedSupportingLink) {
             if (typeof normalizedSupportingLink === 'string') {
                 // Try to parse if it looks like JSON
@@ -456,6 +484,8 @@ Project.updateProject = async (id, data) => {
             } else {
                 normalizedSupportingLink = null;
             }
+        } else {
+            normalizedSupportingLink = null;
         }
 
         const updateProjectQuery = `
@@ -509,7 +539,7 @@ Project.updateProject = async (id, data) => {
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
-            normalizedSupportingLink || null,
+            normalizedSupportingLink,
             id,
         ];
 

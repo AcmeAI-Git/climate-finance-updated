@@ -71,6 +71,34 @@ PendingProject.addPendingProject = async (data) => {
             const parsedSdgIds = parseArray(sdg_ids);
             const parsedDistricts = parseArray(districts);
             const parsedGeographicDivision = parseArray(geographic_division);
+            
+            // Normalize supporting_link to ensure it's always a string
+            let normalizedSupportingLink = supporting_link || null;
+            if (normalizedSupportingLink) {
+                if (typeof normalizedSupportingLink === 'string') {
+                    // Try to parse if it looks like JSON
+                    if (normalizedSupportingLink.trim().startsWith('[') || normalizedSupportingLink.trim().startsWith('{')) {
+                        try {
+                            const parsed = JSON.parse(normalizedSupportingLink);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                normalizedSupportingLink = parsed[0]; // Take first URL if array
+                            } else if (typeof parsed === 'string') {
+                                normalizedSupportingLink = parsed;
+                            } else {
+                                normalizedSupportingLink = null;
+                            }
+                        } catch (e) {
+                            // Not valid JSON, use as is
+                        }
+                    }
+                } else if (Array.isArray(normalizedSupportingLink) && normalizedSupportingLink.length > 0) {
+                    normalizedSupportingLink = normalizedSupportingLink[0];
+                } else {
+                    normalizedSupportingLink = null;
+                }
+            } else {
+                normalizedSupportingLink = null;
+            }
 
             const insertQuery = `
                 INSERT INTO PendingProject (
@@ -128,7 +156,7 @@ PendingProject.addPendingProject = async (data) => {
                 funding_source_name || null,
                 wash_component ? JSON.stringify(wash_component) : null,
                 supporting_document,
-                supporting_link || null,
+                normalizedSupportingLink,
                 location_segregation,
             ];
 
