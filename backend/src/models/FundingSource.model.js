@@ -1,5 +1,13 @@
 const { pool } = require('../config/db');
+const fs = require('fs');
+const path = require('path');
 const FundingSource = {};
+const DEBUG_LOG_PATH = path.join(__dirname, '../../.cursor/debug.log');
+const logDebug = (data) => {
+    try {
+        fs.appendFileSync(DEBUG_LOG_PATH, JSON.stringify({...data, timestamp: Date.now()}) + '\n');
+    } catch (e) {}
+};
 
 FundingSource.addFundingSource = async (data) => {
     const { name } = data;
@@ -15,6 +23,9 @@ FundingSource.addFundingSource = async (data) => {
 };
 
 FundingSource.getAllFundingSources = async () => {
+    // #region agent log
+    logDebug({location:'FundingSource.model.js:17',message:'getAllFundingSources model entry',data:{},sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C'});
+    // #endregion
     const query = `
         SELECT
             fs.funding_source_id,
@@ -29,8 +40,21 @@ FundingSource.getAllFundingSources = async () => {
         GROUP BY fs.funding_source_id, fs.name
         ORDER BY fs.name
     `;
-    const { rows } = await pool.query(query);
-    return rows;
+    // #region agent log
+    logDebug({location:'FundingSource.model.js:32',message:'Before executing query',data:{queryLength:query.length,queryPreview:query.substring(0,150)},sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D'});
+    // #endregion
+    try {
+        const { rows } = await pool.query(query);
+        // #region agent log
+        logDebug({location:'FundingSource.model.js:40',message:'Query executed successfully',data:{rowCount:rows.length},sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C'});
+        // #endregion
+        return rows;
+    } catch (err) {
+        // #region agent log
+        logDebug({location:'FundingSource.model.js:44',message:'Query execution error',data:{errorMessage:err.message,errorCode:err.code,errorDetail:err.detail,errorHint:err.hint,errorPosition:err.position,fullQuery:query},sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D,E'});
+        // #endregion
+        throw err;
+    }
 };
 
 FundingSource.getFundingSourceCount = async () => {
