@@ -18,6 +18,7 @@ const ProjectFormSections = ({
     deliveryPartners,
     fundingSources,
     setFormData, // Added setFormData prop
+    errors = {}, // Error messages for form validation
 }) => {
     const navigate = useNavigate();
     const { language } = useLanguage();
@@ -339,6 +340,11 @@ const ProjectFormSections = ({
                             getOptionId={(division) => division.name}
                             getOptionLabel={(division) => division.name}
                         />
+                        {errors.geographic_division && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.geographic_division}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -362,6 +368,11 @@ const ProjectFormSections = ({
                         {isNationwide && (
                             <p className="text-xs text-gray-500 mt-1">
                                 Districts are set to N/A for nationwide projects
+                            </p>
+                        )}
+                        {errors.districts && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.districts}
                             </p>
                         )}
                     </div>

@@ -395,28 +395,36 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const validateForm = () => {
         const newErrors = {};
 
+        // Core required fields
         if (!formData.title.trim()) {
             newErrors.title = "Project title is required";
         }
 
-        // FIX: Properly check if array exists AND has items
+        if (!formData.status) {
+            newErrors.status = "Project status is required";
+        }
+
+        // approval_fy is optional (can be N/A - leave empty)
+
+        // Location required fields
         if (
             !Array.isArray(formData.geographic_division) ||
             formData.geographic_division.length === 0
         ) {
-            newErrors.geographic_division = "Geographic division is required";
+            newErrors.geographic_division = "At least one geographic division must be selected";
         }
 
-        // FIX: Properly check if array exists AND has items
+        // Districts validation: allow "N/A" for nationwide projects, otherwise require at least one district
+        const isNationwide = Array.isArray(formData.geographic_division) && 
+            formData.geographic_division.includes("Nationwide");
         if (
             !Array.isArray(formData.districts) ||
             formData.districts.length === 0
         ) {
             newErrors.districts = "At least one district must be selected";
-        }
-
-        if (!formData.status) {
-            newErrors.status = "Project status is required";
+        } else if (!isNationwide && formData.districts.length === 1 && formData.districts[0] === "N/A") {
+            // If not nationwide, "N/A" is not valid
+            newErrors.districts = "At least one district must be selected";
         }
 
         setErrors(newErrors);
@@ -481,9 +489,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("closing", formData.closing);
             formDataToSend.append(
                 "approval_fy",
-                formData.approval_fy
+                formData.approval_fy && formData.approval_fy.toString().trim()
                     ? parseInt(formData.approval_fy, 10).toString()
-                    : 2025
+                    : ""
             );
             formDataToSend.append("objectives", formData.objectives || "");
             formDataToSend.append(
@@ -1134,15 +1142,27 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                 <label className="block text-sm font-medium text-gray-700">
                                     Approval Year
                                 </label>
+                                <p className="text-xs text-gray-500 mt-1 mb-2">
+                                    Leave empty if N/A
+                                </p>
                                 <input
                                     type="number"
                                     name="approval_fy"
                                     value={formData.approval_fy}
                                     onChange={handleInputChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    className={`mt-1 block w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
+                                        errors.approval_fy
+                                            ? "border-red-300"
+                                            : "border-gray-300"
+                                    }`}
                                     min="2000"
                                     max="2030"
                                 />
+                                {errors.approval_fy && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.approval_fy}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>

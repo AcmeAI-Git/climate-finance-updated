@@ -82,8 +82,24 @@ Project.addProjectWithRelations = async (data) => {
         const parsedDeliveryPartnerIds = parseArrayField(delivery_partner_ids, 'delivery_partner_ids');
         const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
 
-        if (!title || !status || !approval_fy) {
-            throw new Error("Missing required fields: title, status, approval_fy");
+        // Validate required fields
+        const missingFields = [];
+        if (!title || !title.trim()) missingFields.push('title');
+        if (!status || !status.trim()) missingFields.push('status');
+        // approval_fy is optional (can be N/A)
+        if (!parsedGeographicDivision || parsedGeographicDivision.length === 0) missingFields.push('geographic_division');
+        
+        // Districts validation: allow "N/A" for nationwide projects, otherwise require at least one district
+        const isNationwide = parsedGeographicDivision && parsedGeographicDivision.includes("Nationwide");
+        if (!parsedDistricts || parsedDistricts.length === 0) {
+            missingFields.push('districts');
+        } else if (!isNationwide && parsedDistricts.length === 1 && parsedDistricts[0] === "N/A") {
+            // If not nationwide, "N/A" is not valid
+            missingFields.push('districts');
+        }
+
+        if (missingFields.length > 0) {
+            throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
         }
 
         const project_id = uuidv4();
@@ -112,7 +128,7 @@ Project.addProjectWithRelations = async (data) => {
             project_id,
             title,
             status,
-            approval_fy,
+            approval_fy && approval_fy.toString().trim() ? parseInt(approval_fy, 10) : null,
             beginning || null,
             closing || null,
             parseFloat(total_cost_usd) || 0,
@@ -426,7 +442,7 @@ Project.updateProject = async (id, data) => {
         const values = [
             title,
             status,
-            approval_fy,
+            approval_fy && approval_fy.toString().trim() ? parseInt(approval_fy, 10) : null,
             beginning || null,
             closing || null,
             parseFloat(total_cost_usd) || 0,
