@@ -6,8 +6,15 @@ const { pool } = require('../config/db');
 const DEBUG_LOG_PATH = path.join(__dirname, '../../.cursor/debug.log');
 const logDebug = (data) => {
     try {
+        // Ensure directory exists
+        const logDir = path.dirname(DEBUG_LOG_PATH);
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
         fs.appendFileSync(DEBUG_LOG_PATH, JSON.stringify({...data, timestamp: Date.now()}) + '\n');
-    } catch (e) {}
+    } catch (e) {
+        // Silently fail - don't crash the app if logging fails
+    }
 };
 
 exports.addFundingSource = async (req, res) => {
