@@ -24,8 +24,6 @@ const defaultFormData = {
     project_id: "",
     title: "",
     status: "",
-    sector: "",
-    type: [],
     total_cost_usd: "",
     gef_grant: "",
     cofinancing: "",
@@ -60,8 +58,7 @@ const defaultFormData = {
     equity_marker_description: "",
     assessment: "",
     alignment_sdg: [],
-    alignment_nap: "",
-    alignment_cff: "",
+    other_alignment: "",
     geographic_division: [],
     districts: [],
     climate_relevance_score: "",
@@ -73,7 +70,6 @@ const defaultFormData = {
     additional_location_info: "",
     portfolio_type: "",
     funding_source_name: "",
-    activities: [],
 };
 
 const formatDateForInput = (dateStr) => {
@@ -131,10 +127,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     project_id: projectData.project_id || "",
                     title: projectData.title || "",
                     status: projectData.status || "",
-                    sector: projectData.sector || "",
-                    type: Array.isArray(projectData.type)
-                        ? projectData.type
-                        : [],
                     total_cost_usd: projectData.total_cost_usd || "",
                     gef_grant: projectData.gef_grant || "",
                     cofinancing: projectData.cofinancing || "",
@@ -223,8 +215,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                     equity_marker: projectData.equity_marker || "",
                     equity_marker_description:
                         projectData.equity_marker_description || "",
-                    alignment_nap: projectData.alignment_nap || "",
-                    alignment_cff: projectData.alignment_cff || "",
+                    other_alignment: projectData.other_alignment || "",
                     climate_relevance_score:
                         projectData.climate_relevance_score || "",
                     climate_relevance_category:
@@ -239,9 +230,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         projectData.additional_location_info || "",
                     portfolio_type: projectData.portfolio_type || "",
                     funding_source_name: projectData.funding_source_name || "",
-                    activities: Array.isArray(projectData.activities)
-                        ? projectData.activities
-                        : [],
                 });
             } else {
                 throw new Error("Project not found");
@@ -485,8 +473,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             formDataToSend.append("project_id", formData.project_id || "");
             formDataToSend.append("title", formData.title);
             formDataToSend.append("status", formData.status);
-            formDataToSend.append("sector", formData.sector);
-            formDataToSend.append("type", formData.type.join(","));
             formDataToSend.append("total_cost_usd", totalCost.toString());
             formDataToSend.append("gef_grant", gefGrant.toString());
             formDataToSend.append("cofinancing", cofinancing.toString());
@@ -552,12 +538,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
             );
             formDataToSend.append("assessment", formData.assessment || "");
             formDataToSend.append(
-                "alignment_nap",
-                formData.alignment_nap || ""
-            );
-            formDataToSend.append(
-                "alignment_cff",
-                formData.alignment_cff || ""
+                "other_alignment",
+                formData.other_alignment || ""
             );
             // Safely handle climate relevance score to prevent NaN
             const climateScore = formData.climate_relevance_score
@@ -651,8 +633,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 formData.funding_source_name || ""
             );
             formDataToSend.append(
-                "activities",
-                JSON.stringify(formData.activities || [])
+                "supporting_link",
+                formData.supporting_link || ""
             );
 
             if (actualMode === "public") {
@@ -991,70 +973,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                         {errors.title}
                                     </p>
                                 )}
-                            </div>
-                        </div>
-
-                        {/* Sector row */}
-                        <div className="grid grid-cols-1 gap-6 mt-6">
-                            {/* Sector as text input spanning full row */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Sector
-                                </label>
-                                <input
-                                    type="text"
-                                    name="sector"
-                                    value={formData.sector}
-                                    onChange={handleInputChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                    placeholder="Enter sector (e.g. Agriculture, Water, etc.)"
-                                />
-                            </div>
-
-                            {/* Type as standardized CheckboxGroup */}
-                            <div>
-                                <CheckboxGroup
-                                    label="Type"
-                                    options={[
-                                        {
-                                            id: "Adaptation",
-                                            name: "Adaptation",
-                                        },
-                                        {
-                                            id: "Mitigation",
-                                            name: "Mitigation",
-                                        },
-                                        {
-                                            id: "Loss and Damage",
-                                            name: "Loss and Damage",
-                                        },
-                                        {
-                                            id: "Cross Cutting Finance",
-                                            name: "Cross Cutting Finance",
-                                        },
-                                    ]}
-                                    selectedValues={formData.type || []}
-                                    onChange={(values) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            type: values,
-                                        }))
-                                    }
-                                    getOptionId={(option) => option.id}
-                                    getOptionLabel={(option) => {
-                                        const bangla = {
-                                            Adaptation: "অ্যাডাপটেশন",
-                                            Mitigation: "মিটিগেশন",
-                                            "Loss and Damage": "ক্ষয় ও ক্ষতি",
-                                            "Cross Cutting Finance": "সমন্বয়মূলক অর্থায়ন",
-                                        };
-                                        return language === 'bn' ? (bangla[option.id] || option.name) : option.name;
-                                    }}
-                                    preventTranslate={true}
-                                />
-                                <p className="mt-1 text-xs text-gray-500">
-                                    Select all that apply
-                                </p>
                             </div>
                         </div>
                     </div>

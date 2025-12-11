@@ -105,7 +105,8 @@ exports.getProjectByStatus = async (req, res) => {
 
 exports.getProjectBySector = async (req, res) => {
     try {
-        const response = await Project.getProjectBySector();
+        // Use portfolio_type instead of sector (sector column removed)
+        const response = await Project.getProjectByPortfolioType();
         res.status(200).json({ status: true, data: response });
     } catch (e) {
         res.status(500).json({
@@ -117,7 +118,8 @@ exports.getProjectBySector = async (req, res) => {
 
 exports.getProjectByType = async (req, res) => {
     try {
-        const response = await Project.getProjectByType();
+        // Use portfolio_type instead of type (type column removed)
+        const response = await Project.getProjectByPortfolioType();
         res.status(200).json({ status: true, data: response });
     } catch (e) {
         res.status(500).json({
@@ -201,7 +203,8 @@ exports.getFundingSourceTrend = async (req, res) => {
 
 exports.getFundingSourceSectorAllocation = async (req, res) => {
     try {
-        const response = await Project.getFundingSourceSectorAllocation();
+        // Use portfolio_type instead of sector (sector column removed)
+        const response = await Project.getFundingSourcePortfolioAllocation();
         res.status(200).json({ status: true, data: response });
     } catch (e) {
         res.status(500).json({

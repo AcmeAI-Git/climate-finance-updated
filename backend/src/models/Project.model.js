@@ -45,8 +45,7 @@ Project.addProjectWithRelations = async (data) => {
             equity_marker,
             equity_marker_description,
             assessment,
-            alignment_nap,
-            alignment_cff,
+            other_alignment,
             geographic_division,
             climate_relevance_score,
             climate_relevance_category,
@@ -59,6 +58,7 @@ Project.addProjectWithRelations = async (data) => {
             additional_location_info,
             portfolio_type,
             funding_source_name,
+            supporting_link,
             // New agency arrays (can be IDs or names)
             implementing_entity_ids,
             executing_agency_ids,
@@ -68,10 +68,7 @@ Project.addProjectWithRelations = async (data) => {
             sdg_ids,
             districts,
             wash_component,
-            sector,
-            type,
             location_segregation,
-            activities,
         } = data;
 
         // Parse array fields
@@ -83,9 +80,7 @@ Project.addProjectWithRelations = async (data) => {
         const parsedImplementingEntityIds = parseArrayField(implementing_entity_ids, 'implementing_entity_ids');
         const parsedExecutingAgencyIds = parseArrayField(executing_agency_ids, 'executing_agency_ids');
         const parsedDeliveryPartnerIds = parseArrayField(delivery_partner_ids, 'delivery_partner_ids');
-        const parsedType = parseArrayField(type, 'type');
         const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
-        const parsedActivities = parseArrayField(activities, 'activities');
 
         if (!title || !status || !approval_fy) {
             throw new Error("Missing required fields: title, status, approval_fy");
@@ -99,17 +94,17 @@ Project.addProjectWithRelations = async (data) => {
                 total_cost_usd, gef_grant, cofinancing, loan_amount, objectives,
                 direct_beneficiaries, indirect_beneficiaries, beneficiary_description,
                 gender_inclusion, equity_marker, equity_marker_description,
-                assessment, alignment_nap, alignment_cff, geographic_division,
+                assessment, other_alignment, geographic_division,
                 climate_relevance_score, climate_relevance_category,
                 climate_relevance_justification, wash_component_description, supporting_document,
-                districts, sector, type, location_segregation, activities,
+                districts, location_segregation,
                 hotspot_types, vulnerability_type, additional_location_info,
-                portfolio_type, funding_source_name
+                portfolio_type, funding_source_name, supporting_link
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
                 $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
-                $31,$32,$33,$34,$35,$36
+                $31,$32,$33,$34,$35
             ) RETURNING *
         `;
 
@@ -132,8 +127,7 @@ Project.addProjectWithRelations = async (data) => {
             equity_marker || null,
             equity_marker_description || null,
             assessment || null,
-            alignment_nap || null,
-            alignment_cff || null,
+            other_alignment || null,
             parsedGeographicDivision,
             parseFloat(climate_relevance_score) || 0,
             climate_relevance_category || null,
@@ -141,15 +135,13 @@ Project.addProjectWithRelations = async (data) => {
             wash_component_description || null,
             supporting_document || null,
             parsedDistricts,
-            sector || null,
-            parsedType,
             parsedLocationSegregation,
-            parsedActivities,
             parsedHotspotTypes,
             vulnerability_type || null,
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
+            supporting_link || null,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -375,8 +367,7 @@ Project.updateProject = async (id, data) => {
             equity_marker,
             equity_marker_description,
             assessment,
-            alignment_nap,
-            alignment_cff,
+            other_alignment,
             geographic_division,
             climate_relevance_score,
             climate_relevance_category,
@@ -389,6 +380,7 @@ Project.updateProject = async (id, data) => {
             additional_location_info,
             portfolio_type,
             funding_source_name,
+            supporting_link,
             // New agency arrays
             implementing_entity_ids,
             executing_agency_ids,
@@ -398,10 +390,7 @@ Project.updateProject = async (id, data) => {
             sdg_ids,
             districts,
             wash_component,
-            sector,
-            type,
             location_segregation,
-            activities,
         } = data;
 
         // Parse array fields
@@ -413,9 +402,7 @@ Project.updateProject = async (id, data) => {
         const parsedImplementingEntityIds = parseArrayField(implementing_entity_ids, 'implementing_entity_ids');
         const parsedExecutingAgencyIds = parseArrayField(executing_agency_ids, 'executing_agency_ids');
         const parsedDeliveryPartnerIds = parseArrayField(delivery_partner_ids, 'delivery_partner_ids');
-        const parsedType = parseArrayField(type, 'type');
         const parsedLocationSegregation = parseArrayField(location_segregation, 'location_segregation');
-        const parsedActivities = parseArrayField(activities, 'activities');
 
         const updateProjectQuery = `
             UPDATE Project SET 
@@ -423,16 +410,16 @@ Project.updateProject = async (id, data) => {
                 total_cost_usd = $6, gef_grant = $7, cofinancing = $8, objectives = $9,
                 direct_beneficiaries = $10, indirect_beneficiaries = $11,
                 beneficiary_description = $12, gender_inclusion = $13, equity_marker = $14,
-                equity_marker_description = $15, assessment = $16, alignment_nap = $17,
-                alignment_cff = $18, geographic_division = $19, climate_relevance_score = $20,
-                climate_relevance_category = $21, climate_relevance_justification = $22,
-                wash_component_description = $23, supporting_document = $24,
-                districts = $25, loan_amount = $26, sector = $27, type = $28,
-                location_segregation = $29, activities = $30,
-                hotspot_types = $31, vulnerability_type = $32, additional_location_info = $33,
-                portfolio_type = $34, funding_source_name = $35,
+                equity_marker_description = $15, assessment = $16, other_alignment = $17,
+                geographic_division = $18, climate_relevance_score = $19,
+                climate_relevance_category = $20, climate_relevance_justification = $21,
+                wash_component_description = $22, supporting_document = $23,
+                districts = $24, loan_amount = $25,
+                location_segregation = $26,
+                hotspot_types = $27, vulnerability_type = $28, additional_location_info = $29,
+                portfolio_type = $30, funding_source_name = $31, supporting_link = $32,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE project_id = $36
+            WHERE project_id = $33
             RETURNING *
         `;
 
@@ -453,8 +440,7 @@ Project.updateProject = async (id, data) => {
             equity_marker || null,
             equity_marker_description || null,
             assessment || null,
-            alignment_nap || null,
-            alignment_cff || null,
+            other_alignment || null,
             parsedGeographicDivision,
             parseFloat(climate_relevance_score) || 0,
             climate_relevance_category || null,
@@ -463,15 +449,13 @@ Project.updateProject = async (id, data) => {
             supporting_document || null,
             parsedDistricts,
             parseFloat(loan_amount) || 0,
-            sector || null,
-            parsedType,
             parsedLocationSegregation,
-            parsedActivities,
             parsedHotspotTypes,
             vulnerability_type || null,
             additional_location_info || null,
             portfolio_type || null,
             funding_source_name || null,
+            supporting_link || null,
             id,
         ];
 
@@ -723,35 +707,25 @@ Project.getProjectByStatus = async () => {
     }));
 };
 
-Project.getProjectBySector = async () => {
+// Removed: getProjectBySector - sector column no longer exists
+// Use getProjectByPortfolioType instead
+
+Project.getProjectByPortfolioType = async () => {
     const query = `
-        SELECT sector, COUNT(*) AS value
+        SELECT portfolio_type, COUNT(*) AS value
         FROM Project
-        WHERE sector IS NOT NULL AND sector <> ''
-        GROUP BY sector
+        WHERE portfolio_type IS NOT NULL AND portfolio_type <> ''
+        GROUP BY portfolio_type
     `;
     const { rows } = await pool.query(query);
     return rows.map((row) => ({
-        name: row.sector || 'Unknown',
+        name: row.portfolio_type || 'Unknown',
         value: parseInt(row.value),
     }));
 };
 
-Project.getProjectByType = async () => {
-    const query = `
-        SELECT 
-            unnest(type) AS project_type,
-            COUNT(*) AS value
-        FROM Project
-        WHERE type IS NOT NULL AND array_length(type, 1) > 0
-        GROUP BY project_type
-    `;
-    const { rows } = await pool.query(query);
-    return rows.map((row) => ({
-        name: row.project_type,
-        value: parseInt(row.value),
-    }));
-};
+// Removed: getProjectByType - type column no longer exists
+// Use getProjectByPortfolioType or getProjectByHotspotType instead
 
 Project.getProjectTrend = async () => {
     const query = `
@@ -917,18 +891,18 @@ Project.getFundingSourceTrend = async () => {
     return rows;
 };
 
-Project.getFundingSourceSectorAllocation = async () => {
+Project.getFundingSourcePortfolioAllocation = async () => {
     const query = `
         SELECT 
             fs.name AS funding_source,
-            p.sector,
+            p.portfolio_type,
             COUNT(DISTINCT p.project_id) AS project_count,
             SUM(p.total_cost_usd) AS total_finance
         FROM FundingSource fs
         INNER JOIN ProjectFundingSource pfs ON fs.funding_source_id = pfs.funding_source_id
         INNER JOIN Project p ON pfs.project_id = p.project_id
-        WHERE p.sector IS NOT NULL AND p.sector <> ''
-        GROUP BY fs.name, p.sector
+        WHERE p.portfolio_type IS NOT NULL AND p.portfolio_type <> ''
+        GROUP BY fs.name, p.portfolio_type
         ORDER BY fs.name, total_finance DESC
     `;
     const { rows } = await pool.query(query);

@@ -14,6 +14,7 @@ const CheckboxGroup = ({
   addButtonText = "Add New",
   // When true, mark option label/subtext with translate="no" and the notranslate class
   preventTranslate = false,
+  disabled = false,
 }) => {
   const handleCheckboxChange = (optionId, isChecked) => {
     let newSelectedValues;
@@ -54,17 +55,20 @@ const CheckboxGroup = ({
             return (
               <label 
                 key={optionId} 
-                className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 cursor-pointer group ${
-                  isSelected 
-                    ? 'bg-purple-50 border-purple-200 shadow-sm' 
-                    : 'bg-gray-50 border-gray-300 hover:bg-purple-25 hover:border-purple-200'
+                className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 group ${
+                  disabled 
+                    ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60' 
+                    : isSelected 
+                      ? 'bg-purple-50 border-purple-200 shadow-sm cursor-pointer' 
+                      : 'bg-gray-50 border-gray-300 hover:bg-purple-25 hover:border-purple-200 cursor-pointer'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isSelected}
-                  onChange={(e) => handleCheckboxChange(optionId, e.target.checked)}
-                  className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-400 rounded transition-colors duration-200"
+                  onChange={(e) => !disabled && handleCheckboxChange(optionId, e.target.checked)}
+                  disabled={disabled}
+                  className="mt-0.5 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-400 rounded transition-colors duration-200 disabled:cursor-not-allowed"
                 />
                 <div className="flex-1 min-w-0">
                   <span

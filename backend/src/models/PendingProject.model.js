@@ -44,8 +44,7 @@ PendingProject.addPendingProject = async (data) => {
                 equity_marker,
                 equity_marker_description,
                 assessment,
-                alignment_nap,
-                alignment_cff,
+                other_alignment,
                 geographic_division = [],
                 climate_relevance_score,
                 climate_relevance_category,
@@ -58,11 +57,12 @@ PendingProject.addPendingProject = async (data) => {
                 funding_source_ids = [],
                 sdg_ids = [],
                 districts = [],
+                additional_location_info,
+                portfolio_type,
+                funding_source_name,
                 wash_component,
-                sector,
-                type,
+                supporting_link,
                 location_segregation,
-                activities,
             } = data;
 
             // ✅ Parse array-like fields
@@ -77,18 +77,18 @@ PendingProject.addPendingProject = async (data) => {
                     title, status, approval_fy, beginning, closing, total_cost_usd,
                     gef_grant, cofinancing, loan_amount, objectives, direct_beneficiaries,
                     indirect_beneficiaries, beneficiary_description, gender_inclusion,
-                    equity_marker, equity_marker_description, assessment, alignment_nap,
-                    alignment_cff, geographic_division, climate_relevance_score,
+                    equity_marker, equity_marker_description, assessment, other_alignment,
+                    geographic_division, climate_relevance_score,
                     climate_relevance_category, climate_relevance_justification,
                     hotspot_vulnerability_type, wash_component_description,
                     submitter_email, agency_ids, funding_source_ids, sdg_ids, districts,
-                    wash_component, supporting_document, sector,
-                    type, location_segregation,
-                    activities
+                    additional_location_info, portfolio_type, funding_source_name,
+                    wash_component, supporting_document, supporting_link,
+                    location_segregation
                 )
                 VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31, $32, $33, $34, $35, $36
+                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37
                 )
                 RETURNING *;
             `;
@@ -111,8 +111,7 @@ PendingProject.addPendingProject = async (data) => {
                 equity_marker,
                 equity_marker_description,
                 assessment,
-                alignment_nap,
-                alignment_cff,
+                other_alignment || null,
                 parsedGeographicDivision,
                 climate_relevance_score,
                 climate_relevance_category,
@@ -124,12 +123,13 @@ PendingProject.addPendingProject = async (data) => {
                 parsedFundingSourceIds,
                 parsedSdgIds,
                 parsedDistricts,
+                additional_location_info || null,
+                portfolio_type || null,
+                funding_source_name || null,
                 wash_component ? JSON.stringify(wash_component) : null,
                 supporting_document,
-                sector,
-                type,
+                supporting_link || null,
                 location_segregation,
-                activities,
             ];
 
             const result = await client.query(insertQuery, values);

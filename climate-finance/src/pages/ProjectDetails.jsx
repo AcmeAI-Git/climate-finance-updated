@@ -676,7 +676,8 @@ const ProjectDetails = () => {
                     {/* Geographic Information */}
                     {(project.geographic_division ||
                         (project.districts &&
-                            project.districts.length > 0)) && (
+                            project.districts.length > 0) ||
+                        project.additional_location_info) && (
                         <Card padding="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">
                                 Geographic Information
@@ -691,15 +692,16 @@ const ProjectDetails = () => {
                                             {Array.isArray(
                                                 project.geographic_division
                                             )
-                                                ? project.geographic_division.join(
-                                                      ", "
-                                                  )
+                                                ? project.geographic_division
+                                                      .filter((d) => d !== "Nationwide")
+                                                      .join(", ")
                                                 : project.geographic_division}
                                         </div>
                                     </div>
                                 )}
                                 {project.districts &&
-                                    project.districts.length > 0 && (
+                                    project.districts.length > 0 &&
+                                    !project.districts.includes("N/A") && (
                                         <div>
                                             <div className="text-md text-gray-600 font-semibold mb-1">
                                                 Districts
@@ -718,6 +720,16 @@ const ProjectDetails = () => {
                                             </div>
                                         </div>
                                     )}
+                                {project.additional_location_info && (
+                                    <div>
+                                        <div className="text-md text-gray-600 font-semibold mb-1">
+                                            Additional Location Information
+                                        </div>
+                                        <div className="text-sm text-gray-700">
+                                            {project.additional_location_info}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </Card>
                     )}
@@ -750,30 +762,10 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             )}
-                            {project.alignment_nap && project.alignment_nap.trim() && (
-                                <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
-                                        NAP Alignment
-                                    </div>
-                                    <div className="text-sm text-gray-700">
-                                        {project.alignment_nap}
-                                    </div>
-                                </div>
-                            )}
-                            {project.alignment_cff && project.alignment_cff.trim() && (
-                                <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
-                                        CFF Alignment
-                                    </div>
-                                    <div className="text-sm text-gray-700">
-                                        {project.alignment_cff}
-                                    </div>
-                                </div>
-                            )}
                             {project.other_alignment && project.other_alignment.trim() && (
                                 <div>
                                     <div className="text-sm text-gray-600 font-medium mb-1">
-                                        Other Alignment
+                                        Other Alignment (NAP and CFF)
                                     </div>
                                     <div className="text-sm text-gray-700">
                                         {project.other_alignment}

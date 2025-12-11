@@ -30,6 +30,11 @@ const ProjectFormSections = ({
     const [availableDistricts, setAvailableDistricts] = useState([]);
     const [availableDivisions, setAvailableDivisions] = useState([]);
 
+    // Check if Nationwide is selected
+    const isNationwide = Array.isArray(formData.geographic_division) && 
+        formData.geographic_division.length > 0 &&
+        formData.geographic_division.includes("Nationwide");
+
     // Load districts data
     useEffect(() => {
         fetch("/bd-districts.json")
@@ -61,66 +66,95 @@ const ProjectFormSections = ({
             return;
         }
 
+        // Handle Nationwide selection
+        if (isNationwide) {
+            // Select all divisions
+            const allDivisions = availableDivisions.map((div) => div.name);
+            const currentDivisions = (formData.geographic_division || []).filter(d => d !== "Nationwide");
+            if (JSON.stringify(allDivisions.sort()) !== JSON.stringify(currentDivisions.sort())) {
+                setFormData((prev) => ({
+                    ...prev,
+                    geographic_division: ["Nationwide", ...allDivisions],
+                    districts: ["N/A"],
+                }));
+            }
+            // Show all districts but they should be disabled
+            const allDistricts = Object.values(districtsData)
+                .flat()
+                .map((name, index) => ({ id: index + 1, name }));
+            setAvailableDistricts(allDistricts);
+            return;
+        }
+
         if (
             Array.isArray(formData.geographic_division) &&
             formData.geographic_division.length > 0
         ) {
-            let filteredDistricts = [];
-            formData.geographic_division.forEach((division) => {
-                if (districtsData[division]) {
-                    filteredDistricts = filteredDistricts.concat(
-                        districtsData[division].map((name) => ({ name }))
+            // Filter out "Nationwide" from divisions for processing
+            const actualDivisions = formData.geographic_division.filter(d => d !== "Nationwide");
+            
+            if (actualDivisions.length > 0) {
+                let filteredDistricts = [];
+                actualDivisions.forEach((division) => {
+                    if (districtsData[division]) {
+                        filteredDistricts = filteredDistricts.concat(
+                            districtsData[division].map((name) => ({ name }))
+                        );
+                    }
+                });
+
+                // Remove duplicates and add id
+                const uniqueDistricts = Array.from(
+                    new Set(filteredDistricts.map((d) => d.name))
+                ).map((name, index) => ({ id: index + 1, name }));
+
+                setAvailableDistricts(uniqueDistricts);
+
+                // Validate current districts against available ones
+                // Only validate if we have existing districts to check
+                if (
+                    Array.isArray(formData.districts) &&
+                    formData.districts.length > 0 &&
+                    !formData.districts.includes("N/A")
+                ) {
+                    const validDistrictNames = uniqueDistricts.map((d) => d.name);
+                    const invalidDistricts = formData.districts.filter(
+                        (districtName) => !validDistrictNames.includes(districtName)
                     );
-                }
-            });
 
-            // Remove duplicates and add id
-            const uniqueDistricts = Array.from(
-                new Set(filteredDistricts.map((d) => d.name))
-            ).map((name, index) => ({ id: index + 1, name }));
-
-            setAvailableDistricts(uniqueDistricts);
-
-            // Validate current districts against available ones
-            // Only validate if we have existing districts to check
-            if (
-                Array.isArray(formData.districts) &&
-                formData.districts.length > 0
-            ) {
-                const validDistrictNames = uniqueDistricts.map((d) => d.name);
-                const invalidDistricts = formData.districts.filter(
-                    (districtName) => !validDistrictNames.includes(districtName)
-                );
-
-                // Only update if there are invalid districts to remove
-                if (invalidDistricts.length > 0) {
-                    const validSelectedDistricts = formData.districts.filter(
-                        (districtName) =>
-                            validDistrictNames.includes(districtName)
-                    );
-                    // Only update if the filtered result is different from current
-                    if (
-                        validSelectedDistricts.length !==
-                        formData.districts.length
-                    ) {
-                        setFormData((prev) => ({
-                            ...prev,
-                            districts: validSelectedDistricts,
-                        }));
+                    // Only update if there are invalid districts to remove
+                    if (invalidDistricts.length > 0) {
+                        const validSelectedDistricts = formData.districts.filter(
+                            (districtName) =>
+                                validDistrictNames.includes(districtName)
+                        );
+                        // Only update if the filtered result is different from current
+                        if (
+                            validSelectedDistricts.length !==
+                            formData.districts.length
+                        ) {
+                            setFormData((prev) => ({
+                                ...prev,
+                                districts: validSelectedDistricts,
+                            }));
+                        }
                     }
                 }
+            } else {
+                // Show all districts if no division selected
+                const allDistricts = Object.values(districtsData)
+                    .flat()
+                    .map((name, index) => ({ id: index + 1, name }));
+                setAvailableDistricts(allDistricts);
             }
         } else {
             // Show all districts if no division selected
             const allDistricts = Object.values(districtsData)
                 .flat()
-                .map((name, index) => ({
-                    id: index + 1,
-                    name: name,
-                }));
+                .map((name, index) => ({ id: index + 1, name }));
             setAvailableDistricts(allDistricts);
         }
-    }, [formData.geographic_division, formData.districts, districtsData, setFormData]);
+    }, [formData.geographic_division, formData.districts, districtsData, setFormData, isNationwide, availableDivisions.length]);
 
     const handleWashSliderChange = (value) => {
         handleWashComponentChange((prev) => ({
@@ -250,13 +284,58 @@ const ProjectFormSections = ({
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Division <span className="text-red-500">*</span>
                         </label>
+                        <div className="mb-3">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={isNationwide}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            // Select Nationwide and all divisions
+                                            const allDivisions = availableDivisions.map((div) => div.name);
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                geographic_division: ["Nationwide", ...allDivisions],
+                                                districts: ["N/A"],
+                                                additional_location_info: "", // Clear additional_location_info when Nationwide
+                                            }));
+                                        } else {
+                                            // Deselect Nationwide and clear divisions
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                geographic_division: prev.geographic_division?.filter(d => d !== "Nationwide") || [],
+                                                districts: [],
+                                            }));
+                                        }
+                                    }}
+                                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                                />
+                                <span className="text-sm font-medium text-gray-700">Nationwide</span>
+                            </label>
+                            <p className="text-xs text-gray-500 ml-6 mt-1">
+                                Select all divisions and set districts to N/A
+                            </p>
+                        </div>
                         <CheckboxGroup
                             label="Select Divisions"
                             options={availableDivisions}
-                            selectedValues={formData.geographic_division || []}
-                            onChange={(values) =>
-                                setFormData((prev) => ({ ...prev, geographic_division: values }))
-                            }
+                            selectedValues={(formData.geographic_division || []).filter(d => d !== "Nationwide")}
+                            onChange={(values) => {
+                                // If Nationwide was selected, remove it when manually selecting divisions
+                                const hasNationwide = formData.geographic_division?.includes("Nationwide");
+                                if (hasNationwide && values.length > 0) {
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        geographic_division: values,
+                                        districts: [],
+                                    }));
+                                } else {
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        geographic_division: values,
+                                    }));
+                                }
+                            }}
                             getOptionId={(division) => division.name}
                             getOptionLabel={(division) => division.name}
                         />
@@ -278,6 +357,34 @@ const ProjectFormSections = ({
                             }
                             getOptionId={(district) => district.name}
                             getOptionLabel={(district) => district.name}
+                            disabled={isNationwide}
+                        />
+                        {isNationwide && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Districts are set to N/A for nationwide projects
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Additional Location Information
+                        </label>
+                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
+                            Additional location details such as Upazila, Paurashava, Union, etc.
+                        </p>
+                        <textarea
+                            name="additional_location_info"
+                            value={formData.additional_location_info || ""}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    additional_location_info: e.target.value,
+                                }))
+                            }
+                            rows={3}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                            placeholder="e.g., 14 Drought-prone Upazilas, Only in char and flood-prone areas"
                         />
                     </div>
                 </div>
@@ -569,37 +676,21 @@ const ProjectFormSections = ({
                         />
                     </div>
 
-                    {/* NAP */}
+                    {/* Other Alignment (NAP and CFF) */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            National Adaptation Plans (NAP)
+                            Other Alignment (NAP and CFF)
                         </label>
                         <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                            {formFieldDescriptions.alignment_nap}
+                            Describe how the project aligns with National Adaptation Plans (NAP) and Climate Fiscal Frameworks (CFF)
                         </p>
                         <textarea
-                            name="alignment_nap"
-                            value={formData.alignment_nap || ""}
+                            name="other_alignment"
+                            value={formData.other_alignment || ""}
                             onChange={handleInputChange}
-                            rows={3}
+                            rows={4}
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        />
-                    </div>
-
-                    {/* CFF */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Climate Fiscal Frameworks (CFF)
-                        </label>
-                        <p className="text-sm text-gray-500 mb-2 font-medium italic">
-                            {formFieldDescriptions.alignment_cff}
-                        </p>
-                        <textarea
-                            name="alignment_cff"
-                            value={formData.alignment_cff || ""}
-                            onChange={handleInputChange}
-                            rows={3}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                            placeholder="e.g., Strong NAP. Focus on water security, salinity & drought adaptation; Aligned with Bangladesh NDC & Energy Efficiency Masterplan"
                         />
                     </div>
                 </div>

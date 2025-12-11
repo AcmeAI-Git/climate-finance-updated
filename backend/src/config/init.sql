@@ -15,10 +15,7 @@ CREATE TABLE IF NOT EXISTS Project (
     project_id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
-    sector TEXT,
-    type TEXT,
     location_segregation TEXT,
-    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -43,7 +40,9 @@ CREATE TABLE IF NOT EXISTS Project (
     hotspot_vulnerability_type VARCHAR(255),
     wash_component_description TEXT,
     supporting_document VARCHAR(255),
+    supporting_link TEXT,
     districts TEXT[],
+    additional_location_info TEXT,
     wash_component JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -54,10 +53,7 @@ CREATE TABLE IF NOT EXISTS PendingProject (
                                               pending_id SERIAL PRIMARY KEY,
                                               title VARCHAR(255) NOT NULL,
     status VARCHAR(50),
-    sector TEXT,
-    type TEXT,
     location_segregation TEXT,
-    activities TEXT,
     approval_fy INTEGER,
     beginning VARCHAR(50),
     closing VARCHAR(50),
@@ -87,8 +83,12 @@ CREATE TABLE IF NOT EXISTS PendingProject (
     funding_source_ids INTEGER[],
     sdg_ids INTEGER[],
     districts TEXT[],
+    additional_location_info TEXT,
+    portfolio_type VARCHAR(100),
+    funding_source_name TEXT,
     wash_component JSONB,
-    supporting_document VARCHAR(255)
+    supporting_document VARCHAR(255),
+    supporting_link TEXT
     );
 
 -- Table: Agency
