@@ -15,12 +15,14 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // File Upload Middleware
 app.use(fileUpload({
     useTempFiles: true,
-    tempFileDir: '/tmp/'
+    tempFileDir: '/tmp/',
+    parseNested: true
 }));
 app.use('/uploads', express.static('/var/repository/data/uploads/documents'));
 

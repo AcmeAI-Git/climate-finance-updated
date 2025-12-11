@@ -171,7 +171,7 @@ test/
 *.xlsx
 *.xls
 
-
+scripts/
 migration/
 parse-excel.js
 parsed-excel-data.json
