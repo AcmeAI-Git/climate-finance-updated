@@ -38,7 +38,7 @@ Activity.getRecentActivities = async (limit = 10) => {
                 SELECT 
                     'repository_created' as activity_type,
                     'New repository added' as activity_title,
-                    COALESCE("Heading", 'Untitled Repository') as activity_description,
+                    COALESCE(heading, 'Untitled Repository') as activity_description,
                     created_at as activity_time,
                     'success' as activity_color,
                     'Book' as activity_icon
@@ -50,7 +50,7 @@ Activity.getRecentActivities = async (limit = 10) => {
                 SELECT 
                     'repository_updated' as activity_type,
                     'Repository updated' as activity_title,
-                    COALESCE("Heading", 'Untitled Repository') as activity_description,
+                    COALESCE(heading, 'Untitled Repository') as activity_description,
                     updated_at as activity_time,
                     'success' as activity_color,
                     'Book' as activity_icon
@@ -73,7 +73,7 @@ Activity.getRecentActivities = async (limit = 10) => {
                 SELECT 
                     'pending_repository_submitted' as activity_type,
                     'Pending repository submitted' as activity_title,
-                    COALESCE("Heading", 'Untitled Repository') as activity_description,
+                    COALESCE(heading, 'Untitled Repository') as activity_description,
                     created_at as activity_time,
                     'info' as activity_color,
                     'BookOpenText' as activity_icon

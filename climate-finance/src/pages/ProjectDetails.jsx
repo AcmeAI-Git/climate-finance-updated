@@ -23,6 +23,10 @@ import FinancialSummaryCard from "../components/ui/FinancialSummaryCard";
 import { formatCurrency } from "../utils/formatters";
 import { projectApi } from "../services/api";
 
+// Base URL for file downloads
+const BASE_URL =
+    import.meta.env.VITE_BASE_URL || "https://climate-finance-new.onrender.com";
+
 const ProjectDetails = () => {
     const { id, projectId } = useParams();
     const navigate = useNavigate();
@@ -952,10 +956,14 @@ const ProjectDetails = () => {
                                     </div>
                                     <div className="text-sm">
                                         <a
-                                            href={project.supporting_document}
+                                            href={`${BASE_URL}/document/${project.supporting_document}?download=true`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 underline group"
+                                            onClick={(e) => {
+                                                // Prevent React Router from handling this as a route
+                                                e.stopPropagation();
+                                            }}
                                         >
                                             <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

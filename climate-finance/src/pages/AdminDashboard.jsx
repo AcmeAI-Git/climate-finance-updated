@@ -27,6 +27,7 @@ const AdminDashboard = () => {
     const [error, setError] = useState(null);
     const [activities, setActivities] = useState([]);
     const [activitiesLoading, setActivitiesLoading] = useState(true);
+    const [activitiesError, setActivitiesError] = useState(null);
 
     // Fetch dashboard statistics and activities
     useEffect(() => {
@@ -54,14 +55,23 @@ const AdminDashboard = () => {
     const fetchRecentActivities = async () => {
         try {
             setActivitiesLoading(true);
+            setActivitiesError(null);
             const response = await activityApi.getRecentActivities(10);
             
+            console.log("Recent activities response:", response);
+            
             if (response.status && response.data) {
-                setActivities(response.data);
+                console.log("Activities data:", response.data);
+                setActivities(Array.isArray(response.data) ? response.data : []);
+            } else {
+                console.warn("Invalid response format:", response);
+                setActivitiesError("Failed to load recent activities: Invalid response format");
+                setActivities([]);
             }
         } catch (error) {
             console.error("Error fetching recent activities:", error);
-            // Don't show error for activities, just log it
+            setActivitiesError(`Failed to load recent activities: ${error.message || "Unknown error"}`);
+            setActivities([]);
         } finally {
             setActivitiesLoading(false);
         }
@@ -275,16 +285,38 @@ const AdminDashboard = () => {
 
             {/* Recent Activity */}
             <Card padding="p-4 sm:p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Recent Activity
-                </h2>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                        Recent Activity
+                    </h2>
+                    <button
+                        onClick={fetchRecentActivities}
+                        className="text-sm text-purple-600 hover:text-purple-700 underline"
+                        disabled={activitiesLoading}
+                    >
+                        Refresh
+                    </button>
+                </div>
                 {activitiesLoading ? (
                     <div className="flex justify-center items-center py-8">
                         <Loading size="md" />
                     </div>
+                ) : activitiesError ? (
+                    <div className="text-center py-8">
+                        <p className="text-red-600 mb-2">{activitiesError}</p>
+                        <button
+                            onClick={fetchRecentActivities}
+                            className="text-sm text-purple-600 hover:text-purple-700 underline"
+                        >
+                            Try again
+                        </button>
+                    </div>
                 ) : activities.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                         <p>No recent activity to display</p>
+                        <p className="text-xs text-gray-400 mt-2">
+                            Activities from the last 30 days will appear here
+                        </p>
                     </div>
                 ) : (
                     <div className="space-y-4">
