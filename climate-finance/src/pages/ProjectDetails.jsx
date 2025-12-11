@@ -263,7 +263,7 @@ const ProjectDetails = () => {
                     </div>
 
                     {/* Timeline and Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-base">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-base">
                         <div>
                             <span className="font-semibold text-gray-800">
                                 Timeline:
@@ -318,7 +318,7 @@ const ProjectDetails = () => {
                 </Card>
 
                 {/* Secondary Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* Implementing Entities */}
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -372,7 +372,10 @@ const ProjectDetails = () => {
                             </div>
                         )}
                     </Card>
+                </div>
 
+                {/* Delivery Partners and Funding Sources */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* Delivery Partners */}
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -399,23 +402,21 @@ const ProjectDetails = () => {
                             </div>
                         )}
                     </Card>
-                </div>
 
-                {/* Funding Sources - Full Width */}
-                <div className="grid grid-cols-1 gap-6 mb-6">
+                    {/* Funding Sources */}
                     <Card padding="p-4 sm:p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Funding Sources
                         </h3>
                         {Array.isArray(project.projectFundingSources) &&
                         project.projectFundingSources.length > 0 ? (
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {project.projectFundingSources
                                     .slice(0, 6)
                                     .map((source, index) => (
                                         <div
                                             key={index}
-                                            className="p-3 bg-primary-50 rounded-lg border border-primary-100"
+                                            className="p-3 bg-orange-50 rounded-lg border border-orange-100"
                                         >
                                             <div className="font-medium text-gray-900">
                                                 {source.name}
@@ -446,11 +447,11 @@ const ProjectDetails = () => {
                                             </div>
                                         </div>
                                     ))}
-                                {project.projectFundingSources.length > 4 && (
+                                {project.projectFundingSources.length > 6 && (
                                     <div className="text-sm text-gray-500 text-center font-medium">
                                         +
                                         {project.projectFundingSources.length -
-                                            4}{" "}
+                                            6}{" "}
                                         more sources
                                     </div>
                                 )}
@@ -523,8 +524,8 @@ const ProjectDetails = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                             Financial Summary
                         </h3>
-                        <div className="grid grid-cols-1 gap-4">
-                            <div className="text-center p-4 bg-primary-50 rounded-lg border border-primary-100">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 text-center p-4 bg-primary-50 rounded-lg border border-primary-100">
                                 <div className="text-sm text-gray-600 font-medium mb-2">
                                     Total Cost
                                 </div>
@@ -534,7 +535,7 @@ const ProjectDetails = () => {
                             </div>
                             {/* Grant */}
                             {parseFloat(project.gef_grant || 0) > 0 && (
-                                <div className="text-center p-4 bg-success-50 rounded-lg border border-success-100">
+                                <div className="flex-1 text-center p-4 bg-success-50 rounded-lg border border-success-100">
                                     <div className="text-sm text-gray-600 font-medium mb-2">
                                         Grant
                                     </div>
@@ -545,12 +546,23 @@ const ProjectDetails = () => {
                             )}
                             {/* Co-financing */}
                             {parseFloat(project.cofinancing || 0) > 0 && (
-                                <div className="text-center p-4 bg-warning-50 rounded-lg border border-warning-100">
+                                <div className="flex-1 text-center p-4 bg-warning-50 rounded-lg border border-warning-100">
                                     <div className="text-sm text-gray-600 font-medium mb-2">
                                         Co-financing
                                     </div>
                                     <div className="text-xl font-bold text-warning-700">
                                         {formatCurrency(parseFloat(project.cofinancing))}
+                                    </div>
+                                </div>
+                            )}
+                            {/* Loan */}
+                            {parseFloat(project.loan_amount || 0) > 0 && (
+                                <div className="flex-1 text-center p-4 bg-primary-50 rounded-lg border border-primary-100">
+                                    <div className="text-sm text-gray-600 font-medium mb-2">
+                                        Loan
+                                    </div>
+                                    <div className="text-xl font-bold text-primary-700">
+                                        {formatCurrency(parseFloat(project.loan_amount))}
                                     </div>
                                 </div>
                             )}

@@ -1026,17 +1026,6 @@ const Projects = () => {
                                                 </div>
                                             )}
 
-                                            {parseFloat(project.gef_grant || 0) > 0 && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-gray-600 font-medium">
-                                                        Grant:
-                                                    </span>
-                                                    <span className="text-blue-600 font-semibold text-xs sm:text-sm">
-                                                        {formatCurrency(project.gef_grant)}
-                                                    </span>
-                                                </div>
-                                            )}
-
                                             {getTimelineYears(project.beginning, project.closing) && (
                                                 <div className="text-sm">
                                                     <span className="text-gray-600 font-medium">
