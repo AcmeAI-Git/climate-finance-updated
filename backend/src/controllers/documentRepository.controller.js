@@ -6,8 +6,8 @@ const documentRepositoryController = {};
 // ✅ Create a new document
 documentRepositoryController.create = async (req, res) => {
     try {
-        const { categories, heading, sub_heading, agency_name, programme_code, document_size } = req.body;
-        const data = { categories, heading, sub_heading, agency_name, programme_code, document_size };
+        const { categories, heading, sub_heading, agency_name, programme_code, document_size, supporting_link } = req.body;
+        const data = { categories, heading, sub_heading, agency_name, programme_code, document_size, supporting_link };
 
         // Handle file upload if provided
         if (req.files && req.files.supporting_document) {

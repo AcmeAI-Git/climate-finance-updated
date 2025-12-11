@@ -13,15 +13,16 @@ PendingDocumentRepository.create = async (data) => {
         document_size,
         document_link,
         programme_code,
+        supporting_link,
     } = data;
 
     const query = `
         INSERT INTO PendingDocumentRepository 
-        (categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link, programme_code)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        (categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link, programme_code, supporting_link)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING *;
     `;
-    const values = [categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link, programme_code];
+    const values = [categories, heading, sub_heading, agency_name, submitter_email, document_size, document_link, programme_code, supporting_link || null];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };
@@ -56,7 +57,8 @@ PendingDocumentRepository.update = async (repo_id, data) => {
         submitter_email,
         document_size,
         document_link,
-        programme_code
+        programme_code,
+        supporting_link,
     } = data;
 
     const query = `
@@ -69,12 +71,13 @@ PendingDocumentRepository.update = async (repo_id, data) => {
             document_size = $5,
             document_link = $6,
             categories = $7,
-            programme_code = $8
+            programme_code = $8,
+            supporting_link = $9,
             updated_at = CURRENT_TIMESTAMP
-        WHERE repo_id = $9
+        WHERE repo_id = $10
         RETURNING *;
     `;
-    const values = [heading, sub_heading, agency_name, submitter_email, document_size, document_link, categories, programme_code, repo_id];
+    const values = [heading, sub_heading, agency_name, submitter_email, document_size, document_link, categories, programme_code, supporting_link || null, repo_id];
     const { rows } = await pool.query(query, values);
     return rows[0];
 };

@@ -7,8 +7,8 @@ const PendingDocumentRepositoryController = {};
 // ✅ Create a new document
 PendingDocumentRepositoryController.create = async (req, res) => {
     try {
-        const { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code } = req.body;
-        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code };
+        const { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code, supporting_link } = req.body;
+        const data = { categories, heading, sub_heading, agency_name, submitter_email, document_size, programme_code, supporting_link };
 
         // Handle file upload if provided
         if (req.files && req.files.supporting_document) {

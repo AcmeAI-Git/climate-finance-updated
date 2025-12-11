@@ -350,6 +350,15 @@ const Projects = () => {
                    hotspotTypes === undefined;
         });
 
+        // Check if there are projects without delivery partners (need to add "N/A" option)
+        const hasProjectsWithoutDeliveryPartners = projectsList.some((p) => {
+            const deliveryPartners = p.delivery_partners;
+            return !deliveryPartners || 
+                   (Array.isArray(deliveryPartners) && deliveryPartners.length === 0) ||
+                   deliveryPartners === null ||
+                   deliveryPartners === undefined;
+        });
+
         const districtsList = Array.from(
             new Set(
                 projectsList
@@ -432,14 +441,24 @@ const Projects = () => {
                 ...executingAgencies.map((a) => ({ value: a.id, label: a.name })),
             ],
         });
-        filters.push({
-            key: "delivery_partner_id",
-            label: "Delivery Partner",
-            options: [
+        // Always show delivery partner filter if there are any projects
+        if (deliveryPartners.length > 0 || hasProjectsWithoutDeliveryPartners) {
+            const options = [
                 { value: "All", label: "All Delivery Partners" },
                 ...deliveryPartners.map((p) => ({ value: p.id, label: p.name })),
-            ],
-        });
+            ];
+            
+            // Add "N/A" option if there are projects without delivery partners
+            if (hasProjectsWithoutDeliveryPartners) {
+                options.push({ value: "N/A", label: "N/A" });
+            }
+            
+            filters.push({
+                key: "delivery_partner_id",
+                label: "Delivery Partner",
+                options: options,
+            });
+        }
         filters.push({
             key: "funding_source_id",
             label: "Funding Source",

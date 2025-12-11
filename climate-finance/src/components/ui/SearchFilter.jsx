@@ -70,7 +70,13 @@ const filterData = (data, activeFilters) => {
                         arrayName = "delivery_partners";
                     }
                     
-                    if (arrayName && item[arrayName] && Array.isArray(item[arrayName])) {
+                    // Check for "N/A" first - if array doesn't exist or is empty
+                    if (value === "N/A") {
+                        return !item[arrayName] || !Array.isArray(item[arrayName]) || item[arrayName].length === 0;
+                    }
+                    
+                    // For non-N/A values, check if array exists and has matching items
+                    if (arrayName && item[arrayName] && Array.isArray(item[arrayName]) && item[arrayName].length > 0) {
                         const matches = item[arrayName].some((el) => {
                             if (el && typeof el === "object" && el.id !== undefined) {
                                 return el.id.toString() === value.toString();
@@ -79,10 +85,7 @@ const filterData = (data, activeFilters) => {
                         });
                         return matches;
                     }
-                    // If array doesn't exist or is empty, exclude item (unless value is "N/A")
-                    if (value === "N/A") {
-                        return !item[arrayName] || item[arrayName].length === 0;
-                    }
+                    // If array doesn't exist or is empty and we're not looking for "N/A", exclude item
                     return false;
                 }
 

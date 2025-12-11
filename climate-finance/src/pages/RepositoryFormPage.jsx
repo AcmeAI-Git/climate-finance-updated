@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { pendingRepositoryApi, RepositoryApi } from "../services/api";
 import Button from "../components/ui/Button";
 import Loading from "../components/ui/Loading";
@@ -20,7 +20,6 @@ const RepositoryFormPage = ({ mode = "add" }) => {
     const { isAuthenticated } = useAuth();
     const { toast } = useToast();
     const navigate = useNavigate();
-    const location = useLocation();
     const { language } = useLanguage();
 
     const [formData, setFormData] = useState({
@@ -31,6 +30,7 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         programme_code: "",
         document_size: 0,
         submitter_email: "",
+        supporting_link: "",
     });
 
     const [selectedFile, setSelectedFile] = useState(null);
@@ -106,8 +106,14 @@ const RepositoryFormPage = ({ mode = "add" }) => {
         )
             newErrors.submitter_email = "Invalid email address";
 
-        if (!selectedFile) {
-            newErrors.file = "Please upload a PDF document";
+        // Either file or link must be provided
+        if (!selectedFile && !formData.supporting_link.trim()) {
+            newErrors.file = "Please upload a PDF document or provide a supporting link";
+        }
+        
+        // Validate URL if provided
+        if (formData.supporting_link.trim() && !/^https?:\/\/.+/.test(formData.supporting_link.trim())) {
+            newErrors.supporting_link = "Please enter a valid URL (must start with http:// or https://)";
         }
 
         setErrors(newErrors);
@@ -130,7 +136,10 @@ const RepositoryFormPage = ({ mode = "add" }) => {
             formDataToSend.append("submitter_email", formData.submitter_email);
         }
         formDataToSend.append("document_size", formData.document_size);
-        formDataToSend.append("supporting_document", selectedFile);
+        if (selectedFile) {
+            formDataToSend.append("supporting_document", selectedFile);
+        }
+        formDataToSend.append("supporting_link", formData.supporting_link || "");
 
         try {
             let response;
@@ -411,14 +420,40 @@ const RepositoryFormPage = ({ mode = "add" }) => {
                             </div>
                         )}
 
+                        {/* Supporting Link */}
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Supporting Link
+                            </label>
+                            <p className="text-sm text-gray-500 mb-3">
+                                Add a URL to a website, document, or resource that provides additional information about this repository.
+                            </p>
+                            <input
+                                type="url"
+                                name="supporting_link"
+                                value={formData.supporting_link}
+                                onChange={handleInputChange}
+                                placeholder="https://example.com/repository-details"
+                                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 ${
+                                    errors.supporting_link
+                                        ? "border-red-300"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            {errors.supporting_link && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.supporting_link}
+                                </p>
+                            )}
+                        </div>
+
                         {/* Document Upload */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Upload Document (PDF){" "}
-                                <span className="text-red-500">*</span>
+                                Upload Document (PDF)
                             </label>
                             <p className="text-sm text-gray-500 mb-3">
-                                Max 10MB • PDF only
+                                Max 10MB • PDF only • Required if no supporting link is provided
                             </p>
 
                             {!selectedFile ? (
