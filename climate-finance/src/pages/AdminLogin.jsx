@@ -8,7 +8,6 @@ import Input from "../components/ui/Input";
 import {
     ArrowLeft,
     Lock,
-    User,
     Mail,
     Building,
     UserCog,
@@ -17,7 +16,7 @@ import {
 
 const AdminLogin = () => {
     const [formData, setFormData] = useState({
-        username: "",
+        email: "",
         password: "",
     });
     const [error, setError] = useState("");
@@ -34,20 +33,32 @@ const AdminLogin = () => {
         setError(""); // Clear error when user types
     };
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
 
         // Login validation
-        if (!formData.username || !formData.password) {
+        if (!formData.email || !formData.password) {
             setError("Please fill in all fields");
             setIsLoading(false);
             return;
         }
 
+        // Validate email format
+        if (!validateEmail(formData.email)) {
+            setError("Please enter a valid email address");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const result = await login(formData.username, formData.password);
+            const result = await login(formData.email, formData.password);
 
             if (result.success) {
                 navigate("/admin/dashboard");
@@ -108,16 +119,16 @@ const AdminLogin = () => {
                 <Card padding="p-6" className="shadow-lg">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-4">
-                            {/* Username/Email Field */}
+                            {/* Email Field */}
                             <Input
-                                label="Username or Email"
-                                name="username"
-                                type="text"
-                                value={formData.username}
+                                label="Email"
+                                name="email"
+                                type="email"
+                                value={formData.email}
                                 onChange={handleChange}
-                                placeholder="Enter your username or email"
+                                placeholder="Enter your email address"
                                 leftIcon={
-                                    <User size={20} className="text-gray-400" />
+                                    <Mail size={20} className="text-gray-400" />
                                 }
                                 required
                                 disabled={isLoading}

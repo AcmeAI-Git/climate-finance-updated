@@ -48,8 +48,17 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Use the new method that supports both email and username
-    const user = await User.getUserByEmailOrUsername(email);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ 
+        status: false, 
+        message: 'Please provide a valid email address' 
+      });
+    }
+
+    // Only allow email for login
+    const user = await User.getUserByEmail(email);
     if (!user) {
       return res.status(400).json({ 
         status: false, 
