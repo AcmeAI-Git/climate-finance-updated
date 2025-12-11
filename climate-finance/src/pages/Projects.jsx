@@ -20,6 +20,7 @@ import {
     CheckCircle,
     AlertCircle,
     RefreshCw,
+    MapPin,
 } from "lucide-react";
 import MultiSelect from "../components/ui/MultiSelect";
 import { useLanguage } from "../context/LanguageContext";
@@ -55,6 +56,7 @@ const Projects = () => {
         sector: "All",
         type: "All",
         hotspot_vulnerability_type: "All",
+        hotspot_types: "All",
         districts: "All",
     });
     
@@ -313,6 +315,29 @@ const Projects = () => {
             new Set(projectsList.map((p) => p.hotspot_vulnerability_type).filter(Boolean))
         ).sort();
 
+        const hotspotTypes = Array.from(
+            new Set(
+                projectsList
+                    .flatMap((p) =>
+                        Array.isArray(p.hotspot_types)
+                            ? p.hotspot_types
+                            : p.hotspot_types
+                            ? [p.hotspot_types]
+                            : []
+                    )
+                    .filter(Boolean)
+            )
+        ).sort();
+        
+        // Check if there are projects without hotspots (need to add "N/A" option)
+        const hasProjectsWithoutHotspots = projectsList.some((p) => {
+            const hotspotTypes = p.hotspot_types;
+            return !hotspotTypes || 
+                   (Array.isArray(hotspotTypes) && hotspotTypes.length === 0) ||
+                   hotspotTypes === null ||
+                   hotspotTypes === undefined;
+        });
+
         const districtsList = Array.from(
             new Set(
                 projectsList
@@ -404,6 +429,25 @@ const Projects = () => {
                     { value: "All", label: "All Vulnerability Types" },
                     ...vulnerabilityTypes.map((type) => ({ value: type, label: type })),
                 ],
+            });
+        }
+        
+        // Always show hotspot filter if there are any projects
+        if (hotspotTypes.length > 0 || hasProjectsWithoutHotspots) {
+            const options = [
+                { value: "All", label: "All Hotspot Types" },
+                ...hotspotTypes.map((type) => ({ value: type, label: type })),
+            ];
+            
+            // Add "N/A" option if there are projects without hotspots
+            if (hasProjectsWithoutHotspots) {
+                options.push({ value: "N/A", label: "N/A" });
+            }
+            
+            filters.push({
+                key: "hotspot_types",
+                label: "Hotspot Types",
+                options: options,
             });
         }
         
@@ -732,6 +776,7 @@ const Projects = () => {
                                 sector: "All",
                                 type: "All",
                                 hotspot_vulnerability_type: "All",
+                                hotspot_types: "All",
                                 districts: "All",
                             });
                             setYearRange({ min: null, max: null });
@@ -892,6 +937,30 @@ const Projects = () => {
                                             >
                                                 {project.status}
                                             </span>
+                                            {project.hotspot_types && 
+                                             Array.isArray(project.hotspot_types) && 
+                                             project.hotspot_types.length > 0 ? (
+                                                <>
+                                                    {project.hotspot_types.map((hotspot, idx) => (
+                                                        <span
+                                                            key={idx}
+                                                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800"
+                                                            title={hotspot}
+                                                        >
+                                                            <MapPin size={12} />
+                                                            <span className="line-clamp-1 max-w-[120px]">{hotspot}</span>
+                                                        </span>
+                                                    ))}
+                                                </>
+                                            ) : (
+                                                <span
+                                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600"
+                                                    title="No hotspot assigned"
+                                                >
+                                                    <MapPin size={12} />
+                                                    N/A
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div className="space-y-3 mb-4 flex-1">
@@ -1041,6 +1110,7 @@ const Projects = () => {
                                     sector: "All",
                                     type: "All",
                                     hotspot_vulnerability_type: "All",
+                                    hotspot_types: "All",
                                     districts: "All",
                                 });
                                 setYearRange({ min: null, max: null });

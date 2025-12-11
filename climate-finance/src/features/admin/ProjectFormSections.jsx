@@ -350,6 +350,7 @@ const ProjectFormSections = ({
                 <CheckboxGroup
                     label="Select Hotspot Types"
                     options={[
+                        { id: "N/A", name: "N/A (Not Applicable)" },
                         { id: "SWM", name: "South-western coastal area and Sundarbans (SWM)" },
                         { id: "SEE", name: "South-east and eastern coastal area (SEE)" },
                         { id: "CHT", name: "Chattogram Hill Tracts (CHT)" },
@@ -363,9 +364,28 @@ const ProjectFormSections = ({
                         { id: "URB", name: "Urban areas (URB)" },
                     ]}
                     selectedValues={formData.hotspot_types || []}
-                    onChange={(values) =>
-                        setFormData((prev) => ({ ...prev, hotspot_types: values }))
-                    }
+                    onChange={(values) => {
+                        // Handle mutual exclusivity: N/A vs other options
+                        const hasNA = values.includes("N/A");
+                        const hasOtherOptions = values.some(v => v !== "N/A");
+                        
+                        let finalValues;
+                        if (hasNA && hasOtherOptions) {
+                            // If both N/A and other options are selected, keep only the last one clicked
+                            const lastValue = values[values.length - 1];
+                            if (lastValue === "N/A") {
+                                // If N/A was clicked last, keep only N/A
+                                finalValues = ["N/A"];
+                            } else {
+                                // If another option was clicked last, remove N/A
+                                finalValues = values.filter(v => v !== "N/A");
+                            }
+                        } else {
+                            finalValues = values;
+                        }
+                        
+                        setFormData((prev) => ({ ...prev, hotspot_types: finalValues }));
+                    }}
                     getOptionId={(option) => option.id}
                     getOptionLabel={(option) => option.name}
                 />

@@ -49,7 +49,7 @@ const defaultFormData = {
     submitter_email: "",
 
     // New fields for client requirements
-    hotspot_types: [], // Changed to array for multi-select
+    hotspot_types: ["N/A"], // Default to N/A for new projects
     vulnerability_type: "",
     wash_component_description: "",
     direct_beneficiaries: "",
@@ -206,9 +206,10 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                             : [],
                     assessment: projectData.assessment || "",
                     // Changed: hotspot_types is now an array
-                    hotspot_types: Array.isArray(projectData.hotspot_types)
+                    // If empty/null/undefined, set to ["N/A"] for explicit N/A selection
+                    hotspot_types: Array.isArray(projectData.hotspot_types) && projectData.hotspot_types.length > 0
                         ? projectData.hotspot_types
-                        : [],
+                        : ["N/A"],
                     vulnerability_type: projectData.vulnerability_type || "",
                     wash_component_description:
                         projectData.wash_component_description || "",
@@ -509,9 +510,13 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 JSON.stringify(formData.geographic_division || [])
             );
 
+            // Convert "N/A" selection to empty array for backend
+            const hotspotTypesToSend = formData.hotspot_types && formData.hotspot_types.includes("N/A")
+                ? []
+                : (formData.hotspot_types || []);
             formDataToSend.append(
                 "hotspot_types",
-                JSON.stringify(formData.hotspot_types || [])
+                JSON.stringify(hotspotTypesToSend)
             );
             formDataToSend.append(
                 "vulnerability_type",

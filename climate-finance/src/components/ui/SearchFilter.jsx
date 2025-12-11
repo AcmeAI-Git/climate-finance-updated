@@ -96,6 +96,10 @@ const filterData = (data, activeFilters) => {
                     }
 
                     if (found === undefined || found === null) {
+                        // Special handling for "N/A" filter - match null/undefined values
+                        if (value === "N/A") {
+                            return true;
+                        }
                         // Field absent in this item — skip filter (don't exclude)
                         return true;
                     }
@@ -108,6 +112,11 @@ const filterData = (data, activeFilters) => {
                 if (Array.isArray(itemValue)) {
                     // If filters are set to 'All', pass through
                     if (value === "All") return true;
+                    
+                    // Special handling for "N/A" filter - match empty arrays or null/undefined
+                    if (value === "N/A") {
+                        return itemValue.length === 0;
+                    }
 
                     const matches = itemValue.some((v) => {
                         if (v === undefined || v === null) return false;
@@ -118,6 +127,11 @@ const filterData = (data, activeFilters) => {
                     });
 
                     return matches;
+                }
+                
+                // Handle "N/A" filter for null/undefined values (when itemValue is not an array)
+                if (value === "N/A") {
+                    return itemValue === null || itemValue === undefined || itemValue === "";
                 }
 
                 // Handle case-insensitive matching for string values
