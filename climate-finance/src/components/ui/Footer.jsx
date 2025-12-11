@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Mail, AlertTriangle, Linkedin, Facebook } from "lucide-react";
 import Button from "./Button";
 import ReportIssueModal from "./ReportIssueModal";
+import ContactUsModal from "./ContactUsModal";
 
 const Footer = () => {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const currentYear = new Date().getFullYear();
 
     const socialLinks = [
@@ -103,6 +105,17 @@ const Footer = () => {
                                     </a>
                                 ))}
 
+                                {/* Contact Us Button positioned left of Report Issue button */}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsContactModalOpen(true)}
+                                    leftIcon={<Mail size={14} />}
+                                    className="text-gray-500 hover:text-blue-600 hover:bg-blue-50 ml-2"
+                                >
+                                    Contact Us
+                                </Button>
+
                                 {/* Report Issue Button positioned right of social links */}
                                 <Button
                                     variant="ghost"
@@ -114,7 +127,7 @@ const Footer = () => {
                                     Report Issue
                                 </Button>
                             </div>
-                            <div className="text-sm text-gray-500 justify-center items-center md:justify-start flex flex-row gap-x-4">
+                            <div className="text-sm text-gray-500 justify-center items-center md:justify-end flex flex-row gap-x-4">
                                 <p>Developed by</p>
                                 <a
                                     key={partners[1].alt}
@@ -150,6 +163,12 @@ const Footer = () => {
             <ReportIssueModal
                 isOpen={isReportModalOpen}
                 onClose={() => setIsReportModalOpen(false)}
+            />
+
+            {/* Contact Us Modal */}
+            <ContactUsModal
+                isOpen={isContactModalOpen}
+                onClose={() => setIsContactModalOpen(false)}
             />
         </>
     );
