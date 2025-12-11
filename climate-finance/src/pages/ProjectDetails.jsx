@@ -600,7 +600,16 @@ const ProjectDetails = () => {
                                         : "Not Available"}
                                 </div>
                             </div>
-
+                            {project.beneficiary_description && (
+                                <div>
+                                    <div className="text-md text-gray-600 font-semibold mb-1">
+                                        Beneficiary Description
+                                    </div>
+                                    <div className="text-sm text-gray-700">
+                                        {project.beneficiary_description}
+                                    </div>
+                                </div>
+                            )}
                             {/* Hotspot Types (multi-select) */}
                             {Array.isArray(project.hotspot_types) && project.hotspot_types.length > 0 && (
                                 <div>
@@ -630,16 +639,7 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             )}
-                            {project.beneficiary_description && (
-                                <div>
-                                    <div className="text-md text-gray-600 font-semibold mb-1">
-                                        Beneficiary Description
-                                    </div>
-                                    <div className="text-sm text-gray-700">
-                                        {project.beneficiary_description}
-                                    </div>
-                                </div>
-                            )}
+                            
                         </div>
                     </Card>
 
