@@ -15,7 +15,12 @@ FundingSource.addFundingSource = async (data) => {
     const query = `
         INSERT INTO FundingSource (name)
         VALUES ($1)
-        RETURNING *
+        RETURNING 
+            funding_source_id,
+            name,
+            grant_amount,
+            loan_amount,
+            counterpart_funding
     `;
     const values = [name];
     const { rows } = await pool.query(query, values);
@@ -87,14 +92,33 @@ FundingSource.getFundingSourceOverview = async () => {
 };
 
 FundingSource.getById = async (id) => {
-    const { rows } = await pool.query('SELECT * FROM FundingSource WHERE funding_source_id = $1', [id]);
+    const query = `
+        SELECT 
+            funding_source_id,
+            name,
+            grant_amount,
+            loan_amount,
+            counterpart_funding
+        FROM FundingSource 
+        WHERE funding_source_id = $1
+    `;
+    const { rows } = await pool.query(query, [id]);
     return rows[0];
 };
 
 FundingSource.getFundingSourceById = async (id) => {
     const client = await pool.connect();
     try {
-        const fundingSourceQuery = `SELECT * FROM FundingSource WHERE funding_source_id = $1`;
+        const fundingSourceQuery = `
+            SELECT 
+                funding_source_id,
+                name,
+                grant_amount,
+                loan_amount,
+                counterpart_funding
+            FROM FundingSource 
+            WHERE funding_source_id = $1
+        `;
         const fundingSourceResult = await client.query(fundingSourceQuery, [id]);
 
         if (fundingSourceResult.rows.length === 0) return null;
@@ -147,7 +171,12 @@ FundingSource.updateFundingSource = async (id, data) => {
     const query = `
         UPDATE FundingSource SET ${setClause}
         WHERE funding_source_id = $${fields.length + 1}
-        RETURNING *
+        RETURNING 
+            funding_source_id,
+            name,
+            grant_amount,
+            loan_amount,
+            counterpart_funding
     `;
     const { rows } = await pool.query(query, [...values, id]);
     return rows[0];
