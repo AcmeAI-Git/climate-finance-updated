@@ -85,6 +85,36 @@ const BarChartComponent = ({
         };
     }, [data, scrollable]);
 
+    // Inject custom scrollbar styles for better visibility on mobile
+    useEffect(() => {
+        if (!document.getElementById("bar-chart-scrollbar-style")) {
+            const style = document.createElement("style");
+            style.id = "bar-chart-scrollbar-style";
+            style.innerHTML = `
+                .bar-chart-scrollable::-webkit-scrollbar {
+                    height: 16px !important;
+                }
+                .bar-chart-scrollable::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 8px;
+                }
+                .bar-chart-scrollable::-webkit-scrollbar-thumb {
+                    background: #888;
+                    border-radius: 8px;
+                }
+                .bar-chart-scrollable::-webkit-scrollbar-thumb:hover {
+                    background: #555;
+                }
+                /* Firefox */
+                .bar-chart-scrollable {
+                    scrollbar-width: auto;
+                    scrollbar-color: #888 #f1f1f1;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }, []);
+
     // ---------- prepare data for Victory ----------
     const chartData = data.map((item) => {
         const point = { x: item[xAxisKey] };
@@ -113,6 +143,7 @@ const BarChartComponent = ({
 
                 {/* Chart wrapper - scrollable only when needed */}
                 <div 
+                    className={scrollable ? "bar-chart-scrollable" : ""}
                     style={{ 
                         height: "340px", 
                         overflowX: scrollable ? "auto" : "visible",

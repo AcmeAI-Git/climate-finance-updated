@@ -30,6 +30,7 @@ const BangladeshMapComponent = memo(
         const draw = useRef(null);
         const [mapLoaded, setMapLoaded] = useState(false);
         const currentPopup = useRef(null); // Track the currently open popup
+        const touchStartPos = useRef(null); // Track touch start position
 
         const normalizeRegionName = React.useCallback((shapeName) => {
             const cleanName = shapeName
@@ -194,14 +195,9 @@ const BangladeshMapComponent = memo(
                 },
                 "divisions-line"
             );
-            map.current.on("mouseenter", "data-fill", () => {
-                map.current.getCanvas().style.cursor = "pointer";
-            });
-            map.current.on("mouseleave", "data-fill", () => {
-                map.current.getCanvas().style.cursor = "";
-            });
-            map.current.on("click", "data-fill", (e) => {
-                if (e.features[0]) {
+            // Helper function to show popup
+            const showPopup = (e) => {
+                if (e.features && e.features[0]) {
                     const feature = e.features[0];
                     const props = feature.properties;
                     // Close previous popup if open
@@ -212,6 +208,7 @@ const BangladeshMapComponent = memo(
                     const popup = new maplibregl.Popup({
                         closeButton: true,
                         closeOnClick: false,
+                        closeOnMove: false,
                     })
                         .setLngLat(e.lngLat)
                         .setHTML(
@@ -236,6 +233,48 @@ const BangladeshMapComponent = memo(
                         .addTo(map.current);
                     currentPopup.current = popup; // Track the new popup
                 }
+            };
+
+            map.current.on("mouseenter", "data-fill", () => {
+                map.current.getCanvas().style.cursor = "pointer";
+            });
+            map.current.on("mouseleave", "data-fill", () => {
+                map.current.getCanvas().style.cursor = "";
+            });
+            
+            // Handle click events (desktop and mobile after touch)
+            map.current.on("click", "data-fill", showPopup);
+            
+            // Handle touch events (mobile) - track touch start to distinguish tap from pan
+            map.current.on("touchstart", "data-fill", (e) => {
+                if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length === 1) {
+                    const touch = e.originalEvent.touches[0];
+                    touchStartPos.current = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now(),
+                    };
+                }
+            });
+            
+            map.current.on("touchend", "data-fill", (e) => {
+                if (!touchStartPos.current) return;
+                
+                const touchEnd = e.originalEvent?.changedTouches?.[0];
+                if (!touchEnd) return;
+                
+                const deltaX = Math.abs(touchEnd.clientX - touchStartPos.current.x);
+                const deltaY = Math.abs(touchEnd.clientY - touchStartPos.current.y);
+                const deltaTime = Date.now() - touchStartPos.current.time;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // Only trigger popup if it was a tap (not a pan/swipe)
+                // Threshold: less than 10px movement and less than 300ms
+                if (distance < 10 && deltaTime < 300 && e.features && e.features[0]) {
+                    showPopup(e);
+                }
+                
+                touchStartPos.current = null;
             });
         }, [data, normalizeRegionName]);
 
@@ -430,6 +469,7 @@ const BangladeshMapComponent = memo(
                             width: "100%",
                             height: "100%",
                             borderRadius: "12px",
+                            touchAction: "pan-x pan-y",
                         }}
                     />
 
