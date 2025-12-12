@@ -430,6 +430,8 @@ Project.updateProject = async (id, data) => {
             portfolio_type,
             funding_source_name,
             supporting_link,
+            type,
+            sector,
             // New agency arrays
             implementing_entity_ids,
             executing_agency_ids,

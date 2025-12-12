@@ -18,7 +18,9 @@ const Modal = ({
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
+    xl: 'max-w-4xl',
+    '2xl': 'max-w-6xl',
+    full: 'max-w-[95vw]'
   };
 
   useEffect(() => {
@@ -76,7 +78,7 @@ const Modal = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -87,7 +89,7 @@ const Modal = ({
         className={`
           bg-white rounded-lg shadow-xl w-full 
           ${sizeClasses[size]} 
-          max-h-[90vh] overflow-y-auto
+          max-h-[95vh] overflow-y-auto
           ${className}
         `}
         onClick={handleModalClick}

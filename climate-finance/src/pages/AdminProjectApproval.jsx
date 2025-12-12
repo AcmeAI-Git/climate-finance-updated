@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, FolderTree } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { CheckCircle, XCircle, Clock, FolderTree, Eye } from 'lucide-react';
 import PageLayout from '../components/layouts/PageLayout';
 import AdminPageHeader from '../components/layouts/AdminPageHeader';
 import AdminEmptyState from '../components/layouts/AdminEmptyState';
 import AdminListItem from '../components/layouts/AdminListItem';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
 import Loading from '../components/ui/Loading';
 import { useToast } from '../components/ui/Toast';
 import { useAuth } from '../context/AuthContext';
 import { pendingProjectApi } from '../services/api';
 import { formatDate } from '../utils/formatDate';
-import { formatCurrency } from '../utils/formatters';
 
 const AdminProjectApproval = () => {
   const [pendingProjects, setPendingProjects] = useState([]);
@@ -21,6 +20,7 @@ const AdminProjectApproval = () => {
   const [processingId, setProcessingId] = useState(null);
   const { toast } = useToast();
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPendingProjects();
@@ -118,6 +118,10 @@ const AdminProjectApproval = () => {
     }
   };
 
+  const handleViewDetails = (projectId) => {
+    navigate(`/admin/pending-project/${projectId}`);
+  };
+
   const handleLogout = () => {
     logout();
   };
@@ -177,26 +181,19 @@ const AdminProjectApproval = () => {
           {pendingProjects.map((project, index) => {
             const dataFields = [
               {
-                label: 'Total Cost',
-                value: project.total_cost_usd ? formatCurrency(project.total_cost_usd) : 'N/A'
-              },
-              {
-                label: 'GEF Grant',
-                value: project.gef_grant ? formatCurrency(project.gef_grant) : 'N/A'
-              },
-              {
-                label: 'Timeline',
-                value: project.beginning && project.closing 
-                  ? `${formatDate(project.beginning)} - ${formatDate(project.closing)}`
-                  : 'N/A'
-              },
-              {
                 label: 'Submitted',
                 value: formatDate(project.submitted_at)
               }
             ];
 
             const customActions = [
+              {
+                label: 'View Details',
+                icon: <Eye size={14} />,
+                onClick: () => handleViewDetails(project.pending_id),
+                disabled: false,
+                className: "text-blue-600 border-blue-300 hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-all duration-200"
+              },
               {
                 label: processingId === project.pending_id ? 'Approving...' : 'Approve',
                 icon: <CheckCircle size={14} />,
@@ -220,15 +217,6 @@ const AdminProjectApproval = () => {
                 icon={<FolderTree size={20} className="text-purple-600" />}
                 title={project.title}
                 subtitle={`By: ${project.submitter_email}`}
-                badge={
-                  <div className="flex flex-wrap gap-1">
-                    {project.status && (
-                      <Badge variant="warning" size="sm">
-                        {project.status}
-                      </Badge>
-                    )}
-                  </div>
-                }
                 dataFields={dataFields}
                 customActions={customActions}
                 index={index}

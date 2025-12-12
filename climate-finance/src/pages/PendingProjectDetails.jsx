@@ -10,88 +10,141 @@ import {
     Users,
     Building,
     CheckCircle,
+    XCircle,
     TrendingUp,
     Droplets,
 } from "lucide-react";
 import PageLayout from "../components/layouts/PageLayout";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
-import ExportButton from "../components/ui/ExportButton";
 import Loading from "../components/ui/Loading";
-import ProgressBar from "../components/ui/ProgressBar";
-import FinancialSummaryCard from "../components/ui/FinancialSummaryCard";
 import { formatCurrency } from "../utils/formatters";
-import { projectApi } from "../services/api";
+import { pendingProjectApi } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
+import { formatDate } from "../utils/formatDate";
+import { useToast } from "../components/ui/Toast";
 
 // Base URL for file downloads
 const BASE_URL =
     import.meta.env.VITE_BASE_URL || "https://climate-finance-new.onrender.com";
 
-const ProjectDetails = () => {
-    const { id, projectId } = useParams();
+const PendingProjectDetails = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const { language } = useLanguage();
+    const { toast } = useToast();
     const [project, setProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [retryCount, setRetryCount] = useState(0);
-
-    const actualId = id || projectId;
+    const [processing, setProcessing] = useState(false);
 
     const fetchProjectWithRelatedData = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const projectResponse = await projectApi.getById(actualId);
+            const projectResponse = await pendingProjectApi.getById(id);
             if (!projectResponse?.status || !projectResponse.data) {
-                setError("Project not found");
+                setError("Pending project not found");
                 return;
             }
 
             const projectData = projectResponse.data;
 
-            // Prefer full related objects when they exist (mock API sometimes returns both IDs and full objects)
+            // Map the pending project data structure to match ProjectDetails format
             const enrichedProject = {
                 ...projectData,
-                // New agency types
-                projectImplementingEntities:
-                    projectData.projectImplementingEntities || projectData.implementing_entities || [],
-                projectExecutingAgencies:
-                    projectData.projectExecutingAgencies || projectData.executing_agencies || [],
-                projectDeliveryPartners:
-                    projectData.projectDeliveryPartners || projectData.delivery_partners || [],
-                // Legacy agencies (for backward compatibility)
-                projectAgencies:
-                    projectData.projectAgencies || projectData.agencies || [],
-                projectLocations:
-                    projectData.projectLocations || projectData.locations || [],
-                projectFundingSources:
-                    projectData.projectFundingSources ||
-                    projectData.funding_sources ||
-                    [],
-                projectSDGs: projectData.projectSDGs || projectData.sdgs || [],
+                // Agencies (backward compatibility)
+                projectAgencies: projectData.agencies || [],
+                // New agency types from backend
+                projectImplementingEntities: projectData.implementing_entities || [],
+                projectExecutingAgencies: projectData.executing_agencies || [],
+                projectDeliveryPartners: projectData.delivery_partners || [],
+                // Other relationships
+                projectFundingSources: projectData.funding_sources || [],
+                projectSDGs: projectData.sdg || [],
+                projectLocations: [],
             };
 
             setProject(enrichedProject);
             setRetryCount(0);
         } catch (err) {
-            console.error("Error fetching project:", err);
+            console.error("Error fetching pending project:", err);
             setError(err.message || "Error loading project data");
         } finally {
             setLoading(false);
         }
-    }, [actualId]);
+    }, [id]);
 
     useEffect(() => {
-        if (actualId) {
+        if (id) {
             fetchProjectWithRelatedData();
         } else {
             setError("No project ID provided");
             setLoading(false);
         }
-    }, [actualId, fetchProjectWithRelatedData]);
+    }, [id, fetchProjectWithRelatedData]);
+
+    const handleApprove = async () => {
+        try {
+            setProcessing(true);
+            const response = await pendingProjectApi.approve(id);
+            if (response.status) {
+                toast({
+                    title: 'Success',
+                    message: 'Project approved successfully',
+                    type: 'success'
+                });
+                navigate('/admin/project-approval');
+            } else {
+                toast({
+                    title: 'Error',
+                    message: 'Failed to approve project',
+                    type: 'error'
+                });
+            }
+        } catch (err) {
+            console.error('Error approving project:', err);
+            toast({
+                title: 'Error',
+                message: err.message || 'Failed to approve project',
+                type: 'error'
+            });
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const handleReject = async () => {
+        try {
+            setProcessing(true);
+            const response = await pendingProjectApi.reject(id);
+            if (response.status) {
+                toast({
+                    title: 'Success',
+                    message: 'Project rejected successfully',
+                    type: 'success'
+                });
+                navigate('/admin/project-approval');
+            } else {
+                toast({
+                    title: 'Error',
+                    message: 'Failed to reject project',
+                    type: 'error'
+                });
+            }
+        } catch (err) {
+            console.error('Error rejecting project:', err);
+            toast({
+                title: 'Error',
+                message: err.message || 'Failed to reject project',
+                type: 'error'
+            });
+        } finally {
+            setProcessing(false);
+        }
+    };
 
     const handleRetry = () => {
         setRetryCount((prev) => prev + 1);
@@ -141,11 +194,11 @@ const ProjectDetails = () => {
                                 Retry
                             </Button>
                             <Button
-                                onClick={() => navigate("/projects")}
+                                onClick={() => navigate("/admin/project-approval")}
                                 variant="outline"
                                 className="border-gray-300 text-gray-700 hover:bg-gray-50"
                             >
-                                Back to Projects
+                                Back to Approval List
                             </Button>
                         </div>
                         {retryCount > 2 && (
@@ -196,10 +249,6 @@ const ProjectDetails = () => {
         return Number.isFinite(num) ? num : 0;
     };
 
-    const exportData = {
-        project: [project],
-    };
-
     const getStatusColor = (status) => {
         switch (status) {
             case "Active":
@@ -218,42 +267,56 @@ const ProjectDetails = () => {
     return (
         <PageLayout bgColor="bg-gray-50">
             <div className="max-w-6xl mx-auto">
-                <div className="mb-6">
+                <div className="mb-6 flex items-center justify-between">
                     <Link
-                        to="/projects"
+                        to="/admin/project-approval"
                         className="flex items-center text-purple-600 hover:text-purple-700 transition-colors group"
                     >
                         <ArrowLeft
                             size={18}
                             className="mr-2 group-hover:-translate-x-1 transition-transform"
                         />
-                        Back to Projects
+                        Back to Approval List
                     </Link>
+                    <div className="flex gap-3">
+                        <Button
+                            onClick={handleReject}
+                            variant="outline"
+                            size="sm"
+                            disabled={processing}
+                            className="text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400 hover:text-red-700"
+                            leftIcon={<XCircle size={14} />}
+                        >
+                            {processing ? 'Processing...' : 'Reject'}
+                        </Button>
+                        <Button
+                            onClick={handleApprove}
+                            size="sm"
+                            disabled={processing}
+                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                            leftIcon={<CheckCircle size={14} />}
+                        >
+                            {processing ? 'Processing...' : 'Approve'}
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Main Project Card - Fixed Typography & Colors */}
                 <Card className="mb-6" padding="p-4 sm:p-6">
-                    {/* Top Bar: Status, ID, Export */}
+                    {/* Top Bar: Status, Submitted Date */}
                     <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
                         <div className="flex items-center gap-3">
                             <span
                                 className={`text-sm px-3 py-1 rounded-full font-semibold ${getStatusColor(
-                                    project.status
+                                    project.status || 'Pending'
                                 )}`}
                             >
-                                {project.status}
+                                {project.status || 'Pending'}
                             </span>
                         </div>
-                        <ExportButton
-                            data={exportData}
-                            filename={`${project.project_id}_report`}
-                            title={`${project.title} - Project Report`}
-                            subtitle={`Generated on ${new Date().toLocaleDateString()}`}
-                            variant="primary"
-                            size="sm"
-                            className="bg-primary-600 hover:bg-primary-700 text-white"
-                            exportFormats={["json", "csv"]}
-                        />
+                        <div className="text-sm text-gray-500">
+                            Submitted: {formatDate(project.submitted_at)}
+                        </div>
                     </div>
 
                     {/* Title and Description */}
@@ -261,6 +324,11 @@ const ProjectDetails = () => {
                         <h1 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">
                             {project.title || "Untitled Project"}
                         </h1>
+                        {project.submitter_email && (
+                            <p className="text-sm text-gray-600 mb-2">
+                                Submitted by: {project.submitter_email}
+                            </p>
+                        )}
                         <p className="text-base text-gray-600 leading-relaxed">
                             {project.objectives ||
                                 project.description ||
@@ -339,7 +407,7 @@ const ProjectDetails = () => {
                                         className="p-3 bg-blue-50 rounded-lg border border-blue-100"
                                     >
                                         <div className="font-medium text-gray-900">
-                                            {entity.name}
+                                            {entity.name || entity}
                                         </div>
                                     </div>
                                 ))}
@@ -366,7 +434,7 @@ const ProjectDetails = () => {
                                         className="p-3 bg-green-50 rounded-lg border border-green-100"
                                     >
                                         <div className="font-medium text-gray-900">
-                                            {agency.name}
+                                            {agency.name || agency}
                                         </div>
                                     </div>
                                 ))}
@@ -396,7 +464,7 @@ const ProjectDetails = () => {
                                         className="p-3 bg-purple-50 rounded-lg border border-purple-100"
                                     >
                                         <div className="font-medium text-gray-900">
-                                            {partner.name}
+                                            {partner.name || partner}
                                         </div>
                                     </div>
                                 ))}
@@ -425,7 +493,7 @@ const ProjectDetails = () => {
                                             className="p-3 bg-orange-50 rounded-lg border border-orange-100"
                                         >
                                             <div className="font-medium text-gray-900">
-                                                {source.name}
+                                                {source.name || source}
                                             </div>
                                             <div className="mt-2 text-sm text-gray-600 flex gap-3">
                                                 {/* Grant */}
@@ -768,7 +836,7 @@ const ProjectDetails = () => {
                             Alignment
                         </h3>
                         <div className="space-y-6">
-                            {project.projectSDGs.length > 0 && (
+                            {Array.isArray(project.projectSDGs) && project.projectSDGs.length > 0 && (
                                 <div>
                                     <div className="text-md text-gray-600 font-semibold mb-1">
                                         SDGs
@@ -782,7 +850,8 @@ const ProjectDetails = () => {
                                                 >
                                                     SDG{" "}
                                                     {sdg.sdg_number ||
-                                                        sdg.sdg_id}{" "}
+                                                        sdg.sdg_id ||
+                                                        index + 1}{" "}
                                                     — {sdg.title || sdg}
                                                 </span>
                                             )
@@ -800,26 +869,6 @@ const ProjectDetails = () => {
                                     </div>
                                 </div>
                             )}
-                            {project.alignment_sdg &&
-                                project.alignment_sdg.length > 0 && (
-                                    <div>
-                                        <div className="text-sm text-gray-600 font-medium mb-1">
-                                            SDG Alignment
-                                        </div>
-                                        <div className="flex flex-wrap gap-1">
-                                            {project.alignment_sdg.map(
-                                                (sdg, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-medium"
-                                                    >
-                                                        SDG {sdg}
-                                                    </span>
-                                                )
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
                         </div>
                     </Card>
                 </div>
@@ -1036,4 +1085,4 @@ const ProjectDetails = () => {
     );
 };
 
-export default ProjectDetails;
+export default PendingProjectDetails;

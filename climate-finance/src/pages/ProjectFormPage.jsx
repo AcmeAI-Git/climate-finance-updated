@@ -451,13 +451,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 }));
                 return;
             }
-            if (!formData.objectives.trim()) {
-                setErrors((prev) => ({
-                    ...prev,
-                    objectives: "Project objectives are required",
-                }));
-                return;
-            }
         }
 
         setIsLoading(true);
@@ -1260,6 +1253,9 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         </h3>
                         <div className="grid grid-cols-1 gap-6">
                             <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Project Objectives
+                                </label>
                                 <textarea
                                     name="objectives"
                                     value={formData.objectives}
@@ -1270,7 +1266,6 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                             ? "border-red-300"
                                             : "border-gray-300"
                                     }`}
-                                    required={actualMode === "public"}
                                 />
                                 {errors.objectives && (
                                     <p className="mt-1 text-sm text-red-600">

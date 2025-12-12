@@ -20,6 +20,7 @@ import AdminFundingSources from "../pages/AdminFundingSources";
 import AdminDeliveryPartners from "../pages/AdminDeliveryPartners";
 import AdminLocations from "../pages/AdminLocations";
 import AdminProjectApproval from "../pages/AdminProjectApproval";
+import PendingProjectDetails from "../pages/PendingProjectDetails";
 import UserFormPage from "../pages/UserFormPage";
 import AgencyFormPage from "../pages/AgencyFormPage";
 import DeliveryPartnerFormPage from "../pages/DeliveryPartnerFormPage";
@@ -354,6 +355,14 @@ const Routing = () => {
                 element={
                     <AdminRoute>
                         <AdminProjectApproval />
+                    </AdminRoute>
+                }
+            />
+            <Route
+                path="/admin/pending-project/:id"
+                element={
+                    <AdminRoute>
+                        <PendingProjectDetails />
                     </AdminRoute>
                 }
             />

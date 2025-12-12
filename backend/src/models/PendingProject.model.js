@@ -54,6 +54,9 @@ PendingProject.addPendingProject = async (data) => {
                 submitter_email,
                 supporting_document,
                 agency_ids = [],
+                implementing_entity_ids = [],
+                executing_agency_ids = [],
+                delivery_partner_ids = [],
                 funding_source_ids = [],
                 sdg_ids = [],
                 districts = [],
@@ -69,10 +72,48 @@ PendingProject.addPendingProject = async (data) => {
 
             // ✅ Parse array-like fields
             const parsedAgencyIds = parseArray(agency_ids);
+            const parsedImplementingEntityIds = parseArray(implementing_entity_ids);
+            const parsedExecutingAgencyIds = parseArray(executing_agency_ids);
+            const parsedDeliveryPartnerIds = parseArray(delivery_partner_ids);
             const parsedFundingSourceIds = parseArray(funding_source_ids);
             const parsedSdgIds = parseArray(sdg_ids);
             const parsedDistricts = parseArray(districts);
             const parsedGeographicDivision = parseArray(geographic_division);
+            
+            // Combine all agency types into agency_ids for storage (backward compatibility)
+            // Store separate arrays in wash_component JSON for retrieval
+            const allAgencyIds = [
+                ...parsedAgencyIds,
+                ...parsedImplementingEntityIds,
+                ...parsedExecutingAgencyIds
+            ];
+            
+            // Store agency metadata separately
+            // We'll store it in wash_component JSON as metadata, preserving existing wash_component data
+            let washComponentData = null;
+            if (wash_component) {
+                if (typeof wash_component === 'string') {
+                    try {
+                        washComponentData = JSON.parse(wash_component);
+                    } catch {
+                        washComponentData = {};
+                    }
+                } else if (typeof wash_component === 'object') {
+                    washComponentData = { ...wash_component };
+                } else {
+                    washComponentData = {};
+                }
+            } else {
+                washComponentData = {};
+            }
+            
+            // Add agency metadata to wash_component JSON (preserving existing wash_component data)
+            washComponentData._metadata = {
+                implementing_entity_ids: parsedImplementingEntityIds,
+                executing_agency_ids: parsedExecutingAgencyIds,
+                delivery_partner_ids: parsedDeliveryPartnerIds,
+                agency_ids: parsedAgencyIds
+            };
             
             // Normalize supporting_link to ensure it's always a string
             let normalizedSupportingLink = supporting_link || null;
@@ -149,14 +190,14 @@ PendingProject.addPendingProject = async (data) => {
                 hotspot_vulnerability_type,
                 wash_component_description,
                 submitter_email,
-                parsedAgencyIds,
+                allAgencyIds, // Combined agency IDs for backward compatibility
                 parsedFundingSourceIds,
                 parsedSdgIds,
                 parsedDistricts,
                 additional_location_info || null,
                 portfolio_type || null,
                 funding_source_name || null,
-                wash_component ? JSON.stringify(wash_component) : null,
+                JSON.stringify(washComponentData), // Includes metadata with separate agency arrays
                 supporting_document,
                 normalizedSupportingLink,
                 location_segregation,
@@ -194,11 +235,34 @@ PendingProject.getPendingProjectById = async (id) => {
     const query = `SELECT * FROM PendingProject WHERE pending_id = $1`;
     const { rows } = await pool.query(query, [id]);
     if (rows.length === 0) return null;
+    
+    const row = rows[0];
+    let washComponent = null;
+    let metadata = null;
+    
+    if (row.wash_component) {
+        try {
+            washComponent = JSON.parse(row.wash_component);
+            // Extract metadata if it exists
+            if (washComponent && washComponent._metadata) {
+                metadata = washComponent._metadata;
+                // Remove metadata from wash_component to keep it clean
+                delete washComponent._metadata;
+            }
+        } catch {
+            washComponent = null;
+        }
+    }
+    
     return {
-        ...rows[0],
-        wash_component: rows[0].wash_component
-            ? JSON.parse(rows[0].wash_component)
-            : null,
+        ...row,
+        wash_component: washComponent,
+        // Add separate agency arrays from metadata
+        implementing_entity_ids: metadata?.implementing_entity_ids || [],
+        executing_agency_ids: metadata?.executing_agency_ids || [],
+        delivery_partner_ids: metadata?.delivery_partner_ids || [],
+        // Keep agency_ids for backward compatibility
+        agency_ids: metadata?.agency_ids || row.agency_ids || [],
     };
 };
 
@@ -218,7 +282,15 @@ PendingProject.approveProject = async (pendingId) => {
         const pendingProject = await PendingProject.getPendingProjectById(pendingId);
         if (!pendingProject) throw new Error("Pending project not found");
 
-        const result = await Project.addProjectWithRelations(pendingProject);
+        // Prepare project data with separate agency fields for Project.addProjectWithRelations
+        const projectData = {
+            ...pendingProject,
+            implementing_entity_ids: pendingProject.implementing_entity_ids || [],
+            executing_agency_ids: pendingProject.executing_agency_ids || [],
+            delivery_partner_ids: pendingProject.delivery_partner_ids || [],
+        };
+
+        const result = await Project.addProjectWithRelations(projectData);
 
         await client.query("DELETE FROM PendingProject WHERE pending_id = $1", [pendingId]);
 
