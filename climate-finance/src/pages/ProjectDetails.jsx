@@ -22,6 +22,7 @@ import ProgressBar from "../components/ui/ProgressBar";
 import FinancialSummaryCard from "../components/ui/FinancialSummaryCard";
 import { formatCurrency } from "../utils/formatters";
 import { projectApi } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
 
 // Base URL for file downloads
 const BASE_URL =
@@ -30,6 +31,7 @@ const BASE_URL =
 const ProjectDetails = () => {
     const { id, projectId } = useParams();
     const navigate = useNavigate();
+    const { language } = useLanguage();
     const [project, setProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -890,6 +892,57 @@ const ProjectDetails = () => {
                         </h3>
                         <div className="text-sm text-gray-700">
                             {project.assessment}
+                        </div>
+                    </Card>
+                )}
+
+                {/* Type and Sector */}
+                {(project.type || project.sector) && (
+                    <Card padding="p-4 sm:p-6" className="mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            {language === 'bn' ? 'ধরন ও খাত' : 'Type & Sector'}
+                        </h3>
+                        <div className="space-y-4">
+                            {project.type && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        {language === 'bn' ? 'ধরন' : 'Type'}
+                                    </div>
+                                    <div className="text-sm text-gray-700">
+                                        {language === 'bn' 
+                                            ? (project.type === 'Adaptation' ? 'অ্যাডাপ্টেশন' : project.type === 'Mitigation' ? 'মিটিগেশন' : project.type)
+                                            : project.type}
+                                    </div>
+                                </div>
+                            )}
+                            {project.sector && (
+                                <div>
+                                    <div className="text-sm text-gray-600 font-medium mb-1">
+                                        {language === 'bn' ? 'খাত' : 'Sector'}
+                                    </div>
+                                    <div className="text-sm text-gray-700">
+                                        {(() => {
+                                            const sectorTranslations = {
+                                                'Agriculture & Food Security': 'কৃষি ও খাদ্য নিরাপত্তা',
+                                                'Water & Sanitation': 'পানি ও স্যানিটেশন',
+                                                'Energy': 'জ্বালানি',
+                                                'Transport & Mobility': 'পরিবহন ও গতিশীলতা',
+                                                'Urban Development & Infrastructure': 'শহুরে উন্নয়ন ও অবকাঠামো',
+                                                'Forests, Land Use & Nature-Based Solutions': 'বন, ভূমি ব্যবহার ও প্রকৃতি-ভিত্তিক সমাধান',
+                                                'Waste & Circular Economy': 'বর্জ্য ও বৃত্তাকার অর্থনীতি',
+                                                'Health': 'স্বাস্থ্য',
+                                                'Coastal & Marine Systems': 'উপকূলীয় ও সামুদ্রিক ব্যবস্থা',
+                                                'Disaster Risk Reduction': 'দুর্যোগ ঝুঁকি হ্রাস',
+                                                'Policy, Governance & Finance': 'নীতি, শাসন ও অর্থায়ন',
+                                                'Data, ICT & Early Warning Systems': 'ডেটা, আইসিটি ও প্রারম্ভিক সতর্কতা ব্যবস্থা'
+                                            };
+                                            return language === 'bn' 
+                                                ? (sectorTranslations[project.sector] || project.sector)
+                                                : project.sector;
+                                        })()}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </Card>
                 )}

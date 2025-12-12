@@ -59,6 +59,8 @@ Project.addProjectWithRelations = async (data) => {
             portfolio_type,
             funding_source_name,
             supporting_link,
+            type,
+            sector,
             // New agency arrays (can be IDs or names)
             implementing_entity_ids,
             executing_agency_ids,
@@ -143,12 +145,13 @@ Project.addProjectWithRelations = async (data) => {
                 climate_relevance_justification, wash_component_description, supporting_document,
                 districts, location_segregation,
                 hotspot_types, vulnerability_type, additional_location_info,
-                portfolio_type, funding_source_name, supporting_link
+                portfolio_type, funding_source_name, supporting_link,
+                type, sector
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
                 $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
                 $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
-                $31,$32,$33
+                $31,$32,$33,$34,$35
             ) RETURNING *
         `;
 
@@ -186,6 +189,8 @@ Project.addProjectWithRelations = async (data) => {
             portfolio_type || null,
             funding_source_name || null,
             normalizedSupportingLink,
+            type || null,
+            sector || null,
         ];
 
         await client.query(insertProjectQuery, values);
@@ -502,8 +507,9 @@ Project.updateProject = async (id, data) => {
                 location_segregation = $26,
                 hotspot_types = $27, vulnerability_type = $28, additional_location_info = $29,
                 portfolio_type = $30, funding_source_name = $31, supporting_link = $32,
+                type = $33, sector = $34,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE project_id = $33
+            WHERE project_id = $35
             RETURNING *
         `;
 
@@ -540,6 +546,8 @@ Project.updateProject = async (id, data) => {
             portfolio_type || null,
             funding_source_name || null,
             normalizedSupportingLink,
+            type || null,
+            sector || null,
             id,
         ];
 

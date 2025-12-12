@@ -16,6 +16,7 @@ import ProjectFormSections from "../features/admin/ProjectFormSections";
 import { ArrowLeft, FolderTree, CheckCircle } from "lucide-react";
 import { useToast } from "../components/ui/Toast";
 import CheckboxGroup from "../components/ui/CheckboxGroup";
+import { useLanguage } from "../context/LanguageContext";
 
 const defaultFormData = {
     project_id: "",
@@ -67,6 +68,8 @@ const defaultFormData = {
     additional_location_info: "",
     portfolio_type: "",
     funding_source_name: "",
+    type: "",
+    sector: "",
 };
 
 const formatDateForInput = (dateStr) => {
@@ -82,6 +85,7 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
     const { isAuthenticated } = useAuth();
     const { toast } = useToast();
     const navigate = useNavigate();
+    const { language } = useLanguage();
     const [formData, setFormData] = useState(defaultFormData);
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
@@ -228,6 +232,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                         projectData.additional_location_info || "",
                     portfolio_type: projectData.portfolio_type || "",
                     funding_source_name: projectData.funding_source_name || "",
+                    type: projectData.type || "",
+                    sector: projectData.sector || "",
                 });
                 
                 // Set existing document if available
@@ -634,6 +640,8 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                 "funding_source_name",
                 formData.funding_source_name || ""
             );
+            formDataToSend.append("type", formData.type || "");
+            formDataToSend.append("sector", formData.sector || "");
 
             if (actualMode === "public") {
                 // Submit to pending projects for public mode
@@ -971,6 +979,90 @@ const ProjectFormPage = ({ mode = "add", pageTitle, pageSubtitle }) => {
                                         {errors.title}
                                     </p>
                                 )}
+                            </div>
+
+                            {/* Type field */}
+                            <div>
+                                <label 
+                                    className={`block text-sm font-medium text-gray-700 ${language === 'bn' ? 'notranslate' : ''}`}
+                                    translate={language === 'bn' ? 'no' : undefined}
+                                >
+                                    {language === 'bn' ? 'ধরন' : 'Type'}
+                                </label>
+                                <select
+                                    name="type"
+                                    value={formData.type}
+                                    onChange={handleInputChange}
+                                    className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${language === 'bn' ? 'notranslate' : ''}`}
+                                    translate={language === 'bn' ? 'no' : undefined}
+                                >
+                                    <option value="" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select Type'}
+                                    </option>
+                                    <option value="Adaptation" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'অ্যাডাপ্টেশন' : 'Adaptation'}
+                                    </option>
+                                    <option value="Mitigation" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'মিটিগেশন' : 'Mitigation'}
+                                    </option>
+                                </select>
+                            </div>
+
+                            {/* Sector field */}
+                            <div>
+                                <label 
+                                    className={`block text-sm font-medium text-gray-700 ${language === 'bn' ? 'notranslate' : ''}`}
+                                    translate={language === 'bn' ? 'no' : undefined}
+                                >
+                                    {language === 'bn' ? 'খাত' : 'Sector'}
+                                </label>
+                                <select
+                                    name="sector"
+                                    value={formData.sector}
+                                    onChange={handleInputChange}
+                                    className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${language === 'bn' ? 'notranslate' : ''}`}
+                                    translate={language === 'bn' ? 'no' : undefined}
+                                >
+                                    <option value="" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'নির্বাচন করুন' : 'Select Sector'}
+                                    </option>
+                                    <option value="Agriculture & Food Security" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'কৃষি ও খাদ্য নিরাপত্তা' : 'Agriculture & Food Security'}
+                                    </option>
+                                    <option value="Water & Sanitation" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'পানি ও স্যানিটেশন' : 'Water & Sanitation'}
+                                    </option>
+                                    <option value="Energy" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'জ্বালানি' : 'Energy'}
+                                    </option>
+                                    <option value="Transport & Mobility" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'পরিবহন ও গতিশীলতা' : 'Transport & Mobility'}
+                                    </option>
+                                    <option value="Urban Development & Infrastructure" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'শহুরে উন্নয়ন ও অবকাঠামো' : 'Urban Development & Infrastructure'}
+                                    </option>
+                                    <option value="Forests, Land Use & Nature-Based Solutions" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'বন, ভূমি ব্যবহার ও প্রকৃতি-ভিত্তিক সমাধান' : 'Forests, Land Use & Nature-Based Solutions'}
+                                    </option>
+                                    <option value="Waste & Circular Economy" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'বর্জ্য ও বৃত্তাকার অর্থনীতি' : 'Waste & Circular Economy'}
+                                    </option>
+                                    <option value="Health" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'স্বাস্থ্য' : 'Health'}
+                                    </option>
+                                    <option value="Coastal & Marine Systems" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'উপকূলীয় ও সামুদ্রিক ব্যবস্থা' : 'Coastal & Marine Systems'}
+                                    </option>
+                                    <option value="Disaster Risk Reduction" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'দুর্যোগ ঝুঁকি হ্রাস' : 'Disaster Risk Reduction'}
+                                    </option>
+                                    <option value="Policy, Governance & Finance" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'নীতি, শাসন ও অর্থায়ন' : 'Policy, Governance & Finance'}
+                                    </option>
+                                    <option value="Data, ICT & Early Warning Systems" translate={language === 'bn' ? 'no' : undefined} className={language === 'bn' ? 'notranslate' : undefined}>
+                                        {language === 'bn' ? 'ডেটা, আইসিটি ও প্রারম্ভিক সতর্কতা ব্যবস্থা' : 'Data, ICT & Early Warning Systems'}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                     </div>

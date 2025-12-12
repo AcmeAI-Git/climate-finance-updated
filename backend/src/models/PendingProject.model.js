@@ -63,6 +63,8 @@ PendingProject.addPendingProject = async (data) => {
                 wash_component,
                 supporting_link,
                 location_segregation,
+                type,
+                sector,
             } = data;
 
             // ✅ Parse array-like fields
@@ -112,11 +114,11 @@ PendingProject.addPendingProject = async (data) => {
                     submitter_email, agency_ids, funding_source_ids, sdg_ids, districts,
                     additional_location_info, portfolio_type, funding_source_name,
                     wash_component, supporting_document, supporting_link,
-                    location_segregation
+                    location_segregation, type, sector
                 )
                 VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
-                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36
+                    $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38
                 )
                 RETURNING *;
             `;
@@ -158,6 +160,8 @@ PendingProject.addPendingProject = async (data) => {
                 supporting_document,
                 normalizedSupportingLink,
                 location_segregation,
+                type || null,
+                sector || null,
             ];
 
             const result = await client.query(insertQuery, values);
