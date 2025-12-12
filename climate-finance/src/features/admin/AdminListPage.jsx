@@ -26,6 +26,8 @@ const AdminListPage = ({
     additionalFilters = null,
     customEmptyState = null,
     onAddNew = null, // Add this prop
+    customConfig = null, // Custom search config from parent
+    multiSelect = false, // Enable multi-select mode for filters
 }) => {
     const { logout } = useAuth();
     const navigate = useNavigate();
@@ -35,22 +37,39 @@ const AdminListPage = ({
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeFilters, setActiveFilters] = useState(
-        filters.reduce(
+    const [activeFilters, setActiveFilters] = useState(() => {
+        if (multiSelect) {
+            // In multiSelect mode, initialize all filters as empty arrays
+            return filters.reduce(
+                (acc, filter) => ({
+                    ...acc,
+                    [filter.key]: [],
+                }),
+                {}
+            );
+        }
+        // In single-select mode, use default values
+        return filters.reduce(
             (acc, filter) => ({
                 ...acc,
                 [filter.key]: filter.defaultValue || "All",
             }),
             {}
-        )
-    );
+        );
+    });
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
         item: null,
     });
 
     // Create custom config for SearchFilter
-    const customConfig = useMemo(() => {
+    const searchConfig = useMemo(() => {
+        // If customConfig is provided from parent, use it
+        if (customConfig) {
+            return customConfig;
+        }
+        
+        // Otherwise, build from columns and filters
         if (!filters || filters.length === 0) {
             return {
                 searchFields: columns.map((col) => ({
@@ -70,12 +89,28 @@ const AdminListPage = ({
             })),
             filters: filters,
         };
-    }, [filters, columns]);
+    }, [filters, columns, customConfig]);
 
     // Fetch data
     useEffect(() => {
         fetchData();
     }, []);
+
+    // Sync activeFilters when filters change (to include new filter keys)
+    useEffect(() => {
+        if (filters.length > 0) {
+            setActiveFilters((prev) => {
+                const newFilters = { ...prev };
+                filters.forEach((filter) => {
+                    if (!(filter.key in newFilters)) {
+                        // Add new filter key with appropriate default
+                        newFilters[filter.key] = multiSelect ? [] : (filter.defaultValue || "All");
+                    }
+                });
+                return newFilters;
+            });
+        }
+    }, [filters, multiSelect]);
 
     const fetchData = async () => {
         try {
@@ -183,7 +218,27 @@ const AdminListPage = ({
                     }).format(value);
                 }
                 if (col.type === "date") {
-                    return value ? new Date(value).toLocaleDateString() : "-";
+                    if (!value) return "-";
+                    // Check if this column should show year only
+                    if (col.dateFormat === "year") {
+                        // Try to extract year from the value
+                        const dateStr = value.toString();
+                        const yearMatch = dateStr.match(/\d{4}/);
+                        if (yearMatch) {
+                            return yearMatch[0];
+                        }
+                        // Fallback: try parsing as date
+                        try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                                return date.getFullYear().toString();
+                            }
+                        } catch (e) {
+                            // If parsing fails, return original value
+                        }
+                        return dateStr.substring(0, 4) || "-";
+                    }
+                    return new Date(value).toLocaleDateString();
                 }
                 return value || "-";
             },
@@ -316,10 +371,22 @@ const AdminListPage = ({
                     searchValue={searchTerm}
                     onSearchChange={handleSearchChange}
                     searchPlaceholder={searchPlaceholder}
-                    customConfig={customConfig}
+                    customConfig={searchConfig}
                     activeFilters={activeFilters}
                     onFiltersChange={handleFilterChange}
                     className="mb-4"
+                    multiSelect={multiSelect}
+                    onClearAll={multiSelect ? () => {
+                        setSearchTerm("");
+                        const clearedFilters = filters.reduce(
+                            (acc, filter) => ({
+                                ...acc,
+                                [filter.key]: [],
+                            }),
+                            {}
+                        );
+                        setActiveFilters(clearedFilters);
+                    } : undefined}
                 />
 
                 {additionalFilters}

@@ -20,22 +20,26 @@ const advancedSearch = (data, searchValue, searchConfig) => {
             // Check each search field
             searchConfig.searchFields.forEach((field) => {
                 const value = getNestedValue(item, field.key);
-                if (value) {
-                    const fieldValue = value.toString().toLowerCase();
+                if (value != null && value !== undefined) {
+                    try {
+                        const fieldValue = value.toString().toLowerCase();
 
-                    // Check for exact matches (higher score)
-                    if (fieldValue.includes(searchValue.toLowerCase())) {
-                        score += field.weight * 2;
-                        matchCount++;
-                    }
-
-                    // Check for individual term matches
-                    searchTerms.forEach((term) => {
-                        if (fieldValue.includes(term)) {
-                            score += field.weight;
+                        // Check for exact matches (higher score)
+                        if (fieldValue.includes(searchValue.toLowerCase())) {
+                            score += field.weight * 2;
                             matchCount++;
                         }
-                    });
+
+                        // Check for individual term matches
+                        searchTerms.forEach((term) => {
+                            if (fieldValue.includes(term)) {
+                                score += field.weight;
+                                matchCount++;
+                            }
+                        });
+                    } catch {
+                        // Skip this field if conversion fails
+                    }
                 }
             });
 
@@ -55,6 +59,9 @@ const filterData = (data, activeFilters) => {
     return data.filter((item) => {
         const passesAllFilters = Object.entries(activeFilters).every(
             ([key, value]) => {
+                // Handle undefined/null values - skip filter
+                if (value === undefined || value === null) return true;
+                
                 // Handle array values (multi-select mode)
                 if (Array.isArray(value)) {
                     // Empty array means "All" - show everything
@@ -191,11 +198,14 @@ const filterData = (data, activeFilters) => {
                         if (hasOtherValues) {
                             const matches = itemValue.some((v) => {
                                 if (v === undefined || v === null) return false;
-                                return value.some(filterVal => 
-                                    filterVal !== "N/A" && 
-                                    filterVal !== "All" &&
-                                    v.toString().toLowerCase() === filterVal.toString().toLowerCase()
-                                );
+                                return value.some(filterVal => {
+                                    if (!filterVal || filterVal === "N/A" || filterVal === "All") return false;
+                                    try {
+                                        return v.toString().toLowerCase() === filterVal.toString().toLowerCase();
+                                    } catch {
+                                        return false;
+                                    }
+                                });
                             });
                             return matches;
                         }
@@ -203,6 +213,11 @@ const filterData = (data, activeFilters) => {
                     }
                     
                     // Handle single filter value (backward compatibility)
+                    // If value is undefined, null, or not a string, skip this filter
+                    if (value === undefined || value === null || (typeof value !== "string" && !Array.isArray(value))) {
+                        return true; // Skip filter if value is invalid
+                    }
+                    
                     // If filters are set to 'All', pass through
                     if (value === "All") return true;
                     
@@ -211,12 +226,21 @@ const filterData = (data, activeFilters) => {
                         return itemValue.length === 0;
                     }
 
+                    // Only proceed if value is a string
+                    if (typeof value !== "string") {
+                        return true; // Skip if value is not a string
+                    }
+
                     const matches = itemValue.some((v) => {
                         if (v === undefined || v === null) return false;
-                        return (
-                            v.toString().toLowerCase() ===
-                            value.toString().toLowerCase()
-                        );
+                        try {
+                            return (
+                                v.toString().toLowerCase() ===
+                                value.toString().toLowerCase()
+                            );
+                        } catch {
+                            return false;
+                        }
                     });
 
                     return matches;
@@ -236,7 +260,7 @@ const filterData = (data, activeFilters) => {
                     // Check other values
                     if (hasOtherValues) {
                         return value.some(filterVal => {
-                            if (filterVal === "N/A" || filterVal === "All") return false;
+                            if (!filterVal || filterVal === "N/A" || filterVal === "All") return false;
                             
                             // Handle case-insensitive matching for string values
                             if (typeof itemValue === "string" && typeof filterVal === "string") {
@@ -268,7 +292,9 @@ const filterData = (data, activeFilters) => {
                 // Handle case-insensitive matching for string values
                 if (
                     typeof itemValue === "string" &&
-                    typeof value === "string"
+                    typeof value === "string" &&
+                    itemValue != null &&
+                    value != null
                 ) {
                     const matches =
                         itemValue.toLowerCase() === value.toLowerCase();
@@ -420,6 +446,11 @@ const SearchFilter = ({
                                     ? filterValue 
                                     : (filterValue && filterValue !== "All" ? [filterValue] : []);
                                 
+                                // Generate placeholder from filter label or key
+                                const placeholderText = filter.label 
+                                    ? filter.label.toLowerCase()
+                                    : filter.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                
                                 return (
                                     <MultiSelect
                                         key={filter.key}
@@ -428,7 +459,7 @@ const SearchFilter = ({
                                         onChange={(newValue) => {
                                             handleFilterChange(filter.key, newValue);
                                         }}
-                                        placeholder={`Select ${filter.label.toLowerCase()}...`}
+                                        placeholder={`Select ${placeholderText}...`}
                                         searchable={true}
                                         maxDisplay={2}
                                         className="w-full"
