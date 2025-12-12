@@ -36,13 +36,6 @@ const Footer = () => {
             height: 90,
         },
         {
-            src: "/acme.svg",
-            alt: "Acme AI",
-            href: "https://www.acmeai.tech/",
-            width: 45,
-            height: 45,
-        },
-        {
             src: "/cprd.jpg",
             alt: "CPRD",
             href: "https://cprdbd.org/",
@@ -57,6 +50,14 @@ const Footer = () => {
             height: 80,
         },
     ];
+
+    const developedBy = {
+        src: "/acme.svg",
+        alt: "Acme AI",
+        href: "https://www.acmeai.tech/",
+        width: 45,
+        height: 45,
+    };
 
     return (
         <>
@@ -130,8 +131,8 @@ const Footer = () => {
                             <div className="text-sm text-gray-500 justify-center items-center md:justify-end flex flex-row gap-x-4">
                                 <p>Developed by</p>
                                 <a
-                                    key={partners[1].alt}
-                                    href={partners[1].href}
+                                    key={developedBy.alt}
+                                    href={developedBy.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex-shrink-0"
@@ -142,10 +143,10 @@ const Footer = () => {
                                         }
                                     >
                                         <img
-                                            src={partners[1].src}
-                                            alt={partners[1].alt}
-                                            width={partners[1].width}
-                                            height={partners[1].height}
+                                            src={developedBy.src}
+                                            alt={developedBy.alt}
+                                            width={developedBy.width}
+                                            height={developedBy.height}
                                             className="object-contain"
                                         />
                                         <p className={"text-blue-500"}>
