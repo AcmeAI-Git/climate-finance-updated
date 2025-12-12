@@ -98,7 +98,8 @@ const AdminProjects = () => {
         {
             key: "closing",
             header: "End Date",
-            type: "string",
+            type: "date",
+            dateFormat: "year", // Special flag for year-only display
         },
     ];
 

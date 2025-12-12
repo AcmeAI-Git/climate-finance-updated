@@ -223,6 +223,11 @@ const AdminListPage = ({
                     if (col.dateFormat === "year") {
                         // Try to extract year from the value
                         const dateStr = value.toString();
+                        // Handle ISO date format (YYYY-MM-DD) - extract first 4 digits
+                        if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+                            return dateStr.substring(0, 4);
+                        }
+                        // Try to extract year from the value
                         const yearMatch = dateStr.match(/\d{4}/);
                         if (yearMatch) {
                             return yearMatch[0];
