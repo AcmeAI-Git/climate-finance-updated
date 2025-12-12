@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import {
     getRepositoryCardDescriptionTransliteration,
-    getRepositoryTitleTransliteration,
 } from "../../utils/transliteration";
 
 export default function ResearchDocsCard() {
@@ -11,14 +10,8 @@ export default function ResearchDocsCard() {
     const { language } = useLanguage();
 
     return (
-        <div className="p-6 my-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl border border-purple-200 animate-fade-in-up">
+        <div className="p-6 my-4 bg-linear-to-r from-purple-50 to-purple-100 rounded-2xl border border-purple-200 animate-fade-in-up">
             <div className="flex gap-4">
-                {/* Icon Section */}
-                <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center w-12 h-12 bg-purple-600 rounded-xl">
-                        <Download size={24} className="text-white" />
-                    </div>
-                </div>
 
                 {/* Content Section */}
                 <div className="flex-1">
