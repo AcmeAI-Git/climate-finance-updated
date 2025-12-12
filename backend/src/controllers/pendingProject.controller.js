@@ -42,7 +42,7 @@ exports.getAllPendingProjects = async (req, res) => {
 
                 const agencies = agencyIds.length > 0
                     ? await Promise.all(
-                        agencyIds.map((id) => Agency.getAgencyById(id).catch(() => null))
+                        agencyIds.map((id) => Agency.getById(id).catch(() => null))
                     ).then(results => results.filter(r => r !== null))
                     : [];
 
@@ -94,21 +94,21 @@ exports.getPendingProjectById = async (req, res) => {
         // Fetch agencies (from agency_ids - backward compatibility)
         const agencies = project.agency_ids && project.agency_ids.length > 0
             ? await Promise.all(
-                project.agency_ids.map((id) => Agency.getAgencyById(id))
+                project.agency_ids.map((id) => Agency.getById(id))
             )
             : [];
 
         // Fetch implementing entities
         const implementing_entities = project.implementing_entity_ids && project.implementing_entity_ids.length > 0
             ? await Promise.all(
-                project.implementing_entity_ids.map((id) => Agency.getAgencyById(id))
+                project.implementing_entity_ids.map((id) => Agency.getById(id))
             )
             : [];
 
         // Fetch executing agencies
         const executing_agencies = project.executing_agency_ids && project.executing_agency_ids.length > 0
             ? await Promise.all(
-                project.executing_agency_ids.map((id) => Agency.getAgencyById(id))
+                project.executing_agency_ids.map((id) => Agency.getById(id))
             )
             : [];
 
