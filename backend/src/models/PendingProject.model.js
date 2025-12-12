@@ -222,12 +222,26 @@ PendingProject.getAllPendingProjects = async () => {
     const { pool } = dbConfig;
     const query = `SELECT * FROM PendingProject ORDER BY submitted_at DESC`;
     const { rows } = await pool.query(query);
-    return rows.map((row) => ({
-        ...row,
-        wash_component: row.wash_component
-            ? JSON.parse(row.wash_component)
-            : null,
-    }));
+    return rows.map((row) => {
+        let washComponent = null;
+        if (row.wash_component) {
+            try {
+                washComponent = JSON.parse(row.wash_component);
+            } catch {
+                washComponent = null;
+            }
+        }
+        
+        return {
+            ...row,
+            wash_component: washComponent,
+            // Ensure arrays are always arrays, never null/undefined
+            agency_ids: Array.isArray(row.agency_ids) ? row.agency_ids : [],
+            funding_source_ids: Array.isArray(row.funding_source_ids) ? row.funding_source_ids : [],
+            sdg_ids: Array.isArray(row.sdg_ids) ? row.sdg_ids : [],
+            districts: Array.isArray(row.districts) ? row.districts : [],
+        };
+    });
 };
 
 PendingProject.getPendingProjectById = async (id) => {

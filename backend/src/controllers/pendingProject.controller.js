@@ -35,17 +35,28 @@ exports.getAllPendingProjects = async (req, res) => {
 
         const projectsWithDetails = await Promise.all(
             result.map(async (project) => {
-                const agencies = await Promise.all(
-                    project.agency_ids.map((id) => Agency.getAgencyById(id))
-                );
+                // Safely handle arrays - ensure they exist and are arrays
+                const agencyIds = Array.isArray(project.agency_ids) ? project.agency_ids : [];
+                const fundingSourceIds = Array.isArray(project.funding_source_ids) ? project.funding_source_ids : [];
+                const sdgIds = Array.isArray(project.sdg_ids) ? project.sdg_ids : [];
 
-                const funding_sources = await Promise.all(
-                    project.funding_source_ids.map((id) => FundingSource.getById(id))
-                );
+                const agencies = agencyIds.length > 0
+                    ? await Promise.all(
+                        agencyIds.map((id) => Agency.getAgencyById(id).catch(() => null))
+                    ).then(results => results.filter(r => r !== null))
+                    : [];
 
-                const sdg = await Promise.all(
-                    project.sdg_ids.map((id) => SDGAlignment.getSDGById(id))
-                );
+                const funding_sources = fundingSourceIds.length > 0
+                    ? await Promise.all(
+                        fundingSourceIds.map((id) => FundingSource.getById(id).catch(() => null))
+                    ).then(results => results.filter(r => r !== null))
+                    : [];
+
+                const sdg = sdgIds.length > 0
+                    ? await Promise.all(
+                        sdgIds.map((id) => SDGAlignment.getSDGById(id).catch(() => null))
+                    ).then(results => results.filter(r => r !== null))
+                    : [];
 
                 return {
                     ...project,
@@ -58,7 +69,11 @@ exports.getAllPendingProjects = async (req, res) => {
 
         res.status(200).json({ status: true, data: projectsWithDetails });
     } catch (e) {
-        res.status(500).json({ status: false, message: `Error: ${e.message}` });
+        console.error('Error in getAllPendingProjects:', e);
+        res.status(500).json({ 
+            status: false, 
+            message: `Error: ${e.message || 'Unknown error occurred'}` 
+        });
     }
 };
 
