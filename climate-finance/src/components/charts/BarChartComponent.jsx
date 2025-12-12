@@ -91,6 +91,13 @@ const BarChartComponent = ({
             const style = document.createElement("style");
             style.id = "bar-chart-scrollbar-style";
             style.innerHTML = `
+                .bar-chart-scrollable {
+                    scrollbar-width: thick;
+                    scrollbar-color: #888 #f1f1f1;
+                    -webkit-overflow-scrolling: touch;
+                    touch-action: pan-x;
+                    overscroll-behavior-x: contain;
+                }
                 .bar-chart-scrollable::-webkit-scrollbar {
                     height: 24px !important;
                 }
@@ -105,11 +112,6 @@ const BarChartComponent = ({
                 }
                 .bar-chart-scrollable::-webkit-scrollbar-thumb:hover {
                     background: #555;
-                }
-                /* Firefox */
-                .bar-chart-scrollable {
-                    scrollbar-width: thick;
-                    scrollbar-color: #888 #f1f1f1;
                 }
             `;
             document.head.appendChild(style);
@@ -149,7 +151,8 @@ const BarChartComponent = ({
                         height: "340px", 
                         overflowX: scrollable ? "auto" : "visible",
                         overflowY: "hidden",
-                        WebkitOverflowScrolling: "touch"
+                        WebkitOverflowScrolling: scrollable ? "touch" : "auto",
+                        touchAction: scrollable ? "pan-x" : "auto"
                     }}
                 >
                     <div style={{ width: chartWidth, height: "100%", display: scrollable ? "inline-block" : "block" }}>

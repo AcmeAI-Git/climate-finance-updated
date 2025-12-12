@@ -287,54 +287,46 @@ const FundingSourceDetails = () => {
                                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
                                         Associated Projects
                                     </h3>
-                                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                                        {source.projects
-                                            .slice(0, 5)
-                                            .map((project, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="p-3 bg-white border border-gray-200 rounded-lg"
-                                                >
-                                                    <div className="font-medium text-sm text-gray-900 mb-1">
-                                                        {project.title}
-                                                    </div>
-                                                    <div className="flex justify-between items-center text-xs text-gray-500">
-                                                        <div className="flex gap-x-4">
-                                                            Timeline:
-                                                            <span className="ml-1">
-                                                                {
-                                                                    project.beginning
-                                                                }{" "}
-                                                                <span className="font-bold mx-2">
-                                                                    to
-                                                                </span>
-                                                                {
-                                                                    project.closing
-                                                                }
+                                    <div className="space-y-2">
+                                        {source.projects.map((project, index) => (
+                                            <div
+                                                key={index}
+                                                className="p-3 bg-white border border-gray-200 rounded-lg"
+                                            >
+                                                <div className="font-medium text-sm text-gray-900 mb-1">
+                                                    {project.title}
+                                                </div>
+                                                <div className="flex justify-between items-center text-xs text-gray-500">
+                                                    <div className="flex gap-x-4">
+                                                        Timeline:
+                                                        <span className="ml-1">
+                                                            {
+                                                                project.beginning
+                                                            }{" "}
+                                                            <span className="font-bold mx-2">
+                                                                to
                                                             </span>
-                                                        </div>
-                                                        <span
-                                                            className={`px-2 py-1 rounded-full ${
-                                                                project.status ===
-                                                                "Active"
-                                                                    ? "bg-green-100 text-green-800"
-                                                                    : project.status ===
-                                                                      "Completed"
-                                                                    ? "bg-blue-100 text-blue-800"
-                                                                    : "bg-gray-100 text-gray-800"
-                                                            }`}
-                                                        >
-                                                            {project.status}
+                                                            {
+                                                                project.closing
+                                                            }
                                                         </span>
                                                     </div>
+                                                    <span
+                                                        className={`px-2 py-1 rounded-full ${
+                                                            project.status ===
+                                                            "Active"
+                                                                ? "bg-green-100 text-green-800"
+                                                                : project.status ===
+                                                                  "Completed"
+                                                                ? "bg-blue-100 text-blue-800"
+                                                                : "bg-gray-100 text-gray-800"
+                                                        }`}
+                                                    >
+                                                        {project.status}
+                                                    </span>
                                                 </div>
-                                            ))}
-                                        {source.projects.length > 5 && (
-                                            <div className="text-center text-sm text-gray-500 py-2">
-                                                +{source.projects.length - 5}{" "}
-                                                more projects
                                             </div>
-                                        )}
+                                        ))}
                                     </div>
                                 </div>
                             )}
