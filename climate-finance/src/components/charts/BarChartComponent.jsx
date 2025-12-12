@@ -92,22 +92,23 @@ const BarChartComponent = ({
             style.id = "bar-chart-scrollbar-style";
             style.innerHTML = `
                 .bar-chart-scrollable::-webkit-scrollbar {
-                    height: 16px !important;
+                    height: 24px !important;
                 }
                 .bar-chart-scrollable::-webkit-scrollbar-track {
                     background: #f1f1f1;
-                    border-radius: 8px;
+                    border-radius: 12px;
                 }
                 .bar-chart-scrollable::-webkit-scrollbar-thumb {
                     background: #888;
-                    border-radius: 8px;
+                    border-radius: 12px;
+                    min-height: 24px;
                 }
                 .bar-chart-scrollable::-webkit-scrollbar-thumb:hover {
                     background: #555;
                 }
                 /* Firefox */
                 .bar-chart-scrollable {
-                    scrollbar-width: auto;
+                    scrollbar-width: thick;
                     scrollbar-color: #888 #f1f1f1;
                 }
             `;

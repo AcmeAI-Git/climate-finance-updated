@@ -31,6 +31,7 @@ const BangladeshMapComponent = memo(
         const [mapLoaded, setMapLoaded] = useState(false);
         const currentPopup = useRef(null); // Track the currently open popup
         const touchStartPos = useRef(null); // Track touch start position
+        const isPanning = useRef(false); // Track if user is panning
 
         const normalizeRegionName = React.useCallback((shapeName) => {
             const cleanName = shapeName
@@ -242,40 +243,8 @@ const BangladeshMapComponent = memo(
                 map.current.getCanvas().style.cursor = "";
             });
             
-            // Handle click events (desktop and mobile after touch)
+            // Handle click events (works for both mouse and touch)
             map.current.on("click", "data-fill", showPopup);
-            
-            // Handle touch events (mobile) - track touch start to distinguish tap from pan
-            map.current.on("touchstart", "data-fill", (e) => {
-                if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length === 1) {
-                    const touch = e.originalEvent.touches[0];
-                    touchStartPos.current = {
-                        x: touch.clientX,
-                        y: touch.clientY,
-                        time: Date.now(),
-                    };
-                }
-            });
-            
-            map.current.on("touchend", "data-fill", (e) => {
-                if (!touchStartPos.current) return;
-                
-                const touchEnd = e.originalEvent?.changedTouches?.[0];
-                if (!touchEnd) return;
-                
-                const deltaX = Math.abs(touchEnd.clientX - touchStartPos.current.x);
-                const deltaY = Math.abs(touchEnd.clientY - touchStartPos.current.y);
-                const deltaTime = Date.now() - touchStartPos.current.time;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                // Only trigger popup if it was a tap (not a pan/swipe)
-                // Threshold: less than 10px movement and less than 300ms
-                if (distance < 10 && deltaTime < 300 && e.features && e.features[0]) {
-                    showPopup(e);
-                }
-                
-                touchStartPos.current = null;
-            });
         }, [data, normalizeRegionName]);
 
         const loadDivisionBoundaries = React.useCallback(async () => {
@@ -390,6 +359,142 @@ const BangladeshMapComponent = memo(
                 map.current.on("load", () => {
                     setMapLoaded(true);
                     loadDivisionBoundaries();
+                    
+                    // Add touch handlers for mobile - register once at map level
+                    const handleTouchStart = (e) => {
+                        if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches.length === 1) {
+                            const touch = e.originalEvent.touches[0];
+                            touchStartPos.current = {
+                                x: touch.clientX,
+                                y: touch.clientY,
+                                time: Date.now(),
+                            };
+                            isPanning.current = false;
+                            
+                            // Check if touch is over a region - if so, we might want to show popup instead of panning
+                            const rect = map.current.getContainer().getBoundingClientRect();
+                            const point = [
+                                touch.clientX - rect.left,
+                                touch.clientY - rect.top
+                            ];
+                            const features = map.current.queryRenderedFeatures(point, {
+                                layers: ["data-fill"],
+                            });
+                            
+                            // If touching a region, we'll handle it in touchend
+                            if (features && features.length > 0) {
+                                // Store that we're over a feature
+                                touchStartPos.current.overFeature = true;
+                            }
+                        }
+                    };
+
+                    const handleTouchMove = () => {
+                        if (touchStartPos.current) {
+                            isPanning.current = true;
+                        }
+                    };
+
+                    const handleTouchEnd = (e) => {
+                        if (!touchStartPos.current) {
+                            return;
+                        }
+                        
+                        // If user was panning, don't show popup
+                        if (isPanning.current) {
+                            touchStartPos.current = null;
+                            isPanning.current = false;
+                            return;
+                        }
+                        
+                        const touchEnd = e.originalEvent?.changedTouches?.[0];
+                        if (!touchEnd) {
+                            touchStartPos.current = null;
+                            return;
+                        }
+                        
+                        const deltaX = Math.abs(touchEnd.clientX - touchStartPos.current.x);
+                        const deltaY = Math.abs(touchEnd.clientY - touchStartPos.current.y);
+                        const deltaTime = Date.now() - touchStartPos.current.time;
+                        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        
+                        // Only trigger popup if it was a tap (not a pan/swipe)
+                        // Threshold: less than 20px movement and less than 500ms
+                        if (distance < 20 && deltaTime < 500) {
+                            // Get the bounding rect of the map container
+                            const rect = map.current.getContainer().getBoundingClientRect();
+                            // Calculate point relative to map container
+                            const point = [
+                                touchEnd.clientX - rect.left,
+                                touchEnd.clientY - rect.top
+                            ];
+                            
+                            // Query features at the touch point
+                            const features = map.current.queryRenderedFeatures(point, {
+                                layers: ["data-fill"],
+                            });
+                            
+                            if (features && features.length > 0) {
+                                // Get lngLat from the point
+                                const lngLat = map.current.unproject(point);
+                                // Create a synthetic event object for showPopup
+                                const syntheticEvent = {
+                                    features: features,
+                                    lngLat: lngLat,
+                                };
+                                
+                                // Helper function to show popup
+                                const showPopupFromTouch = (e) => {
+                                    if (e.features && e.features[0]) {
+                                        const feature = e.features[0];
+                                        const props = feature.properties;
+                                        // Close previous popup if open
+                                        if (currentPopup.current) {
+                                            currentPopup.current.remove();
+                                            currentPopup.current = null;
+                                        }
+                                        const popup = new maplibregl.Popup({
+                                            closeButton: true,
+                                            closeOnClick: false,
+                                            closeOnMove: false,
+                                        })
+                                            .setLngLat(e.lngLat)
+                                            .setHTML(
+                                                `<div style="font-family: system-ui; min-width: 200px;">
+                                                <h4 style="font-weight: 600; margin-bottom: 8px; border-bottom: 2px solid #7c3aed; padding-bottom: 4px;">
+                                                    ${props.displayName}
+                                                </h4>
+                                                <p style="margin: 4px 0;"><span style="color: #059669; font-weight: 500;">Active:</span> ${
+                                                    props.active || 0
+                                                }</p>
+                                                <p style="margin: 4px 0;"><span style="color: #6366f1; font-weight: 500;">Completed:</span> ${
+                                                    props.completed || 0
+                                                }</p>
+                                                <p style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #e5e7eb;">
+                                                    <span style="color: #7c3aed; font-weight: 600;">Total:</span> ${
+                                                        props.total ||
+                                                        (props.active || 0) + (props.completed || 0)
+                                                    }
+                                                </p>
+                                            </div>`
+                                            )
+                                            .addTo(map.current);
+                                        currentPopup.current = popup;
+                                    }
+                                };
+                                
+                                showPopupFromTouch(syntheticEvent);
+                            }
+                        }
+                        
+                        touchStartPos.current = null;
+                        isPanning.current = false;
+                    };
+
+                    // Register touch handlers at map level
+                    map.current.on("touchstart", handleTouchStart);
+                    map.current.on("touchmove", handleTouchMove);
+                    map.current.on("touchend", handleTouchEnd);
                 });
 
                 map.current.on("draw.create", handleDrawingChange);
@@ -469,7 +574,7 @@ const BangladeshMapComponent = memo(
                             width: "100%",
                             height: "100%",
                             borderRadius: "12px",
-                            touchAction: "pan-x pan-y",
+                            touchAction: "manipulation",
                         }}
                     />
 

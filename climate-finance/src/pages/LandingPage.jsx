@@ -542,7 +542,7 @@ const LandingPage = () => {
                                     formatYAxis={true}
                                     bars={[{
                                         dataKey: "Total_Finance",
-                                        name: "Total Climate Finance (USD M)",
+                                        name: "USD",
                                         fill: "#8B5CF6",
                                     }]}
                                     description={chartDescriptions.climateFinanceTrend}
