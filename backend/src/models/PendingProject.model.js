@@ -256,7 +256,14 @@ PendingProject.getPendingProjectById = async (id) => {
     
     if (row.wash_component) {
         try {
-            washComponent = JSON.parse(row.wash_component);
+            // PostgreSQL JSONB fields are already parsed, so check if it's already an object
+            if (typeof row.wash_component === 'string') {
+                washComponent = JSON.parse(row.wash_component);
+            } else {
+                // Already an object (JSONB from PostgreSQL)
+                washComponent = { ...row.wash_component };
+            }
+            
             // Extract metadata if it exists
             if (washComponent && washComponent._metadata) {
                 metadata = washComponent._metadata;

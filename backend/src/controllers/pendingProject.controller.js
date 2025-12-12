@@ -91,46 +91,54 @@ exports.getPendingProjectById = async (req, res) => {
                 .json({ status: false, message: "Pending project not found" });
         }
 
+        // Debug: Log extracted IDs
+        console.log('Pending Project IDs:', {
+            implementing_entity_ids: project.implementing_entity_ids,
+            executing_agency_ids: project.executing_agency_ids,
+            delivery_partner_ids: project.delivery_partner_ids,
+            funding_source_ids: project.funding_source_ids,
+        });
+
         // Fetch agencies (from agency_ids - backward compatibility)
         const agencies = project.agency_ids && project.agency_ids.length > 0
-            ? await Promise.all(
-                project.agency_ids.map((id) => Agency.getById(id))
-            )
+            ? (await Promise.all(
+                project.agency_ids.map((id) => Agency.getById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         // Fetch implementing entities
         const implementing_entities = project.implementing_entity_ids && project.implementing_entity_ids.length > 0
-            ? await Promise.all(
-                project.implementing_entity_ids.map((id) => Agency.getById(id))
-            )
+            ? (await Promise.all(
+                project.implementing_entity_ids.map((id) => Agency.getById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         // Fetch executing agencies
         const executing_agencies = project.executing_agency_ids && project.executing_agency_ids.length > 0
-            ? await Promise.all(
-                project.executing_agency_ids.map((id) => Agency.getById(id))
-            )
+            ? (await Promise.all(
+                project.executing_agency_ids.map((id) => Agency.getById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         // Fetch delivery partners
         const delivery_partners = project.delivery_partner_ids && project.delivery_partner_ids.length > 0
-            ? await Promise.all(
-                project.delivery_partner_ids.map((id) => DeliveryPartner.getById(id))
-            )
+            ? (await Promise.all(
+                project.delivery_partner_ids.map((id) => DeliveryPartner.getById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         // Fetch funding sources
         const funding_sources = project.funding_source_ids && project.funding_source_ids.length > 0
-            ? await Promise.all(
-                project.funding_source_ids.map((id) => FundingSource.getById(id))
-            )
+            ? (await Promise.all(
+                project.funding_source_ids.map((id) => FundingSource.getById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         // Fetch SDGs
         const sdg = project.sdg_ids && project.sdg_ids.length > 0
-            ? await Promise.all(
-                project.sdg_ids.map((id) => SDGAlignment.getSDGById(id))
-            )
+            ? (await Promise.all(
+                project.sdg_ids.map((id) => SDGAlignment.getSDGById(id).catch(() => null))
+            )).filter(item => item !== null && item !== undefined)
             : [];
 
         res.status(200).json({ 

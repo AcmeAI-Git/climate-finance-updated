@@ -52,6 +52,13 @@ const PendingProjectDetails = () => {
 
             const projectData = projectResponse.data;
 
+            // Debug: Log what we're receiving from the API
+            console.log('API Response - projectData:', projectData);
+            console.log('implementing_entities:', projectData.implementing_entities);
+            console.log('executing_agencies:', projectData.executing_agencies);
+            console.log('delivery_partners:', projectData.delivery_partners);
+            console.log('funding_sources:', projectData.funding_sources);
+
             // Map the pending project data structure to match ProjectDetails format
             const enrichedProject = {
                 ...projectData,
@@ -66,6 +73,10 @@ const PendingProjectDetails = () => {
                 projectSDGs: projectData.sdg || [],
                 projectLocations: [],
             };
+
+            console.log('Enriched project - projectImplementingEntities:', enrichedProject.projectImplementingEntities);
+            console.log('Enriched project - projectExecutingAgencies:', enrichedProject.projectExecutingAgencies);
+            console.log('Enriched project - projectDeliveryPartners:', enrichedProject.projectDeliveryPartners);
 
             setProject(enrichedProject);
             setRetryCount(0);
@@ -90,27 +101,15 @@ const PendingProjectDetails = () => {
         try {
             setProcessing(true);
             const response = await pendingProjectApi.approve(id);
-            if (response.status) {
-                toast({
-                    title: 'Success',
-                    message: 'Project approved successfully',
-                    type: 'success'
-                });
+            if (response?.status) {
+                toast.success('Project approved successfully', 'Success');
                 navigate('/admin/project-approval');
             } else {
-                toast({
-                    title: 'Error',
-                    message: 'Failed to approve project',
-                    type: 'error'
-                });
+                toast.error(response?.message || 'Failed to approve project', 'Error');
             }
         } catch (err) {
             console.error('Error approving project:', err);
-            toast({
-                title: 'Error',
-                message: err.message || 'Failed to approve project',
-                type: 'error'
-            });
+            toast.error(err.message || 'Failed to approve project', 'Error');
         } finally {
             setProcessing(false);
         }
@@ -120,27 +119,15 @@ const PendingProjectDetails = () => {
         try {
             setProcessing(true);
             const response = await pendingProjectApi.reject(id);
-            if (response.status) {
-                toast({
-                    title: 'Success',
-                    message: 'Project rejected successfully',
-                    type: 'success'
-                });
+            if (response?.status) {
+                toast.success('Project rejected successfully', 'Success');
                 navigate('/admin/project-approval');
             } else {
-                toast({
-                    title: 'Error',
-                    message: 'Failed to reject project',
-                    type: 'error'
-                });
+                toast.error(response?.message || 'Failed to reject project', 'Error');
             }
         } catch (err) {
             console.error('Error rejecting project:', err);
-            toast({
-                title: 'Error',
-                message: err.message || 'Failed to reject project',
-                type: 'error'
-            });
+            toast.error(err.message || 'Failed to reject project', 'Error');
         } finally {
             setProcessing(false);
         }
