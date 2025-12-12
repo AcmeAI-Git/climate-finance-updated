@@ -51,7 +51,7 @@ const AboutPage = () => {
             ) : (
               <div className="notranslate">
                 <p className="text-gray-600 leading-relaxed break-words">
-                  The Bangladesh Climate Finance Tracker is a public platform designed to bring transparency and accessibility to climate finance data. Our mission is to empower policymakers, researchers, journalists, and the public with comprehensive, up-to-date information on climate-related projects and funding sources across Bangladesh.
+                  Green Accountability Monitor  is a public platform designed to bring transparency and accessibility to climate finance data. Our mission is to empower policymakers, researchers, journalists, and the public with comprehensive, up-to-date information on climate-related projects and funding sources across Bangladesh.
                 </p>
                 <p className="text-gray-600 leading-relaxed mt-4 break-words whitespace-pre-line notranslate">
                   By providing detailed insights into financial flows, project statuses, and sectoral allocations, we aim to support effective decision-making, enhance accountability, and foster a greater understanding of the national response to climate change.
