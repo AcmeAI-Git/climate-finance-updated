@@ -717,6 +717,27 @@ Project.deleteProject = async (id) => {
     const client = await pool.connect();
     try {
         await client.query("BEGIN");
+        
+        // First, fetch the project title before deletion for audit logging
+        const projectQuery = await client.query("SELECT title FROM Project WHERE project_id = $1", [id]);
+        const projectTitle = projectQuery.rows.length > 0 ? projectQuery.rows[0].title : 'Unknown Project';
+        
+        // Log the deletion to AuditLog
+        await client.query(
+            `INSERT INTO AuditLog (activity_type, activity_title, activity_description, activity_color, activity_icon, entity_id, entity_type)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+                'project_deleted',
+                'Project deleted',
+                projectTitle,
+                'warning',
+                'Trash2',
+                id,
+                'Project'
+            ]
+        );
+        
+        // Now delete the project and related data
         await client.query("DELETE FROM ProjectSDG WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectFundingSource WHERE project_id = $1", [id]);
         await client.query("DELETE FROM ProjectLocation WHERE project_id = $1", [id]);

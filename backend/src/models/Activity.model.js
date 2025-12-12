@@ -80,6 +80,17 @@ Activity.getRecentActivities = async (limit = 10) => {
                 FROM PendingDocumentRepository
                 WHERE created_at >= NOW() - INTERVAL '30 days'
             ),
+            audit_log_activities AS (
+                SELECT 
+                    activity_type,
+                    activity_title,
+                    COALESCE(activity_description, '') as activity_description,
+                    activity_time,
+                    activity_color,
+                    activity_icon
+                FROM AuditLog
+                WHERE activity_time >= NOW() - INTERVAL '30 days'
+            ),
             all_activities AS (
                 SELECT * FROM project_activities
                 UNION ALL
@@ -88,6 +99,8 @@ Activity.getRecentActivities = async (limit = 10) => {
                 SELECT * FROM pending_project_activities
                 UNION ALL
                 SELECT * FROM pending_repository_activities
+                UNION ALL
+                SELECT * FROM audit_log_activities
             )
             SELECT 
                 activity_type,

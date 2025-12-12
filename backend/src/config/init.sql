@@ -206,6 +206,19 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
 
+-- Table: AuditLog (for tracking deletions and other audit events)
+CREATE TABLE IF NOT EXISTS AuditLog (
+    audit_id SERIAL PRIMARY KEY,
+    activity_type VARCHAR(50) NOT NULL,
+    activity_title VARCHAR(255) NOT NULL,
+    activity_description TEXT,
+    activity_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activity_color VARCHAR(50) DEFAULT 'warning',
+    activity_icon VARCHAR(50) DEFAULT 'Trash2',
+    entity_id VARCHAR(50),
+    entity_type VARCHAR(50)
+    );
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_project_title ON Project(title);
 CREATE INDEX IF NOT EXISTS idx_project_status ON Project(status);
@@ -213,6 +226,8 @@ CREATE INDEX IF NOT EXISTS idx_project_geographic_division ON Project(geographic
 CREATE INDEX IF NOT EXISTS idx_agency_name ON Agency(name);
 CREATE INDEX IF NOT EXISTS idx_funding_source_name ON FundingSource(name);
 CREATE INDEX IF NOT EXISTS idx_location_name ON Location(name);
+CREATE INDEX IF NOT EXISTS idx_audit_log_time ON AuditLog(activity_time);
+CREATE INDEX IF NOT EXISTS idx_audit_log_type ON AuditLog(activity_type);
 
 -- Comments for documentation
 COMMENT ON TABLE Project IS 'Stores information about environmental and climate projects in Bangladesh';

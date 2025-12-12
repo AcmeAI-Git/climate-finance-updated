@@ -20,6 +20,7 @@ import {
     CheckCircle,
     Handshake,
     RefreshCw,
+    Trash2,
 } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -109,6 +110,7 @@ const AdminDashboard = () => {
             Book: Book,
             BookOpenText: BookOpenText,
             CheckCircle: CheckCircle,
+            Trash2: Trash2,
         };
         const IconComponent = iconMap[iconName] || Plus;
         return <IconComponent className="w-4 h-4" />;
