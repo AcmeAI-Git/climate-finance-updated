@@ -326,7 +326,7 @@ Project.getAllProjects = async () => {
         implementingEntityResult.rows.forEach((row) => {
             if (!implementingEntityMap[row.project_id]) implementingEntityMap[row.project_id] = [];
             implementingEntityMap[row.project_id].push({
-                id: row.entity_id,
+                id: row.agency_id,
                 name: row.entity_name,
             });
         });

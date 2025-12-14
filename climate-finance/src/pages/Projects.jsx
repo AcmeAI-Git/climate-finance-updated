@@ -469,20 +469,78 @@ const Projects = () => {
             });
         }
         
+        // Filter implementing entities to only show those actually used in projects
+        // Convert to strings for comparison to handle number/string mismatches
+        const usedImplementingEntityIds = new Set(
+            projectsList
+                .flatMap((p) => (p.implementing_entities || []))
+                .map((e) => {
+                    const id = typeof e === 'object' ? (e.id || e.agency_id) : e;
+                    return id != null ? String(id) : null;
+                })
+                .filter(Boolean)
+        );
+        
+        // If no projects have implementing entities, show all agencies (fallback)
+        // Otherwise, filter to only show used ones, but always include all if filtering results in empty
+        let filteredImplementingEntities = usedImplementingEntityIds.size > 0
+            ? implementingEntities.filter((e) => {
+                const agencyId = e.id || e.agency_id;
+                return agencyId != null && usedImplementingEntityIds.has(String(agencyId));
+            })
+            : implementingEntities;
+        
+        // Safety check: if filtering resulted in empty list, show all instead
+        if (filteredImplementingEntities.length === 0 && implementingEntities.length > 0) {
+            filteredImplementingEntities = implementingEntities;
+        }
+        
         filters.push({
             key: "implementing_entity_id",
             label: "Implementing Entity",
             options: [
                 { value: "All", label: "All Implementing Entities" },
-                ...implementingEntities.map((e) => ({ value: e.id, label: e.name })),
+                ...filteredImplementingEntities.map((e) => ({ 
+                    value: e.id || e.agency_id, 
+                    label: e.name 
+                })),
             ],
         });
+        // Filter executing agencies to only show those actually used in projects
+        // Convert to strings for comparison to handle number/string mismatches
+        const usedExecutingAgencyIds = new Set(
+            projectsList
+                .flatMap((p) => (p.executing_agencies || []))
+                .map((a) => {
+                    const id = typeof a === 'object' ? (a.id || a.agency_id) : a;
+                    return id != null ? String(id) : null;
+                })
+                .filter(Boolean)
+        );
+        
+        // If no projects have executing agencies, show all agencies (fallback)
+        // Otherwise, filter to only show used ones, but always include all if filtering results in empty
+        let filteredExecutingAgencies = usedExecutingAgencyIds.size > 0
+            ? executingAgencies.filter((a) => {
+                const agencyId = a.id || a.agency_id;
+                return agencyId != null && usedExecutingAgencyIds.has(String(agencyId));
+            })
+            : executingAgencies;
+        
+        // Safety check: if filtering resulted in empty list, show all instead
+        if (filteredExecutingAgencies.length === 0 && executingAgencies.length > 0) {
+            filteredExecutingAgencies = executingAgencies;
+        }
+        
         filters.push({
             key: "executing_agency_id",
             label: "Executing Agency",
             options: [
                 { value: "All", label: "All Executing Agencies" },
-                ...executingAgencies.map((a) => ({ value: a.id, label: a.name })),
+                ...filteredExecutingAgencies.map((a) => ({ 
+                    value: a.id || a.agency_id, 
+                    label: a.name 
+                })),
             ],
         });
         // Always show delivery partner filter if there are any projects
