@@ -40,21 +40,34 @@ const BarChartComponent = ({
 
     // ---------- responsive width ----------
     const containerRef = useRef(null);
+    const scrollableRef = useRef(null);
     const [chartWidth, setChartWidth] = useState(800);
 
     useEffect(() => {
         const handleResize = () => {
-            if (containerRef.current) {
-                const containerWidth = containerRef.current.offsetWidth - 40;
+            // Use scrollable container if available, otherwise fall back to outer container
+            const ref = scrollableRef.current || containerRef.current;
+            if (ref) {
+                // Use clientWidth for scrollable container (excludes scrollbar, includes padding)
+                // Use offsetWidth for outer container (includes padding and border)
+                const containerWidth = scrollableRef.current 
+                    ? scrollableRef.current.clientWidth 
+                    : (containerRef.current?.offsetWidth || 800);
+                
                 // Calculate minimum viable width for chart to be readable
                 // Each bar group needs ~25-30px minimum
-                const minBarWidth = 25;
-                const requiredWidth = data.length * minBarWidth + 200; // 200 for axes/labels
+                const minBarWidth = 30;
+                const requiredWidth = data.length * minBarWidth + 250; // 250 for axes/labels/padding
                 
                 // If scrollable is enabled, always allow the chart to be wider if needed
                 if (scrollable) {
-                    // Scrollable mode: always use required width or container width, whichever is larger
-                    setChartWidth(Math.max(containerWidth, requiredWidth));
+                    // Scrollable mode: ensure chart is always wider than container to enable scrolling
+                    // Add extra width to guarantee scrolling works
+                    const calculatedWidth = Math.max(
+                        containerWidth + 200, // Always add at least 200px more
+                        requiredWidth
+                    );
+                    setChartWidth(calculatedWidth);
                 } else {
                     // Default responsive mode
                     if (containerWidth < 500) {
@@ -68,22 +81,73 @@ const BarChartComponent = ({
             }
         };
         
-        // Call on mount
-        handleResize();
+        // Use requestAnimationFrame to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            handleResize();
+        }, 0);
         
         // Debounce resize events
-        let timeout;
+        let resizeTimeout;
         const debouncedResize = () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(handleResize, 150);
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(handleResize, 150);
         };
         
         window.addEventListener("resize", debouncedResize);
+        
+        // Also observe the container for size changes
+        let resizeObserver;
+        if (scrollableRef.current && window.ResizeObserver) {
+            resizeObserver = new ResizeObserver(debouncedResize);
+            resizeObserver.observe(scrollableRef.current);
+        } else if (containerRef.current && window.ResizeObserver) {
+            resizeObserver = new ResizeObserver(debouncedResize);
+            resizeObserver.observe(containerRef.current);
+        }
+        
         return () => {
+            clearTimeout(timeoutId);
+            clearTimeout(resizeTimeout);
             window.removeEventListener("resize", debouncedResize);
-            clearTimeout(timeout);
+            if (resizeObserver) {
+                if (scrollableRef.current) {
+                    resizeObserver.unobserve(scrollableRef.current);
+                }
+                if (containerRef.current) {
+                    resizeObserver.unobserve(containerRef.current);
+                }
+            }
         };
     }, [data, scrollable]);
+
+    // Recalculate width when scrollable ref is ready (additional check for mobile)
+    useEffect(() => {
+        if (scrollable && scrollableRef.current) {
+            const handleResize = () => {
+                if (scrollableRef.current) {
+                    const containerWidth = scrollableRef.current.clientWidth || scrollableRef.current.offsetWidth;
+                    const minBarWidth = 30;
+                    const requiredWidth = data.length * minBarWidth + 250;
+                    // Ensure chart is definitely wider than container
+                    const calculatedWidth = Math.max(containerWidth + 200, requiredWidth);
+                    if (calculatedWidth > containerWidth) {
+                        setChartWidth(calculatedWidth);
+                    }
+                }
+            };
+            
+            // Multiple attempts to ensure DOM is ready (mobile can be slow)
+            const timeoutId1 = setTimeout(handleResize, 50);
+            const timeoutId2 = setTimeout(handleResize, 200);
+            const timeoutId3 = setTimeout(handleResize, 500);
+            
+            return () => {
+                clearTimeout(timeoutId1);
+                clearTimeout(timeoutId2);
+                clearTimeout(timeoutId3);
+            };
+        }
+    }, [scrollable, data.length]);
 
     // Inject custom scrollbar styles for better visibility on mobile
     useEffect(() => {
@@ -137,7 +201,7 @@ const BarChartComponent = ({
     return (
         <div ref={containerRef} className="w-full">
             <div
-                className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300 select-none"
+                className="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-300"
                 style={{ minHeight: "440px" }}
             >
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 text-start">
@@ -146,16 +210,32 @@ const BarChartComponent = ({
 
                 {/* Chart wrapper - scrollable only when needed */}
                 <div 
+                    ref={scrollableRef}
+                    className={scrollable ? "bar-chart-scrollable" : ""}
                     style={{ 
                         height: "340px", 
+                        width: "100%",
+                        maxWidth: "100%",
                         overflowX: scrollable ? "auto" : "visible",
                         overflowY: "hidden",
                         WebkitOverflowScrolling: scrollable ? "touch" : "auto",
                         touchAction: scrollable ? "pan-x" : "auto",
-                        overscrollBehaviorX: scrollable ? "contain" : "auto"
+                        overscrollBehaviorX: scrollable ? "contain" : "auto",
+                        overscrollBehaviorY: "none",
+                        position: "relative",
+                        userSelect: "none",
+                        WebkitUserSelect: "none",
+                        msUserSelect: "none",
+                        WebkitTouchCallout: "none",
+                        willChange: scrollable ? "scroll-position" : "auto"
                     }}
                 >
-                    <div style={{ width: chartWidth, height: "100%", display: scrollable ? "inline-block" : "block" }}>
+                    <div style={{ 
+                        width: scrollable ? chartWidth : "100%", 
+                        height: "100%", 
+                        display: scrollable ? "inline-block" : "block",
+                        minWidth: scrollable ? chartWidth : "auto"
+                    }}>
                     <VictoryChart
                         theme={VictoryTheme.material}
                         width={chartWidth}
