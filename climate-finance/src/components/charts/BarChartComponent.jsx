@@ -96,13 +96,16 @@ const BarChartComponent = ({
         window.addEventListener("resize", debouncedResize);
         
         // Also observe the container for size changes
+        // Capture ref values to use in cleanup
+        const currentScrollableRef = scrollableRef.current;
+        const currentContainerRef = containerRef.current;
         let resizeObserver;
-        if (scrollableRef.current && window.ResizeObserver) {
+        if (currentScrollableRef && window.ResizeObserver) {
             resizeObserver = new ResizeObserver(debouncedResize);
-            resizeObserver.observe(scrollableRef.current);
-        } else if (containerRef.current && window.ResizeObserver) {
+            resizeObserver.observe(currentScrollableRef);
+        } else if (currentContainerRef && window.ResizeObserver) {
             resizeObserver = new ResizeObserver(debouncedResize);
-            resizeObserver.observe(containerRef.current);
+            resizeObserver.observe(currentContainerRef);
         }
         
         return () => {
@@ -110,11 +113,11 @@ const BarChartComponent = ({
             clearTimeout(resizeTimeout);
             window.removeEventListener("resize", debouncedResize);
             if (resizeObserver) {
-                if (scrollableRef.current) {
-                    resizeObserver.unobserve(scrollableRef.current);
+                if (currentScrollableRef) {
+                    resizeObserver.unobserve(currentScrollableRef);
                 }
-                if (containerRef.current) {
-                    resizeObserver.unobserve(containerRef.current);
+                if (currentContainerRef) {
+                    resizeObserver.unobserve(currentContainerRef);
                 }
             }
         };
