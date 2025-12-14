@@ -214,12 +214,14 @@ const LandingPage = () => {
 
             // Set district data for bar chart
             if (districtResponse.status && Array.isArray(districtResponse.data)) {
-                const districtDataProcessed = districtResponse.data.map((item) => ({
-                    region: item.region,
-                    active: Number(item.active) || 0,
-                    completed: Number(item.completed) || 0,
-                    total: Number(item.total) || 0,
-                }));
+                const districtDataProcessed = districtResponse.data
+                    .filter((item) => item.region && item.region !== "N/A") // Filter out N/A districts
+                    .map((item) => ({
+                        region: item.region,
+                        active: Number(item.active) || 0,
+                        completed: Number(item.completed) || 0,
+                        total: Number(item.total) || 0,
+                    }));
                 setDistrictData(districtDataProcessed);
             } else {
                 setDistrictData([]);
