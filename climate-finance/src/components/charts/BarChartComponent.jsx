@@ -180,6 +180,13 @@ const BarChartComponent = ({
                 .bar-chart-scrollable::-webkit-scrollbar-thumb:hover {
                     background: #555;
                 }
+                .bar-chart-scrollable svg {
+                    touch-action: pan-x;
+                    pointer-events: auto;
+                }
+                .bar-chart-scrollable > div {
+                    touch-action: pan-x;
+                }
             `;
             document.head.appendChild(style);
         }
@@ -212,40 +219,33 @@ const BarChartComponent = ({
                 </h3>
 
                 {/* Chart wrapper - scrollable only when needed */}
-                <div 
-                    ref={scrollableRef}
-                    className={scrollable ? "bar-chart-scrollable" : ""}
-                    style={{ 
-                        height: "340px", 
-                        width: "100%",
-                        maxWidth: "100%",
-                        overflowX: scrollable ? "auto" : "visible",
-                        overflowY: "hidden",
-                        WebkitOverflowScrolling: scrollable ? "touch" : "auto",
-                        touchAction: scrollable ? "pan-x" : "auto",
-                        overscrollBehaviorX: scrollable ? "contain" : "auto",
-                        overscrollBehaviorY: "none",
-                        position: "relative",
-                        userSelect: "none",
-                        WebkitUserSelect: "none",
-                        msUserSelect: "none",
-                        WebkitTouchCallout: "none",
-                        willChange: scrollable ? "scroll-position" : "auto"
-                    }}
-                >
-                    <div style={{ 
-                        width: scrollable ? chartWidth : "100%", 
-                        height: "100%", 
-                        display: scrollable ? "inline-block" : "block",
-                        minWidth: scrollable ? chartWidth : "auto"
-                    }}>
-                    <VictoryChart
-                        theme={VictoryTheme.material}
-                        width={chartWidth}
-                        domainPadding={{ x: 60, y: 20 }}
-                        padding={{ left: 60, top: 20, right: 60, bottom: 80 }}
-                        domain={{ y: [0, maxY] }}
+                {scrollable ? (
+                    <div 
+                        ref={scrollableRef}
+                        className="bar-chart-scrollable"
+                        style={{ 
+                            overflowX: "auto",
+                            overflowY: "hidden",
+                            WebkitOverflowScrolling: "touch",
+                            touchAction: "pan-x",
+                            overscrollBehaviorX: "contain",
+                            width: "100%",
+                            height: "340px"
+                        }}
                     >
+                        <div style={{ 
+                            width: chartWidth,
+                            height: "340px",
+                            minWidth: chartWidth,
+                            display: "inline-block"
+                        }}>
+                            <VictoryChart
+                                theme={VictoryTheme.material}
+                                width={chartWidth}
+                                domainPadding={{ x: 60, y: 20 }}
+                                padding={{ left: 60, top: 20, right: 60, bottom: 80 }}
+                                domain={{ y: [0, maxY] }}
+                            >
                         {/* Legend */}
                         {bars.length > 1 && (
                             <VictoryLegend
@@ -330,9 +330,104 @@ const BarChartComponent = ({
                                 }
                             />
                         ))}
-                    </VictoryChart>
+                            </VictoryChart>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div style={{ height: "340px", width: "100%" }}>
+                        <VictoryChart
+                            theme={VictoryTheme.material}
+                            width={chartWidth}
+                            domainPadding={{ x: 60, y: 20 }}
+                            padding={{ left: 60, top: 20, right: 60, bottom: 80 }}
+                            domain={{ y: [0, maxY] }}
+                        >
+                            {/* Legend */}
+                            {bars.length > 1 && (
+                                <VictoryLegend
+                                    x={chartWidth / 2 - 100}
+                                    y={10}
+                                    orientation="horizontal"
+                                    gutter={20}
+                                    style={{
+                                        labels: { fontSize: 11, fill: "#6B7280" },
+                                    }}
+                                    data={bars.map((bar) => ({
+                                        name: Transliteration(
+                                            bar.name ?? bar.dataKey,
+                                            language
+                                        ),
+                                        symbol: { fill: bar.fill, type: "square" },
+                                    }))}
+                                />
+                            )}
+
+                            {/* Y Axis */}
+                            <VictoryAxis
+                                dependentAxis
+                                tickFormat={(t) =>
+                                    formatYAxis ? formatCurrency(t) : Math.floor(t)
+                                }
+                                style={{
+                                    axis: { stroke: "#E5E7EB" },
+                                    grid: { stroke: "none" },
+                                    tickLabels: { fontSize: 11, fill: "#6B7280" },
+                                }}
+                            />
+
+                            {/* X Axis */}
+                            <VictoryAxis
+                                tickFormat={(t) => t}
+                                style={{
+                                    axis: { stroke: "#E5E7EB" },
+                                    tickLabels: {
+                                        fontSize: 10,
+                                        fill: "#6B7280",
+                                        angle: -45,
+                                        textAnchor: "end",
+                                    },
+                                }}
+                            />
+
+                            {/* Bars */}
+                            {bars.map((bar, idx) => (
+                                <VictoryBar
+                                    key={idx}
+                                    data={chartData}
+                                    x="x"
+                                    y={bar.dataKey}
+                                    barRatio={0.8}
+                                    style={{ data: { fill: bar.fill } }}
+                                    labels={({ datum }) => {
+                                        const barVal = datum[bar.dataKey];
+                                        const barName = Transliteration(
+                                            bar.name ?? bar.dataKey,
+                                            language
+                                        );
+                                        const formattedBar = formatYAxis
+                                            ? formatCurrency(barVal)
+                                            : barVal;
+                                        return `${barName}: ${formattedBar}`;
+                                    }}
+                                    labelComponent={
+                                        <VictoryTooltip
+                                            flyoutStyle={{
+                                                fill: "rgba(17,24,39,0.95)",
+                                                stroke: "#7C65C1",
+                                            }}
+                                            style={{
+                                                fontSize: 13,
+                                                fill: "#F9FAFB",
+                                            }}
+                                            cornerRadius={4}
+                                            pointerLength={8}
+                                        />
+                                    }
+                                />
+                            ))}
+                        </VictoryChart>
+                    </div>
+                )}
                 {description && (
                     <p className="text-sm text-gray-500 mt-2 text-center italic">
                         {description}
