@@ -529,7 +529,7 @@ const LandingPage = () => {
                 </div>
             </div>
             {/* Yearly Climate Finance Trend */}
-            <div className="mt-6 w-full overflow-hidden">
+            <div className="mt-6 w-full">
                 <div className="animate-fade-in-up" style={{ animationDelay: "750ms" }}>
                     {climateFinanceTrend.length > 0 ? (
                         <div className="w-full">

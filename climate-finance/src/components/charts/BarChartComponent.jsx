@@ -146,13 +146,13 @@ const BarChartComponent = ({
 
                 {/* Chart wrapper - scrollable only when needed */}
                 <div 
-                    className={scrollable ? "bar-chart-scrollable" : ""}
                     style={{ 
                         height: "340px", 
                         overflowX: scrollable ? "auto" : "visible",
                         overflowY: "hidden",
                         WebkitOverflowScrolling: scrollable ? "touch" : "auto",
-                        touchAction: scrollable ? "pan-x" : "auto"
+                        touchAction: scrollable ? "pan-x" : "auto",
+                        overscrollBehaviorX: scrollable ? "contain" : "auto"
                     }}
                 >
                     <div style={{ width: chartWidth, height: "100%", display: scrollable ? "inline-block" : "block" }}>
