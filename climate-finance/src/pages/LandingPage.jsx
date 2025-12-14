@@ -6,7 +6,6 @@ import {
     DollarSign,
     TrendingUp,
     Target,
-    Activity,
     CheckCircle,
     FolderTree,
     Plus,
@@ -92,13 +91,6 @@ const LandingPage = () => {
                         title: "Total Climate Finance",
                         value: formatCurrency(
                             Number(data.total_climate_finance || 0)
-                        ),
-                        change: "",
-                    },
-                    {
-                        title: "Total WASH Finance",
-                        value: formatCurrency(
-                            Number(data.total_wash_finance || 0)
                         ),
                         change: "",
                     },
@@ -298,10 +290,9 @@ const LandingPage = () => {
 
     // Add icons to stats
     const statsData = overviewStats.map((stat, index) => {
-        const colors = ["success", "info", "warning", "primary"];
+        const colors = ["success", "warning", "primary"];
         const icons = [
             <DollarSign size={20} />, // Total Climate Finance
-            <Activity size={20} />, // Total WASH Finance
             <FolderTree size={20} />, // Total Projects
             <Target size={20} />, // Average Climate Relevance
         ];
@@ -402,7 +393,7 @@ const LandingPage = () => {
             {/* Stats Grid */}
             {statsData.length > 0 ? (
                 <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                         {statsData.map((stat, index) => (
                             <div
                                 key={index}
