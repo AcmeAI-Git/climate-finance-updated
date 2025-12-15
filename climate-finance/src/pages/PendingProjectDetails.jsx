@@ -21,6 +21,10 @@ import Loading from "../components/ui/Loading";
 import { formatCurrency } from "../utils/formatters";
 import { pendingProjectApi } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
+import {
+    getImplementingAgenciesTransliteration,
+    getExecutingAgenciesTransliteration,
+} from "../utils/transliteration";
 import { formatDate } from "../utils/formatDate";
 import { useToast } from "../components/ui/Toast";
 
@@ -382,8 +386,8 @@ const PendingProjectDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* Implementing Entities */}
                     <Card padding="p-4 sm:p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Implementing Entities
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 notranslate" translate="no">
+                            {getImplementingAgenciesTransliteration(language)}
                         </h3>
                         {Array.isArray(project.projectImplementingEntities) &&
                         project.projectImplementingEntities.length > 0 ? (
@@ -409,8 +413,8 @@ const PendingProjectDetails = () => {
 
                     {/* Executing Agencies */}
                     <Card padding="p-4 sm:p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Executing Agencies
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 notranslate" translate="no">
+                            {getExecutingAgenciesTransliteration(language)}
                         </h3>
                         {Array.isArray(project.projectExecutingAgencies) &&
                         project.projectExecutingAgencies.length > 0 ? (

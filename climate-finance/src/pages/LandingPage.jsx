@@ -29,6 +29,7 @@ import { translateChartData, getChartTitle } from "../utils/chartTranslations";
 import {
     getDeshboardDescriptionTransliteration,
     getInsightsTransliteration,
+    getMapSubtitleTransliteration,
 } from "../utils/transliteration";
 import ResearchDocsCard from "../components/ui/ResearchDocsCard";
 import { useAuth } from "../context/AuthContext";
@@ -432,8 +433,8 @@ const LandingPage = () => {
                     {regionalData.length > 0 && (
                         <BangladeshMapComponent data={regionalData} />
                     )}
-                    <p className="text-sm text-gray-500 mt-4 text-center italic">
-                        {chartDescriptions.regionalDistribution}
+                    <p className="text-sm text-gray-500 mt-4 text-center italic notranslate" translate="no">
+                        {getMapSubtitleTransliteration(language)}
                     </p>
                 </div>
             </div>

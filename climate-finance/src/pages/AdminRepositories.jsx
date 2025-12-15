@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import AdminListPage from "../features/admin/AdminListPage";
 import { RepositoryApi } from "../services/api";
 import { getChartTranslation } from "../utils/chartTranslations";
-import { formatCategoryToTitleCase } from "../utils/transliteration";
+import { formatCategoryToTitleCase, getAllCategoriesTransliteration } from "../utils/transliteration";
+import { useLanguage } from "../context/LanguageContext";
 
 const AdminRepositories = () => {
+    const { language } = useLanguage();
     const [repositoriesList, setRepositoriesList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -99,12 +101,16 @@ const AdminRepositories = () => {
                 key: "categories",
                 defaultValue: "All",
                 options: [
-                    { value: "All", label: "All Categories" },
+                    { value: "All", label: getAllCategoriesTransliteration(language) },
                     ...categories.map((category) => ({
                         value: category,
                         label: formatCategoryToTitleCase(category),
                     })),
                 ],
+                selectProps: {
+                    className: "notranslate",
+                    translate: "no"
+                }
             },
         ];
     }, [repositoriesList]);

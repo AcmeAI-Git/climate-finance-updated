@@ -27,7 +27,7 @@ export default function ResearchDocsCard() {
 
                     {/* Info Box */}
                     <div className="bg-white bg-opacity-60 rounded-lg p-3 mb-4 border border-purple-200">
-                        <p className="text-xs text-purple-700 font-medium">
+                        <p className="text-xs text-purple-700 font-medium notranslate" translate="no">
                             {getRepositoryCardDescriptionTransliteration(
                                 language
                             )}

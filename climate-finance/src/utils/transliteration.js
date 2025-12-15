@@ -58,9 +58,58 @@ export const getDeshboardDescriptionTransliteration = (language) => {
 
 export const getRepositoryCardDescriptionTransliteration = (language) => {
     if (language === "bn") {
-        return "কোথায় পাবেন: সমস্ত উপলব্ধ গবেষণা ডকুমেন্টেশন ব্রাউজ এবং ডাউনলোড করতে ব্রাউজ ডকুমেন্টস বাটনে ক্লিক করুন অথবা ডকুমেন্টস রিপোজিটরি পৃষ্ঠায় নেভিগেট করুন।";
+        return "যেভাবে পাবেন: সমস্ত গবেষণার ডকুমেন্ট ব্রাউজ এবং ডাউনলোড করতে \"ব্রাউজ ডকুমেন্টস\" বাটনে ক্লিক করুন অথবা ডকুমেন্ট রিপোজিটরি পৃষ্ঠা নেভিগেট করুন।";
     }
     return "Where to find: Click the Browse Documents button or navigate to the Documents Repository page to browse and download all available research documentation.";
+};
+
+export const getMapSubtitleTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাংলাদেশের বিভাগগুলিতে প্রকল্পগুলির ভৌগোলিক বিস্তার, সক্রিয় এবং সমাপ্ত হওয়া প্রকল্পগুলি";
+    }
+    return "Geographic spread of projects across Bangladesh's divisions, highlighting active and completed projects.";
+};
+
+export const getImplementingAgenciesTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাস্তবায়নকারী সংস্থাগুলি";
+    }
+    return "Implementing Agencies";
+};
+
+export const getExecutingAgenciesTransliteration = (language) => {
+    if (language === "bn") {
+        return "নির্বাহী সংস্থাগুলি";
+    }
+    return "Executing Agencies";
+};
+
+export const getAllStatusTransliteration = (language) => {
+    if (language === "bn") {
+        return "সকল স্ট্যাটাস";
+    }
+    return "All Status";
+};
+
+export const getAllCategoriesTransliteration = (language) => {
+    if (language === "bn") {
+        return "সকল ক্যাটাগরি";
+    }
+    return "All Categories";
+};
+
+export const getAllImplementingEntitiesTransliteration = (language) => {
+    if (language === "bn") {
+        return "সকল বাস্তবায়নকারী সংস্থা";
+    }
+    return "All Implementing Entities";
+};
+
+export const getAllExecutingAgenciesTransliteration = (language) => {
+    if (language === "bn") {
+        return "সকল নির্বাহী সংস্থা";
+    }
+    return "All Executing Agencies";
 };
 
 export const getInsightsTransliteration = (language) => {

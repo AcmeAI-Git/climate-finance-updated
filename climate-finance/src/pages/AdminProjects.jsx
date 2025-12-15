@@ -3,8 +3,15 @@ import { FolderTree, CheckCircle } from "lucide-react";
 import AdminListPage from "../features/admin/AdminListPage";
 import { projectApi, agencyApi, deliveryPartnerApi, fundingSourceApi } from "../services/api";
 import { getChartTranslation } from "../utils/chartTranslations";
+import { useLanguage } from "../context/LanguageContext";
+import { 
+    getAllStatusTransliteration,
+    getAllImplementingEntitiesTransliteration,
+    getAllExecutingAgenciesTransliteration
+} from "../utils/transliteration";
 
 const AdminProjects = () => {
+    const { language } = useLanguage();
     const [projectsList, setProjectsList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [implementingEntities, setImplementingEntities] = useState([]);
@@ -193,9 +200,13 @@ const AdminProjects = () => {
             key: "status",
             defaultValue: "All",
             options: [
-                { value: "All", label: "All Status" },
+                { value: "All", label: getAllStatusTransliteration(language) },
                 ...statuses.map((status) => ({ value: status, label: status })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         
         if (sectors.length > 0) {
@@ -246,18 +257,26 @@ const AdminProjects = () => {
             key: "implementing_entity_id",
             defaultValue: "All",
             options: [
-                { value: "All", label: "All Implementing Entities" },
+                { value: "All", label: getAllImplementingEntitiesTransliteration(language) },
                 ...implementingEntities.map((e) => ({ value: e.id || e.agency_id, label: e.name })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         
         filters.push({
             key: "executing_agency_id",
             defaultValue: "All",
             options: [
-                { value: "All", label: "All Executing Agencies" },
+                { value: "All", label: getAllExecutingAgenciesTransliteration(language) },
                 ...executingAgencies.map((a) => ({ value: a.id || a.agency_id, label: a.name })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         
         // Always show delivery partner filter if there are any projects

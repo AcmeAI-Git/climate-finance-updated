@@ -6,6 +6,10 @@ import SingleSlider from "../../components/ui/SingleSlider";
 import { sdgList } from "../../constants/sdgList";
 import { formFieldDescriptions } from "../../constants/formFieldDescriptions";
 import { useLanguage } from "../../context/LanguageContext";
+import {
+    getImplementingAgenciesTransliteration,
+    getExecutingAgenciesTransliteration,
+} from "../../utils/transliteration";
 
 const ProjectFormSections = ({
     formData,
@@ -186,8 +190,8 @@ const ProjectFormSections = ({
         <>
             {/* Implementing Entities */}
             <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Implementing Entities
+                <h3 className="text-lg font-medium text-gray-900 mb-4 notranslate" translate="no">
+                    {getImplementingAgenciesTransliteration(language)}
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
                     {formFieldDescriptions.implementing_entities || "Organizations that provide funding and oversight for the project"}
@@ -208,8 +212,8 @@ const ProjectFormSections = ({
 
             {/* Executing Agencies */}
             <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Executing Agencies
+                <h3 className="text-lg font-medium text-gray-900 mb-4 notranslate" translate="no">
+                    {getExecutingAgenciesTransliteration(language)}
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
                     {formFieldDescriptions.executing_agencies || "Organizations responsible for executing the project activities"}

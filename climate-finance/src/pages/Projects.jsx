@@ -26,6 +26,11 @@ import MultiSelect from "../components/ui/MultiSelect";
 import { useLanguage } from "../context/LanguageContext";
 import { translateChartData, getChartTitle } from "../utils/chartTranslations";
 import { chartDescriptions } from "../constants/chartDescriptions";
+import { 
+    getAllStatusTransliteration,
+    getAllImplementingEntitiesTransliteration,
+    getAllExecutingAgenciesTransliteration
+} from "../utils/transliteration";
 
 const Transliteration = (type, language) => {
     if (language === "bn") {
@@ -420,9 +425,13 @@ const Projects = () => {
             key: "status",
             label: "Status",
             options: [
-                { value: "All", label: "All Status" },
+                { value: "All", label: getAllStatusTransliteration(language) },
                 ...statuses.map((status) => ({ value: status, label: status })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         
         if (sectors.length > 0) {
@@ -499,12 +508,16 @@ const Projects = () => {
             key: "implementing_entity_id",
             label: "Implementing Entity",
             options: [
-                { value: "All", label: "All Implementing Entities" },
+                { value: "All", label: getAllImplementingEntitiesTransliteration(language) },
                 ...filteredImplementingEntities.map((e) => ({ 
                     value: e.id || e.agency_id, 
                     label: e.name 
                 })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         // Filter executing agencies to only show those actually used in projects
         // Convert to strings for comparison to handle number/string mismatches
@@ -536,12 +549,16 @@ const Projects = () => {
             key: "executing_agency_id",
             label: "Executing Agency",
             options: [
-                { value: "All", label: "All Executing Agencies" },
+                { value: "All", label: getAllExecutingAgenciesTransliteration(language) },
                 ...filteredExecutingAgencies.map((a) => ({ 
                     value: a.id || a.agency_id, 
                     label: a.name 
                 })),
             ],
+            selectProps: {
+                className: "notranslate",
+                translate: "no"
+            }
         });
         // Always show delivery partner filter if there are any projects
         if (deliveryPartners.length > 0 || hasProjectsWithoutDeliveryPartners) {

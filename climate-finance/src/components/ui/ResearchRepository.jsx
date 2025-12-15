@@ -11,10 +11,13 @@ import {
 } from "lucide-react";
 import { RepositoryApi, downloadDocumentApi } from "../../services/api";
 import Pagination from "./Pagination";
-import { formatCategoryToTitleCase } from "../../utils/transliteration";
+import { formatCategoryToTitleCase, getAllCategoriesTransliteration } from "../../utils/transliteration";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ResearchRepository() {
+    const { language } = useLanguage();
     const [searchTerm, setSearchTerm] = useState("");
+    const allCategoriesLabel = getAllCategoriesTransliteration(language);
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
     const [selectedOrganization, setSelectedOrganization] = useState("All Organizations");
     const [selectedYear, setSelectedYear] = useState("All Years");
@@ -173,11 +176,12 @@ export default function ResearchRepository() {
                                 onChange={(e) =>
                                     setSelectedCategory(e.target.value)
                                 }
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none cursor-pointer bg-white notranslate"
+                                translate="no"
                             >
                                 {categories.map((cat) => (
-                                    <option key={cat} value={cat}>
-                                        {cat === "All Categories" ? cat : formatCategoryToTitleCase(cat)}
+                                    <option key={cat} value={cat} className={cat === "All Categories" ? "notranslate" : ""} translate={cat === "All Categories" ? "no" : undefined}>
+                                        {cat === "All Categories" ? allCategoriesLabel : formatCategoryToTitleCase(cat)}
                                     </option>
                                 ))}
                             </select>
