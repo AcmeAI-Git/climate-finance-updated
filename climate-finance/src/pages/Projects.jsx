@@ -29,7 +29,9 @@ import { chartDescriptions } from "../constants/chartDescriptions";
 import { 
     getAllStatusTransliteration,
     getAllImplementingEntitiesTransliteration,
-    getAllExecutingAgenciesTransliteration
+    getAllExecutingAgenciesTransliteration,
+    getEquityMarkerTransliteration,
+    getAllEquityMarkersTransliteration
 } from "../utils/transliteration";
 
 const Transliteration = (type, language) => {
@@ -620,14 +622,18 @@ const Projects = () => {
         if (equityMarkers.length > 0) {
             filters.push({
                 key: "equity_marker",
-                label: "Equity Marker",
+                label: getEquityMarkerTransliteration(language),
                 options: [
-                    { value: "All", label: "All Equity Markers" },
+                    { value: "All", label: getAllEquityMarkersTransliteration(language) },
                     ...equityMarkers.map((marker) => ({
                         value: marker,
                         label: marker.charAt(0).toUpperCase() + marker.slice(1),
                     })),
                 ],
+                selectProps: {
+                    className: "notranslate",
+                    translate: "no"
+                }
             });
         }
 

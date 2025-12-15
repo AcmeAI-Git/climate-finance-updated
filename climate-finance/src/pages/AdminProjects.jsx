@@ -7,7 +7,8 @@ import { useLanguage } from "../context/LanguageContext";
 import { 
     getAllStatusTransliteration,
     getAllImplementingEntitiesTransliteration,
-    getAllExecutingAgenciesTransliteration
+    getAllExecutingAgenciesTransliteration,
+    getAllEquityMarkersTransliteration
 } from "../utils/transliteration";
 
 const AdminProjects = () => {
@@ -342,12 +343,16 @@ const AdminProjects = () => {
                 key: "equity_marker",
                 defaultValue: "All",
                 options: [
-                    { value: "All", label: "All Equity Markers" },
+                    { value: "All", label: getAllEquityMarkersTransliteration(language) },
                     ...equityMarkers.map((marker) => ({
                         value: marker,
                         label: marker.charAt(0).toUpperCase() + marker.slice(1),
                     })),
                 ],
+                selectProps: {
+                    className: "notranslate",
+                    translate: "no"
+                }
             });
         }
 

@@ -112,6 +112,83 @@ export const getAllExecutingAgenciesTransliteration = (language) => {
     return "All Executing Agencies";
 };
 
+export const getSelectImplementingEntitiesTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাস্তবায়নকারী সংস্থা নির্বাচন করুন";
+    }
+    return "Select Implementing Entities";
+};
+
+export const getSelectExecutingAgenciesTransliteration = (language) => {
+    if (language === "bn") {
+        return "নির্বাহী সংস্থা নির্বাচন করুন";
+    }
+    return "Select Executing Agencies";
+};
+
+export const getAddImplementingEntityTransliteration = (language) => {
+    if (language === "bn") {
+        return "বাস্তবায়নকারী সংস্থা যোগ করুন";
+    }
+    return "Add Implementing Entity";
+};
+
+export const getAddExecutingAgencyTransliteration = (language) => {
+    if (language === "bn") {
+        return "নির্বাহী সংস্থা যোগ করুন";
+    }
+    return "Add Executing Agency";
+};
+
+export const getGenderAndEquityTransliteration = (language) => {
+    if (language === "bn") {
+        return "জেন্ডার অ্যান্ড ইক্যুইটি";
+    }
+    return "Gender & Equity";
+};
+
+export const getGenderInclusionTransliteration = (language) => {
+    if (language === "bn") {
+        return "জেন্ডার অন্তর্ভুক্তি";
+    }
+    return "Gender Inclusion";
+};
+
+export const getEquityMarkerTransliteration = (language) => {
+    if (language === "bn") {
+        return "ইক্যুইটি মার্কার";
+    }
+    return "Equity Marker";
+};
+
+export const getAllEquityMarkersTransliteration = (language) => {
+    if (language === "bn") {
+        return "সকল ইক্যুইটি মার্কার";
+    }
+    return "All Equity Markers";
+};
+
+export const getEquityMarkerLevelTransliteration = (language) => {
+    if (language === "bn") {
+        return "ইক্যুইটি মার্কার লেভেল";
+    }
+    return "Equity Marker Level";
+};
+
+export const getEquityMarkerDescriptionTransliteration = (language) => {
+    if (language === "bn") {
+        return "ইক্যুইটি মার্কার বিবরণ";
+    }
+    return "Equity Marker Description";
+};
+
+export const getEquityDescriptionTransliteration = (language) => {
+    if (language === "bn") {
+        return "ইক্যুইটি বিবরণ";
+    }
+    return "Equity Description";
+};
+
 export const getInsightsTransliteration = (language) => {
     if (language === "bn") {
         return "বিস্তারিত প্রতিবেদন এবং এ্যানালাইসিস করুন";

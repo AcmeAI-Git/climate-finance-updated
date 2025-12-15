@@ -58,13 +58,14 @@ const CheckboxGroup = ({
       {/* Header with label and optional add button */}
       <div className="flex items-center justify-between mb-3">
         {label && (
-          <label className="block text-sm font-medium text-gray-700">{label}</label>
+          <label className="block text-sm font-medium text-gray-700 notranslate" translate="no">{label}</label>
         )}
         {onAddNew && (
           <button
             type="button"
             onClick={onAddNew}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md transition-all duration-200"
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md transition-all duration-200 notranslate"
+            translate="no"
           >
             <Plus size={12} />
             {addButtonText}

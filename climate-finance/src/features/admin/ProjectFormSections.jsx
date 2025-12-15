@@ -9,6 +9,14 @@ import { useLanguage } from "../../context/LanguageContext";
 import {
     getImplementingAgenciesTransliteration,
     getExecutingAgenciesTransliteration,
+    getSelectImplementingEntitiesTransliteration,
+    getSelectExecutingAgenciesTransliteration,
+    getAddImplementingEntityTransliteration,
+    getAddExecutingAgencyTransliteration,
+    getGenderAndEquityTransliteration,
+    getEquityMarkerTransliteration,
+    getEquityMarkerLevelTransliteration,
+    getEquityMarkerDescriptionTransliteration,
 } from "../../utils/transliteration";
 
 const ProjectFormSections = ({
@@ -197,7 +205,7 @@ const ProjectFormSections = ({
                     {formFieldDescriptions.implementing_entities || "Organizations that provide funding and oversight for the project"}
                 </p>
                 <CheckboxGroup
-                    label="Select Implementing Entities"
+                    label={getSelectImplementingEntitiesTransliteration(language)}
                     options={implementingEntities || []}
                     selectedValues={formData.implementing_entity_ids || []}
                     onChange={(values) =>
@@ -206,7 +214,7 @@ const ProjectFormSections = ({
                     getOptionId={(entity) => entity.id || entity.agency_id}
                     getOptionLabel={(entity) => entity.name}
                     onAddNew={handleAddAgency}
-                    addButtonText="Add Implementing Entity"
+                    addButtonText={getAddImplementingEntityTransliteration(language)}
                 />
             </div>
 
@@ -219,7 +227,7 @@ const ProjectFormSections = ({
                     {formFieldDescriptions.executing_agencies || "Organizations responsible for executing the project activities"}
                 </p>
                 <CheckboxGroup
-                    label="Select Executing Agencies"
+                    label={getSelectExecutingAgenciesTransliteration(language)}
                     options={executingAgencies || []}
                     selectedValues={formData.executing_agency_ids || []}
                     onChange={(values) =>
@@ -228,7 +236,7 @@ const ProjectFormSections = ({
                     getOptionId={(agency) => agency.id || agency.agency_id}
                     getOptionLabel={(agency) => agency.name}
                     onAddNew={handleAddAgency}
-                    addButtonText="Add Executing Agency"
+                    addButtonText={getAddExecutingAgencyTransliteration(language)}
                 />
             </div>
 
@@ -588,8 +596,8 @@ const ProjectFormSections = ({
 
             {/* Gender & Inclusion */}
             <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Gender & Inclusion
+                <h3 className="text-lg font-medium text-gray-900 mb-4 notranslate" translate="no">
+                    {getGenderAndEquityTransliteration(language)}
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
                     {formFieldDescriptions.gender_inclusion}
@@ -609,16 +617,16 @@ const ProjectFormSections = ({
 
             {/* Equity Marker */}
             <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Equity Marker
+                <h3 className="text-lg font-medium text-gray-900 mb-4 notranslate" translate="no">
+                    {getEquityMarkerTransliteration(language)}
                 </h3>
                 <p className="text-sm text-gray-500 mb-2 font-medium italic">
                     {formFieldDescriptions.equity_marker}
                 </p>
                 <div className="bg-linear-to-br from-white to-gray-50 border-0 rounded-2xl p-6 shadow-sm">
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                            Equity Marker Level
+                        <label className="block text-sm font-medium text-gray-700 mb-3 notranslate" translate="no">
+                            {getEquityMarkerLevelTransliteration(language)}
                         </label>
                         <div className="flex space-x-6">
                             {['Strong', 'Partial', 'Weak'].map((level) => (
@@ -642,8 +650,8 @@ const ProjectFormSections = ({
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Equity Marker Description
+                        <label className="block text-sm font-medium text-gray-700 mb-2 notranslate" translate="no">
+                            {getEquityMarkerDescriptionTransliteration(language)}
                         </label>
                         <p className="text-sm text-gray-500 mb-2 font-medium italic">
                             {formFieldDescriptions.equity_marker_description}

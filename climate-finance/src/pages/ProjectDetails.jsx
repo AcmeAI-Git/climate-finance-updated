@@ -26,6 +26,10 @@ import { useLanguage } from "../context/LanguageContext";
 import {
     getImplementingAgenciesTransliteration,
     getExecutingAgenciesTransliteration,
+    getGenderAndEquityTransliteration,
+    getGenderInclusionTransliteration,
+    getEquityMarkerTransliteration,
+    getEquityDescriptionTransliteration,
 } from "../utils/transliteration";
 
 // Base URL for file downloads
@@ -56,9 +60,21 @@ const ProjectDetails = () => {
 
             const projectData = projectResponse.data;
 
+            // Normalize location_segregation - ensure it's a string, not an object
+            let normalizedLocationSegregation = projectData.location_segregation;
+            if (normalizedLocationSegregation && typeof normalizedLocationSegregation === 'object') {
+                // If it's an object (like {}), convert to null
+                normalizedLocationSegregation = null;
+            } else if (normalizedLocationSegregation && typeof normalizedLocationSegregation === 'string' && normalizedLocationSegregation.trim() === '') {
+                // If it's an empty string, convert to null
+                normalizedLocationSegregation = null;
+            }
+
             // Prefer full related objects when they exist (mock API sometimes returns both IDs and full objects)
             const enrichedProject = {
                 ...projectData,
+                // Normalize location_segregation
+                location_segregation: normalizedLocationSegregation,
                 // New agency types
                 projectImplementingEntities:
                     projectData.projectImplementingEntities || projectData.implementing_entities || [],
@@ -655,14 +671,14 @@ const ProjectDetails = () => {
 
                     {/* Gender & Equity */}
                     <Card padding="p-4 sm:p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Gender & Equity
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 notranslate" translate="no">
+                            {getGenderAndEquityTransliteration(language)}
                         </h3>
                         <div className="space-y-6">
                             {project.gender_inclusion && (
                                 <div>
-                                    <div className="text-md text-gray-600 font-semibold mb-1">
-                                        Gender Inclusion
+                                    <div className="text-md text-gray-600 font-semibold mb-1 notranslate" translate="no">
+                                        {getGenderInclusionTransliteration(language)}
                                     </div>
                                     <div className="text-sm text-gray-700">
                                         {project.gender_inclusion}
@@ -671,8 +687,8 @@ const ProjectDetails = () => {
                             )}
                             {project.equity_marker && (
                                 <div>
-                                    <div className="text-md text-gray-600 font-semibold mb-1">
-                                        Equity Marker
+                                    <div className="text-md text-gray-600 font-semibold mb-1 notranslate" translate="no">
+                                        {getEquityMarkerTransliteration(language)}
                                     </div>
                                     <div className="text-sm text-gray-700 capitalize">
                                         {project.equity_marker}
@@ -681,8 +697,8 @@ const ProjectDetails = () => {
                             )}
                             {project.equity_marker_description && (
                                 <div>
-                                    <div className="text-sm text-gray-600 font-medium mb-1">
-                                        Equity Description
+                                    <div className="text-sm text-gray-600 font-medium mb-1 notranslate" translate="no">
+                                        {getEquityDescriptionTransliteration(language)}
                                     </div>
                                     <div className="text-sm text-gray-700">
                                         {project.equity_marker_description}
