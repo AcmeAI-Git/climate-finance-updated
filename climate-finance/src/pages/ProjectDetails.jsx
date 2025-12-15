@@ -768,7 +768,10 @@ const ProjectDetails = () => {
                                         </div>
                                     </div>
                                 )}
-                                {project.location_segregation && (
+                                {project.location_segregation && 
+                                 typeof project.location_segregation === 'string' && 
+                                 project.location_segregation.trim() !== '' &&
+                                 ['Rural', 'Urban', 'Both'].includes(project.location_segregation) && (
                                     <div>
                                         <div className="text-md text-gray-600 font-semibold mb-1">
                                             Location Segregation
